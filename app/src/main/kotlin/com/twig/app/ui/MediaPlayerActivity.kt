@@ -389,6 +389,10 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
                             queueIndex in 0 until queue.size - 1
                         ) {
                             playAt(queueIndex + 1)
+                        } else {
+                            // Nothing plays next: leave instead of parking on the last frame.
+                            // onPause/onDestroy save the (end) position as usual.
+                            finish()
                         }
                     }
                     else -> {}
