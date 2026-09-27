@@ -54,7 +54,7 @@ object MediaSources {
         val shared = BufferedRandomSource(FsRegistry.of(file).openRandom(file))
         val factory = DataSource.Factory { RandomSourceDataSource(shared) }
         val src = ProgressiveMediaSource.Factory(factory, extractors())
-            .createMediaSource(MediaItem.fromUri("twig:///media.${file.extension}"))
+            .createMediaSource(MediaItem.fromUri("twig:///media.${com.twig.app.OpenFiles.typeExt(file)}"))
         return src to shared
     }
 
@@ -72,6 +72,6 @@ object MediaSources {
         }
         val factory = DataSource.Factory { LazyRandomDataSource { AudioCache.source(file) } }
         return ProgressiveMediaSource.Factory(factory)
-            .createMediaSource(MediaItem.fromUri("twig:///media.${file.extension}"))
+            .createMediaSource(MediaItem.fromUri("twig:///media.${com.twig.app.OpenFiles.typeExt(file)}"))
     }
 }

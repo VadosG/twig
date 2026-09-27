@@ -491,7 +491,7 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
         // and won't continue updating the UI.
         lifecycleScope.launch {
             try {
-                if (file.extension == "m2ts") {
+                if (OpenFiles.typeExt(file) == "m2ts") {
                     prepareM2ts(p, file)
                 } else if (file.scheme == "file") {
                     p.setMediaItem(MediaItem.fromUri(Uri.fromFile(java.io.File(file.path))))

@@ -40,7 +40,13 @@ object FileIcons {
     /** Target edge for a decoded [bundleIcon]; the largest row icon is well under this. */
     private const val ICON_PX = 128
 
-    fun baseIconRes(file: XFile): Int = when {
+    fun baseIconRes(file: XFile): Int {
+        // Extensionless file whose head was already read: iconed as what it turned out to be.
+        val sniffed = com.twig.app.FileSniff.cached(file)
+        return if (sniffed.isNullOrEmpty()) byName(file) else byName(com.twig.app.FileSniff.typedTwin(file, sniffed))
+    }
+
+    private fun byName(file: XFile): Int = when {
         // Entries in the "Apps" tree (.apk / .xapk for split APKs) uniformly use the apk icon as the base,
         // the real app icon is fetched live from PackageManager below by "pkg:" key (filled in async, doesn't go through the thumbnail pipeline)
         file.scheme == com.twig.app.AppsFileSystem.SCHEME -> R.drawable.ic_file_apk
@@ -138,9 +144,31 @@ object FileIcons {
             OpenFiles.isApk(file) && file.scheme == "file" -> file.path
             OpenFiles.isApkBundle(file) && file.scheme == "file" -> "bundle:${file.path}"
             base == R.drawable.ic_file && file.extension.isNotEmpty() -> "ext:${file.extension}"
+            base == R.drawable.ic_file && sniffOnBind(file) -> return sniff(view, file)
             else -> { view.tag = null; return }
         }
         fill(view, key)
+    }
+
+    /**
+     * Extensionless files get their head read at bind time only where that is a local read:
+     * a directory of them over the network (git objects, a restic repo) would be one round
+     * trip per row. There the type is learned when the file is tapped
+     * (`PaneFragment.open`), and the row picks it up on its next bind.
+     */
+    private fun sniffOnBind(file: XFile): Boolean =
+        com.twig.app.FileSniff.applies(file) && file.size > 0 &&
+            (file.scheme == "file" || file.scheme == "saf") &&
+            com.twig.app.FileSniff.cached(file) == null
+
+    private fun sniff(view: ImageView, file: XFile) {
+        val key = "sniff:${file.scheme}:${file.path}"
+        view.tag = key
+        executor.execute {
+            if (com.twig.app.FileSniff.sniff(file) == null) return@execute
+            val res = baseIconRes(file)
+            main.post { if (view.tag == key) view.setImageResource(res) }
+        }
     }
 
     /**

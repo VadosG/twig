@@ -369,6 +369,8 @@ class PaneFragment : Fragment() {
         if (host?.onPickFile(file) == true) return // Picker mode: tap selects, doesn't open.
         if (file.scheme.startsWith("git")) return openGitEntry(file)
         viewModel.noteOpenedIn(file) // Recent records the containing directory, not the file itself.
+        // No extension: nothing below can match by name, so read the head first (see FileSniff).
+        if (com.twig.app.FileSniff.applies(file) && file.scheme != AppsFileSystem.SCHEME) return openSniffed(file)
         when {
             // App entry: tapping launches the app (tapping "install yourself" is meaningless — the system would only say the same version is installed);
             // entries without a launch entry (most system apps) fall back to the app info page so a tap never does nothing.
@@ -390,6 +392,43 @@ class PaneFragment : Fragment() {
                 MediaPlayerActivity.start(requireContext(), file)
             // No built-in viewer: pop the system resolver directly (with "Just once / Always"); if nothing can open it, fall back to the open-with dialog.
             else -> if (!OpenFiles.openWith(requireContext(), file)) chooseOpen(file)
+        }
+    }
+
+    /**
+     * Extensionless file: sniff its head (one small read, off the main thread) and open it with
+     * the built-in viewer for what it turned out to be; anything unrecognised takes the same
+     * route as an unknown extension. Opened on its own — the sibling lists (image paging, the
+     * music queue) are built by extension and would not contain it.
+     */
+    private fun openSniffed(file: XFile) {
+        val ctx = requireContext()
+        val wasKnown = com.twig.app.FileSniff.cached(file) != null
+        viewLifecycleOwner.lifecycleScope.launch {
+            val ext = withContext(Dispatchers.IO) { com.twig.app.FileSniff.sniff(file) }
+            // A network row is not sniffed at bind time (FileIcons.sniffOnBind); now that the
+            // type is known, redraw it so the icon says what the file is.
+            if (!wasKnown && ext != null && ::adapter.isInitialized) {
+                val i = adapter.currentList.indexOfFirst {
+                    it is PaneViewModel.FileNode && it.file.scheme == file.scheme && it.file.path == file.path
+                }
+                if (i >= 0) adapter.notifyItemChanged(i)
+            }
+            val typed = ext?.let { com.twig.app.FileSniff.typedTwin(file, it) }
+            when {
+                typed == null -> if (!OpenFiles.openWith(ctx, file)) chooseOpen(file)
+                OpenFiles.canViewPdf(typed) -> PdfViewerActivity.start(ctx, file)
+                OpenFiles.isText(typed) -> TextViewerActivity.start(ctx, file)
+                OpenFiles.isImage(typed) -> {
+                    awaitingImageResult = true
+                    ImageViewerActivity.start(ctx, listOf(file), 0)
+                }
+                // Straight to the player rather than the music queue: the queue is rebuilt
+                // from its tracks' names, which would not say "audio".
+                OpenFiles.isAudio(typed) -> MediaPlayerActivity.start(ctx, file)
+                OpenFiles.isVideo(typed) -> MediaPlayerActivity.start(ctx, file, asVideo = true)
+                else -> if (!OpenFiles.openWith(ctx, file)) chooseOpen(file)
+            }
         }
     }
 

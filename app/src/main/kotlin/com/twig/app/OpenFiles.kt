@@ -47,6 +47,9 @@ object OpenFiles {
 
     fun isText(file: XFile): Boolean = !file.isDir && file.extension in TEXT_EXT
 
+    /** [XFile.extension], or for an extensionless file whatever [FileSniff] already found in its head. */
+    fun typeExt(file: XFile): String = file.extension.ifEmpty { FileSniff.cached(file).orEmpty() }
+
     /** markdown/html: openable via [com.twig.app.ui.TextViewerActivity] preview mode (WebView render). */
     fun isPreviewable(file: XFile): Boolean = !file.isDir && file.extension in PREVIEW_EXT
 
