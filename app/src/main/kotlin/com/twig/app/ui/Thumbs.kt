@@ -284,8 +284,21 @@ object Thumbs {
         }
     }
 
-    fun canThumb(f: XFile): Boolean =
-        if (f.isDir) {
+    /**
+     * An extensionless file that [com.twig.app.FileSniff] has already identified, seen under the
+     * extension it turned out to have; anything else unchanged. ★ Only the cache is consulted —
+     * this pipeline never reads a head itself. The row icon's bind-time sniff (local sources) or
+     * the user opening the file (network ones) fills it, so the thumbnail shows up the next time
+     * the row binds (collapse and expand again), and an unopened network file costs nothing.
+     * The cache key stays on the real file ([keyOf]); only type decisions use this.
+     */
+    private fun typed(f: XFile): XFile =
+        com.twig.app.FileSniff.cached(f)?.takeIf { it.isNotEmpty() }
+            ?.let { com.twig.app.FileSniff.typedTwin(f, it) } ?: f
+
+    fun canThumb(file: XFile): Boolean {
+        val f = typed(file)
+        return if (f.isDir) {
             // Directories normally have no thumbnail, but media-server
             // episodes/albums/photo-albums **are themselves directories**, and they
             // have ready-made posters (see [hasCover]). Sorting is unaffected: in
@@ -296,6 +309,7 @@ object Thumbs {
             OpenFiles.isImage(f) || OpenFiles.isVideo(f) || OpenFiles.isAudio(f) ||
                 f.extension == "pdf" || hasCover(f)
         }
+    }
 
     /** Whatever is already sitting in the in-memory cache for this file, with no generation
      * triggered — used when pinning a desktop shortcut, which wants "reuse what the row is
@@ -308,7 +322,8 @@ object Thumbs {
         runCatching { FsRegistry.of(f) is com.twig.core.CoverSource }.getOrDefault(false)
 
     /** Pre-check whether this file has any chance of generating successfully; network-source PDFs inevitably fail (require a real, locally random-accessible file), not worth queuing in the background thread pool — otherwise they'd block behind slower network image downloads in the same pool, just queueing pointlessly. Videos obey the "generate thumbnails for network files" toggle (just like images, going over the network means real bandwidth), unlike PDFs which are fundamentally unable to do it. */
-    private fun eligible(ctx: Context, file: XFile): Boolean {
+    private fun eligible(ctx: Context, raw: XFile): Boolean {
+        val file = typed(raw)
         val localish = file.scheme == "file" || file.scheme == "saf"
         return when {
             // ★ Covers are NOT constrained by the "generate thumbnails for network
@@ -542,7 +557,7 @@ object Thumbs {
         // Image itself is already ≤256: no need to save a separate thumbnail file
         // (saves disk + avoids a second lossy JPEG pass), hand the decode result
         // straight to the memory cache.
-        if (OpenFiles.isImage(file) && maxOf(raw.width, raw.height) <= MAX_EDGE) return raw
+        if (OpenFiles.isImage(typed(file)) && maxOf(raw.width, raw.height) <= MAX_EDGE) return raw
         val bmp = scaleTo(raw)
         val png = bmp.hasAlpha()
         val bytes = ByteArrayOutputStream().let { bos ->
@@ -570,7 +585,9 @@ object Thumbs {
         null
     }
 
-    private fun genFallback(ctx: Context, file: XFile): Bitmap? = when {
+    private fun genFallback(ctx: Context, raw: XFile): Bitmap? = genByType(ctx, typed(raw))
+
+    private fun genByType(ctx: Context, file: XFile): Bitmap? = when {
         OpenFiles.isImage(file) -> genImage(ctx, file)
         OpenFiles.isVideo(file) -> genVideo(ctx, file)
         OpenFiles.isAudio(file) -> genAudio(file)

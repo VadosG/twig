@@ -13,11 +13,12 @@ import java.util.concurrent.ConcurrentHashMap
  * if that is "anything"; second-guessing a name the user (or a program) chose costs more in
  * surprises than it wins. An extensionless file said nothing, so its bytes are the only answer.
  *
- * Deliberately left out:
- * - archives and apks — whether a row expands in the tree is decided by extension in
- *   `Archives` / `PaneViewModel.expandableArchive`, and an archive icon on a row that does
- *   not expand is a lie;
- * - thumbnails — [com.twig.app.ui.Thumbs] still goes by the name alone (not wanted yet).
+ * Deliberately left out: archives and apks — whether a row expands in the tree is decided by
+ * extension in `Archives` / `PaneViewModel.expandableArchive`, and an archive icon on a row
+ * that does not expand is a lie.
+ *
+ * Who sniffs: the row icon at bind time (local sources only) and a tap on the file. Thumbnails
+ * only ever read the cache ([com.twig.app.ui.Thumbs]), so they follow one bind later.
  *
  * Results are cached per file (including "nothing recognised") so the icon of an extensionless
  * row is sniffed once, not on every bind.
