@@ -356,6 +356,7 @@
     <string name="open_with_external">用其他应用打开</string>
     <string name="open_hex">十六进制查看</string>
     <string name="open_text">文本查看</string>
+    <string name="open_video">视频播放</string>
     <string name="open_as_archive">以压缩包方式打开</string>
     <string name="viewer_theme">配色</string>
     <string name="viewer_wrap">自动换行</string>

@@ -57,6 +57,7 @@ class OpenShortcutActivity : AppCompatActivity() {
         const val MODE_AUTO = "auto"
         const val MODE_TEXT = "text"
         const val MODE_HEX = "hex"
+        const val MODE_VIDEO = "video"
         /** Always opens with the one app chosen when the shortcut was pinned (see
          * [PaneFragment.pickAppForShortcut]) — a shortcut has no chance to show the system
          * resolver on every tap, so that choice is made once, up front, not at open time. */
@@ -133,6 +134,7 @@ class OpenShortcutActivity : AppCompatActivity() {
         when (mode) {
             MODE_TEXT -> TextViewerActivity.start(this, file, preview = false)
             MODE_HEX -> HexViewerActivity.start(this, file)
+            MODE_VIDEO -> MediaPlayerActivity.start(this, file, asVideo = true)
             // component is always set when this shortcut was pinned through the picker; the
             // chooser fallback only covers a shortcut somehow pinned without one.
             MODE_EXTERNAL -> {

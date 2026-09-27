@@ -359,6 +359,7 @@
     <string name="open_with_external">Open with other app</string>
     <string name="open_hex">View as hex</string>
     <string name="open_text">View as text</string>
+    <string name="open_video">View as video</string>
     <string name="open_as_archive">Open as archive</string>
     <string name="viewer_theme">Color scheme</string>
     <string name="viewer_wrap">Word wrap</string>

@@ -458,6 +458,9 @@ class PaneFragment : Fragment() {
         actions.item(getString(R.string.open_hex), R.drawable.ic_file) {
             HexViewerActivity.start(requireContext(), file)
         }
+        actions.item(getString(R.string.open_video), R.drawable.ic_file_video) {
+            MediaPlayerActivity.start(requireContext(), file, asVideo = true)
+        }
         showActionMenu(requireContext(), getString(R.string.open_how), actions)
     }
 
@@ -1749,7 +1752,7 @@ class PaneFragment : Fragment() {
     /**
      * Desktop shortcut for a single file: unlike [pinFileShortcut] (which just reveals a
      * directory in the tree), tapping this one opens the file directly — so first ask how:
-     * automatic dispatch (the default), as text, as hex, or with one specific app chosen
+     * automatic dispatch (the default), as text, as hex, as video, or with one specific app chosen
      * right now ([pickAppForShortcut] — not the in-app "Open with" menu's resolver, which
      * can re-ask on every tap; a shortcut can't do that, so the choice is made once here).
      */
@@ -1767,6 +1770,9 @@ class PaneFragment : Fragment() {
         }
         actions.item(getString(R.string.open_hex), R.drawable.ic_file) {
             pinFileShortcutWithMode(file, OpenShortcutActivity.MODE_HEX)
+        }
+        actions.item(getString(R.string.open_video), R.drawable.ic_file_video) {
+            pinFileShortcutWithMode(file, OpenShortcutActivity.MODE_VIDEO)
         }
         actions.item(getString(R.string.open_with_app), R.drawable.ic_open_with) {
             pickAppForShortcut(file)

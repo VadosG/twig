@@ -211,7 +211,7 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
         // judged false (no surface bound, only sound remains), and MediaSources's `twig:///media.<ext>`
         // also loses its extension (container recognition degrades to sniff order)
         file = XFile(scheme, path, isDir = false, size = size, displayName = name)
-        isVideo = OpenFiles.isVideo(file)
+        isVideo = intent.getBooleanExtra(EXTRA_AS_VIDEO, false) || OpenFiles.isVideo(file)
         loadMemo()
 
         b.toolbar.title = name
@@ -1606,14 +1606,20 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
         private const val EXTRA_PATH = "path"
         private const val EXTRA_NAME = "name"
         private const val EXTRA_SIZE = "size"
+        private const val EXTRA_AS_VIDEO = "asVideo"
 
-        fun start(context: Context, file: XFile) {
+        /** [asVideo]: the user chose "View as video" — treat the file as video whatever its
+         * extension says. An extension no extractor claims leaves the container to sniffing,
+         * which is what such a file needs anyway; and there is no episode queue: its siblings are judged
+         * by extension, so the file is not among them. */
+        fun start(context: Context, file: XFile, asVideo: Boolean = false) {
             context.startActivity(
                 Intent(context, MediaPlayerActivity::class.java).apply {
                     putExtra(EXTRA_SCHEME, file.scheme)
                     putExtra(EXTRA_PATH, file.path)
                     putExtra(EXTRA_NAME, file.name)
                     putExtra(EXTRA_SIZE, file.size)
+                    putExtra(EXTRA_AS_VIDEO, asVideo)
                 },
             )
         }
