@@ -370,7 +370,9 @@ class PaneFragment : Fragment() {
         if (file.scheme.startsWith("git")) return openGitEntry(file)
         viewModel.noteOpenedIn(file) // Recent records the containing directory, not the file itself.
         // No extension: nothing below can match by name, so read the head first (see FileSniff).
-        if (com.twig.app.FileSniff.applies(file) && file.scheme != AppsFileSystem.SCHEME) return openSniffed(file)
+        if (com.twig.app.FileSniff.applies(file) && file.scheme != AppsFileSystem.SCHEME &&
+            com.twig.app.Prefs.sniffTypes(requireContext())
+        ) return openSniffed(file)
         when {
             // App entry: tapping launches the app (tapping "install yourself" is meaningless — the system would only say the same version is installed);
             // entries without a launch entry (most system apps) fall back to the app info page so a tap never does nothing.
@@ -406,8 +408,8 @@ class PaneFragment : Fragment() {
         val wasKnown = com.twig.app.FileSniff.cached(file) != null
         viewLifecycleOwner.lifecycleScope.launch {
             val ext = withContext(Dispatchers.IO) { com.twig.app.FileSniff.sniff(file) }
-            // A network row is not sniffed at bind time (FileIcons.sniffOnBind); now that the
-            // type is known, redraw it so the icon says what the file is.
+            // Tapped before its bind-time sniff finished (or the row was never re-bound since):
+            // now that the type is known, redraw it so the icon says what the file is.
             if (!wasKnown && ext != null && ::adapter.isInitialized) {
                 val i = adapter.currentList.indexOfFirst {
                     it is PaneViewModel.FileNode && it.file.scheme == file.scheme && it.file.path == file.path

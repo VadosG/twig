@@ -287,9 +287,8 @@ object Thumbs {
     /**
      * An extensionless file that [com.twig.app.FileSniff] has already identified, seen under the
      * extension it turned out to have; anything else unchanged. ★ Only the cache is consulted —
-     * this pipeline never reads a head itself. The row icon's bind-time sniff (local sources) or
-     * the user opening the file (network ones) fills it, so the thumbnail shows up the next time
-     * the row binds (collapse and expand again), and an unopened network file costs nothing.
+     * this pipeline never reads a head itself. The row icon's bind-time sniff or a tap on the file
+     * fills it, and either one rebinds the row, which is when the thumbnail shows up.
      * The cache key stays on the real file ([keyOf]); only type decisions use this.
      */
     private fun typed(f: XFile): XFile =

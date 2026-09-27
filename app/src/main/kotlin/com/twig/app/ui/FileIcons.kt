@@ -12,6 +12,7 @@ import android.os.Looper
 import android.widget.ImageView
 import com.twig.app.Format
 import com.twig.app.OpenFiles
+import com.twig.app.Prefs
 import com.twig.app.R
 import com.twig.core.XFile
 import com.twig.fs.network.JellyfinFileSystem
@@ -134,7 +135,12 @@ object FileIcons {
         else -> R.drawable.ic_storage // local / SAF / unknown type
     }
 
-    fun bind(view: ImageView, file: XFile) {
+    /**
+     * @param onTyped called (main thread, row still showing [file]) once a bind-time sniff has
+     *   given an extensionless file a type — the row may now want a thumbnail, which only a
+     *   rebind lays out.
+     */
+    fun bind(view: ImageView, file: XFile, onTyped: (() -> Unit)? = null) {
         val base = baseIconRes(file)
         view.setImageResource(base)
         val key = when {
@@ -144,30 +150,40 @@ object FileIcons {
             OpenFiles.isApk(file) && file.scheme == "file" -> file.path
             OpenFiles.isApkBundle(file) && file.scheme == "file" -> "bundle:${file.path}"
             base == R.drawable.ic_file && file.extension.isNotEmpty() -> "ext:${file.extension}"
-            base == R.drawable.ic_file && sniffOnBind(file) -> return sniff(view, file)
+            base == R.drawable.ic_file && sniffOnBind(view.context, file) -> return sniff(view, file, onTyped)
             else -> { view.tag = null; return }
         }
         fill(view, key)
     }
 
     /**
-     * Extensionless files get their head read at bind time only where that is a local read:
-     * a directory of them over the network (git objects, a restic repo) would be one round
-     * trip per row. There the type is learned when the file is tapped
-     * (`PaneFragment.open`), and the row picks it up on its next bind.
+     * Extensionless files get their head read at bind time, on every source, when the user has
+     * turned [Prefs.sniffTypes] on. Only bound rows are sniffed, so a network directory full of
+     * them (git objects, a restic repo) costs one small read per row scrolled past, not per entry.
      */
-    private fun sniffOnBind(file: XFile): Boolean =
+    private fun sniffOnBind(ctx: Context, file: XFile): Boolean =
         com.twig.app.FileSniff.applies(file) && file.size > 0 &&
-            (file.scheme == "file" || file.scheme == "saf") &&
-            com.twig.app.FileSniff.cached(file) == null
+            Prefs.sniffTypes(ctx) && com.twig.app.FileSniff.cached(file) == null
 
-    private fun sniff(view: ImageView, file: XFile) {
+    /**
+     * Sniffs run on their own pool, not [executor]: a network read takes a round trip, and on
+     * the single icon thread every app icon queued behind it would wait for it.
+     */
+    private val sniffPool = Executors.newFixedThreadPool(2) { r ->
+        Thread(r, "twig-sniff").apply { isDaemon = true }
+    }
+
+    private fun sniff(view: ImageView, file: XFile, onTyped: (() -> Unit)?) {
         val key = "sniff:${file.scheme}:${file.path}"
         view.tag = key
-        executor.execute {
+        sniffPool.execute {
             if (com.twig.app.FileSniff.sniff(file) == null) return@execute
             val res = baseIconRes(file)
-            main.post { if (view.tag == key) view.setImageResource(res) }
+            main.post {
+                if (view.tag != key) return@post
+                view.setImageResource(res)
+                onTyped?.invoke()
+            }
         }
     }
 

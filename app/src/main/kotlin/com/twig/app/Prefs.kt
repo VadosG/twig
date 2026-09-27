@@ -368,6 +368,18 @@ object Prefs {
         sp(ctx).edit().putBoolean("thumbs_embedded", on).apply()
     }
 
+    /**
+     * Read the first bytes of files with no extension to pick their icon, viewer and thumbnail
+     * ([FileSniff]), default off. Off means none of it: no head is read at bind time or on a
+     * tap, and whatever was sniffed so far is forgotten, so rows go back to the generic icon.
+     */
+    fun sniffTypes(ctx: Context): Boolean = sp(ctx).getBoolean("sniff_types", false)
+
+    fun setSniffTypes(ctx: Context, on: Boolean) {
+        sp(ctx).edit().putBoolean("sniff_types", on).apply()
+        if (!on) FileSniff.clear()
+    }
+
     /** Show hidden files (dotfiles and dot-directories), default off. */
     fun showHidden(ctx: Context): Boolean = sp(ctx).getBoolean("show_hidden", false)
 
@@ -425,7 +437,7 @@ object Prefs {
      * returning from settings, MainActivity recreates. */
     fun uiSignature(ctx: Context): String = listOf(
         density(ctx), textSize(ctx), thumbs(ctx), thumbsGrid(ctx), thumbsGridNames(ctx), gridCell(ctx),
-        showHidden(ctx), rowDivider(ctx),
+        showHidden(ctx), rowDivider(ctx), sniffTypes(ctx),
     ).joinToString(",")
 
     /** Last active queue id (NOW or a named playlist), used by cold-start resume to locate the right list. */

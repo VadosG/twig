@@ -200,6 +200,11 @@ class SettingsActivity : AppCompatActivity() {
             set = { Prefs.setShowHidden(this, it) },
         )
         switchRow(
+            getString(R.string.settings_sniff_types), getString(R.string.settings_sniff_types_desc),
+            get = { Prefs.sniffTypes(this) },
+            set = { Prefs.setSniffTypes(this, it) },
+        )
+        switchRow(
             getString(R.string.settings_row_divider), getString(R.string.settings_row_divider_desc),
             get = { Prefs.rowDivider(this) },
             set = { Prefs.setRowDivider(this, it) },

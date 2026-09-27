@@ -267,6 +267,19 @@ class FileAdapter(
         super.onBindViewHolder(holder, position, payloads)
     }
 
+    /**
+     * For [FileIcons.bind]: once a bind-time sniff has typed [file] (see FileSniff), rebind its
+     * row if that type gets a thumbnail — the thumbnail frame is laid out in bind, so setting
+     * the icon alone would leave it at icon size.
+     */
+    private fun onTyped(holder: RecyclerView.ViewHolder, file: XFile): (() -> Unit)? =
+        if (!thumbs) null else {
+            {
+                val pos = holder.bindingAdapterPosition
+                if (pos != RecyclerView.NO_POSITION && Thumbs.canThumb(file)) notifyItemChanged(pos)
+            }
+        }
+
     private fun refreshSelection() {
         if (itemCount > 0) notifyItemRangeChanged(0, itemCount, PAYLOAD_SELECTION)
     }
@@ -299,7 +312,7 @@ class FileAdapter(
             b.thumb.scaleType = ImageView.ScaleType.FIT_CENTER
             val pad = edge / 5
             b.thumb.setPadding(pad, pad, pad, pad)
-            FileIcons.bind(b.thumb, node.file)
+            FileIcons.bind(b.thumb, node.file, onTyped(this, node.file))
             if (thumbs) Thumbs.bind(b.thumb, node.file)
 
             bindSelection(node)
@@ -687,7 +700,7 @@ class FileAdapter(
                     }
                 }
                 else -> {
-                    FileIcons.bind(b.icon, file)
+                    FileIcons.bind(b.icon, file, onTyped(this, file))
                     // Tree-style thumbnail (rows not handled by grid): the icon slot becomes a larger thumbnail;
                     // add minimum top/bottom margin so that thumbnails on adjacent rows don't touch when filenames are short
                     if (thumbs && Thumbs.canThumb(file)) {

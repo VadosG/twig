@@ -17,8 +17,10 @@ import java.util.concurrent.ConcurrentHashMap
  * extension in `Archives` / `PaneViewModel.expandableArchive`, and an archive icon on a row
  * that does not expand is a lie.
  *
- * Who sniffs: the row icon at bind time (local sources only) and a tap on the file. Thumbnails
- * only ever read the cache ([com.twig.app.ui.Thumbs]), so they follow one bind later.
+ * All of it sits behind [Prefs.sniffTypes] (default off). Who sniffs: the row icon at bind time
+ * (every source — over the network that is one 4 KB read per extensionless row that gets bound)
+ * and a tap on the file. Thumbnails only ever read the cache ([com.twig.app.ui.Thumbs]); the
+ * row asks for a rebind once its type is known, which is when they appear.
  *
  * Results are cached per file (including "nothing recognised") so the icon of an extensionless
  * row is sniffed once, not on every bind.
@@ -33,6 +35,9 @@ object FileSniff {
     private val cache = ConcurrentHashMap<String, Entry>()
 
     private fun keyOf(file: XFile) = "${file.scheme}\u0000${file.path}"
+
+    /** Forget every verdict — the preference was turned off. */
+    fun clear() = cache.clear()
 
     /** Whether [file] is a candidate at all: a file (not a directory) with no extension. */
     fun applies(file: XFile): Boolean = !file.isDir && file.extension.isEmpty()

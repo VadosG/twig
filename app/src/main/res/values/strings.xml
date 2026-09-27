@@ -484,6 +484,8 @@
     <string name="settings_section_display">Display</string>
     <string name="settings_show_hidden">Show hidden files</string>
     <string name="settings_show_hidden_desc">When off, files and folders whose name starts with a dot are hidden</string>
+    <string name="settings_sniff_types">Detect type of files without extension</string>
+    <string name="settings_sniff_types_desc">Reads the first 4 KB of each file with no extension to pick its icon, viewer and thumbnail. Costs one small read per such file, over the network too</string>
     <string name="settings_row_divider">Dividers</string>
     <string name="settings_row_divider_desc">Draw a faint line between list rows</string>
     <string name="settings_section_grid">Grid view</string>

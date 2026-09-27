@@ -481,6 +481,8 @@
     <string name="settings_section_display">显示</string>
     <string name="settings_show_hidden">显示隐藏文件</string>
     <string name="settings_show_hidden_desc">关闭时,名字以点开头的文件与目录不显示</string>
+    <string name="settings_sniff_types">识别无扩展名文件的类型</string>
+    <string name="settings_sniff_types_desc">读取无扩展名文件的前 4 KB 来决定图标、打开方式和缩略图。每个这样的文件多一次小读取,网络文件也一样</string>
     <string name="settings_row_divider">分割线</string>
     <string name="settings_row_divider_desc">列表相邻两行之间画一条淡线</string>
     <string name="settings_section_grid">网格视图</string>
