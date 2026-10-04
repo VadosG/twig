@@ -9,6 +9,8 @@
     <cloud-backup>
         <exclude domain="sharedpref" path="twig_connections.xml" />
         <exclude domain="sharedpref" path="twig_restic_pw.xml" />
+        <exclude domain="sharedpref" path="twig_archive_pw.xml" />
+        <exclude domain="sharedpref" path="twig_share.xml" />
         <exclude domain="file" path="keys/" />
         <exclude domain="file" path=".ssh/" />
         <exclude domain="sharedpref" path="twig_stream.xml" />
@@ -16,6 +18,8 @@
     <device-transfer>
         <exclude domain="sharedpref" path="twig_connections.xml" />
         <exclude domain="sharedpref" path="twig_restic_pw.xml" />
+        <exclude domain="sharedpref" path="twig_archive_pw.xml" />
+        <exclude domain="sharedpref" path="twig_share.xml" />
         <exclude domain="file" path="keys/" />
         <exclude domain="file" path=".ssh/" />
         <exclude domain="sharedpref" path="twig_stream.xml" />

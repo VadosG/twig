@@ -306,6 +306,13 @@ option.**
   the KDF runs before the GCM tag can reject the file. BouncyCastle refuses an overflowing N
   by itself but accepts p up to ~209k, which on the old code meant allocating p × 1 KiB and
   dying of OOM (or hours of CPU where the memory is there).
+- **Encrypted credentials still need system-backup exclusions** (2026-10-04, F-Droid review).
+  `twig_archive_pw` and `twig_share` were missing from both Android backup rule files.
+  Encryption alone did not close this: with a master password enabled, the system backup
+  also contains the scrypt-wrapped DEK in `twig_secure`, allowing offline password guessing.
+  Exclude credential stores from legacy full backup, cloud backup and device transfer;
+  `SystemBackupRulesTest` checks all three together. User-requested `.twigbak` exports
+  retain their separate export-password encryption path.
 - **Previewing a document must not silently fetch external resources** (2026-10-04, F-Droid review).
   Returning null for foreign hosts from the Markdown/HTML preview's request interceptor
   delegated images, badges, tracking pixels, CSS and fonts to WebView's network loader.

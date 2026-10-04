@@ -501,7 +501,7 @@ add its symptom here.
   stream URIs are HMAC-signed.
   *Explains*: a crash right after entering the master password, "after unlocking, WebDAV
   login fails until I re-save the connection", a password field rendered in plain text,
-  document previews fetching tracking pixels.
+  saved archive/sharing passwords included in system backups, document previews fetching tracking pixels.
 - **[SAF](docs/lessons/saf.md)** — a SAF path is a whole document URI, so nothing may
   slice it: ask the tree who contains a row instead of computing a parent. The grant is
   persistable, so SAF entries are *local* (real fd, pread), not outsiders.

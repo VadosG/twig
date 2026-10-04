@@ -17,6 +17,9 @@
     <exclude domain="sharedpref" path="twig_connections.xml" />
     <!-- Restic repository password -->
     <exclude domain="sharedpref" path="twig_restic_pw.xml" />
+    <!-- Saved archive passwords and WiFi sharing credentials -->
+    <exclude domain="sharedpref" path="twig_archive_pw.xml" />
+    <exclude domain="sharedpref" path="twig_share.xml" />
     <!-- Imported SFTP private keys (MainActivity's key picker copies them here) -->
     <exclude domain="file" path="keys/" />
     <!-- The local shell's ssh home: ssh-keygen writes unencrypted private keys here -->
