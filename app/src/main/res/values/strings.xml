@@ -365,6 +365,7 @@
     <string name="viewer_wrap">Word wrap</string>
     <string name="viewer_line_numbers">Line numbers</string>
     <string name="viewer_search">Search</string>
+    <string name="viewer_load_external_resources">Load external resources</string>
     <string name="viewer_text_bigger">Larger text</string>
     <string name="viewer_text_smaller">Smaller text</string>
     <string name="hex_search_text">TXT</string>

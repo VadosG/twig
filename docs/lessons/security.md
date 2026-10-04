@@ -306,3 +306,19 @@ option.**
   the KDF runs before the GCM tag can reject the file. BouncyCastle refuses an overflowing N
   by itself but accepts p up to ~209k, which on the old code meant allocating p × 1 KiB and
   dying of OOM (or hours of CPU where the memory is there).
+- **Previewing a document must not silently fetch external resources** (2026-10-04, F-Droid review).
+  Returning null for foreign hosts from the Markdown/HTML preview's request interceptor
+  delegated images, badges, tracking pixels, CSS and fonts to WebView's network loader.
+  The preview defaults to `blockNetworkLoads` and returns an empty response for foreign
+  requests or failed relative reads. A preview-only "Load external resources" menu action
+  permits http(s) loads for the current viewer session; consent is never persisted.
+  The action re-renders the in-memory document and restores scroll position
+  after page loading; enabling network loads alone does not fetch previously blocked resources.
+  Relative images/CSS still use the document's
+  FileSystem; deliberate http(s) link clicks still go to the browser. Robolectric checks
+  the client responses and settings, but real WebView rendering needs a device check.
+  - **Visible images do not prove a new network request**: on-device testing reported
+    external images still visible after disabling loading or reopening a document, until
+    the process restarted. Renderer-cache reuse is consistent with this symptom, though
+    fresh network traffic was not measured. The user explicitly chose to retain cached
+    images. The menu is consequently a load action, with no checkbox or disable operation.

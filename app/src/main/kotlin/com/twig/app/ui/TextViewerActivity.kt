@@ -82,6 +82,10 @@ class TextViewerActivity : AppCompatActivity() {
     private var isHtml = false
     private var isPreviewable = false
     private var previewMode = false
+    // Session-only consent; the request interceptor reads it on WebView's background thread.
+    @Volatile private var loadExternalResources = false
+    private var externalResourcesMenuItem: MenuItem? = null
+    private var previewScrollToRestore: Pair<Int, Int>? = null
 
     /**
      * Preview is this file's *home* view — set when the activity was opened in preview mode.
@@ -184,6 +188,17 @@ class TextViewerActivity : AppCompatActivity() {
             isVisible = false
             setOnMenuItemClickListener { save(); true }
         }
+        externalResourcesMenuItem = b.toolbar.menu.add(R.string.viewer_load_external_resources).apply {
+            isVisible = false
+            setOnMenuItemClickListener {
+                b.webview.stopLoading()
+                loadExternalResources = true
+                b.webview.settings.blockNetworkLoads = false
+                previewScrollToRestore = b.webview.scrollX to b.webview.scrollY
+                renderPreview() // Reuse raw: do not re-read the file just to change resource loading.
+                true
+            }
+        }
         wrapMenuItem = b.toolbar.menu.add(R.string.viewer_wrap).apply {
             isCheckable = true
             isChecked = Prefs.viewerWrap(this@TextViewerActivity)
@@ -244,11 +259,13 @@ class TextViewerActivity : AppCompatActivity() {
      * Preview-mode WebView: JS disabled (pure display, no scripting capability needed, reduces attack surface); relative
      * resource requests (images / CSS) are mapped back to [currentFile]'s directory by [shouldInterceptRequest], read
      * via the unified FileSystem abstraction — local / inside-archive / SMB / WebDAV etc. sources naturally all work.
+     * External resources are blocked until explicitly enabled for this viewer session.
      * Both internal relative links and external http(s) links are intercepted: the former because cross-document
      * navigation isn't supported yet, the latter gets handed off to the system browser.
      */
     private fun setupWebView() {
         b.webview.settings.javaScriptEnabled = false
+        b.webview.settings.blockNetworkLoads = true
         b.webview.settings.setSupportZoom(true)
         b.webview.settings.builtInZoomControls = true
         b.webview.settings.displayZoomControls = false
@@ -257,16 +274,27 @@ class TextViewerActivity : AppCompatActivity() {
                 view: WebView,
                 request: WebResourceRequest,
             ): WebResourceResponse? {
-                if (request.url.host != WEBVIEW_HOST) return null
+                fun emptyResponse() = WebResourceResponse("text/plain", "utf-8", "".byteInputStream())
+                if (request.url.scheme != "https" || request.url.host != WEBVIEW_HOST) {
+                    val network = request.url.scheme == "http" || request.url.scheme == "https"
+                    return if (loadExternalResources && network) null else emptyResponse()
+                }
                 return runCatching {
                     // Uri.path is already decoded, and the base URL itself is the file's real directory
                     // (see webviewBaseUrl()), so when the browser resolves "../" it climbs along the real directory
                     // depth, not getting truncated at a "fake root" earlier — parent-directory relative refs just work.
-                    val abs = normalizePath(request.url.path.orEmpty().ifEmpty { return null })
+                    val abs = normalizePath(request.url.path.orEmpty().ifEmpty { return emptyResponse() })
                     val target = XFile(currentFile.scheme, abs, isDir = false)
                     val input = FsRegistry.of(target).openInput(target)
                     WebResourceResponse(OpenFiles.mimeOf(target.name), "", input)
-                }.getOrNull()
+                // Never fall back to WebView's loader, even when a relative resource is missing.
+                }.getOrElse { emptyResponse() }
+            }
+
+            override fun onPageFinished(view: WebView, url: String) {
+                val position = previewScrollToRestore ?: return
+                previewScrollToRestore = null
+                view.post { view.scrollTo(position.first, position.second) }
             }
 
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
@@ -546,6 +574,7 @@ class TextViewerActivity : AppCompatActivity() {
         saveMenuItem?.isVisible = editMode
         // Search yields to editing: hit offsets get scrambled by edits
         searchMenuItem?.isVisible = !editMode
+        externalResourcesMenuItem?.isVisible = previewMode
         // Wrap/line numbers/theme act on the raw-text view (b.content); the rendered
         // WebView has none of those, so they are noise while a markdown/HTML preview is showing.
         wrapMenuItem?.isVisible = !previewMode
