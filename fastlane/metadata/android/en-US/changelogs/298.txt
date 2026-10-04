@@ -1,0 +1,3 @@
+Privacy fixes: document previews block automatic external resource loading; saved archive and WiFi sharing passwords are excluded from system backups. External resources can be loaded for the current document from its menu.
+
+New: optional type detection and thumbnails for extensionless files, forced video opening, more syntax highlighting languages, date format choices and optional pane swipe animation. Video playback closes when the queue ends.
