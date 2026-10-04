@@ -145,7 +145,7 @@ class HexCompareActivity : AppCompatActivity() {
 
     private fun sideInfo(side: String, size: Long, time: Long): String {
         val head = "$side · ${Format.size(size)}"
-        return if (time > 0) "$head · ${Format.time(time)}" else head
+        return if (time > 0) "$head · ${Format.time(time, this)}" else head
     }
 
     // ---- load ----

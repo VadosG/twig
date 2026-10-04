@@ -85,7 +85,7 @@ object FileInfo {
                     s(ctx, R.string.info_size_value, Format.size(bytes), "%,d".format(bytes))
             }
         }
-        if (file.lastModified > 0) rows += s(ctx, R.string.info_modified) to Format.time(file.lastModified)
+        if (file.lastModified > 0) rows += s(ctx, R.string.info_modified) to Format.time(file.lastModified, ctx)
         rows += s(ctx, R.string.info_writable) to
             s(ctx, if (file.canWrite) R.string.info_yes else R.string.info_no)
         if (!file.isDir) rows += apps(ctx, file) // open-with merged into basic info
@@ -464,9 +464,9 @@ object FileInfo {
             if (ai.flags and ApplicationInfo.FLAG_SYSTEM != 0) R.string.info_app_system
             else R.string.info_app_user,
         )
-        rows += s(ctx, R.string.info_install_time) to Format.time(pi.firstInstallTime)
+        rows += s(ctx, R.string.info_install_time) to Format.time(pi.firstInstallTime, ctx)
         if (pi.lastUpdateTime != pi.firstInstallTime) {
-            rows += s(ctx, R.string.info_update_time) to Format.time(pi.lastUpdateTime)
+            rows += s(ctx, R.string.info_update_time) to Format.time(pi.lastUpdateTime, ctx)
         }
         val splits = ai.splitSourceDirs?.size ?: 0
         if (splits > 0) rows += s(ctx, R.string.info_splits) to s(ctx, R.string.info_splits_value, splits)

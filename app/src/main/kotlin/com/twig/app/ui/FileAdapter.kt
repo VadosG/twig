@@ -647,7 +647,7 @@ class FileAdapter(
             if (file.scheme == com.twig.app.AppsFileSystem.SCHEME) bindApp(file)
             setMeta(
                 node.capacity ?: when {
-                    file.isDir -> Format.time(file.lastModified).takeIf { file.lastModified > 0 }
+                    file.isDir -> Format.time(file.lastModified, b.root.context).takeIf { file.lastModified > 0 }
                     else -> fileMeta(file)
                 },
             )
@@ -830,7 +830,7 @@ class FileAdapter(
             // When size is unknown (media servers don't give byte counts for photos) don't show the whole segment, don't write "0 B"
             val known = if (bytes > 0) file.copy(size = bytes) else file
             val size = Format.sizeOrNull(known)?.takeIf { known.size > 0 || known.lastModified > 0 }
-            val time = Format.time(file.lastModified).takeIf { file.lastModified > 0 }
+            val time = Format.time(file.lastModified, b.root.context).takeIf { file.lastModified > 0 }
             if (size == null) return time
             val sb = SpannableStringBuilder(size)
             sb.setSpan(

@@ -887,4 +887,9 @@
     <string name="about_no_browser">Nothing on this device can open a link — the address was copied to the clipboard instead</string>
     <string name="pdf_page_mode">One page per screen</string>
     <string name="pdf_open_failed">Cannot open this PDF</string>
+    <string name="settings_date_format">Date format</string>
+    <string name="date_format_system">Follow system region</string>
+    <string name="date_format_ymd">YY-MM-DD</string>
+    <string name="date_format_dmy">DD.MM.YY</string>
+    <string name="date_format_mdy">MM/DD/YY</string>
 </resources>

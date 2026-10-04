@@ -179,6 +179,15 @@ class SettingsActivity : AppCompatActivity() {
             set = { LanguagePref.apply(it) },
         )
         choiceRow(
+            getString(R.string.settings_date_format),
+            arrayOf(
+                getString(R.string.date_format_system), getString(R.string.date_format_ymd),
+                getString(R.string.date_format_dmy), getString(R.string.date_format_mdy),
+            ),
+            get = { Prefs.dateFormat(this) },
+            set = { Prefs.setDateFormat(this, it) },
+        )
+        choiceRow(
             getString(R.string.action_density),
             arrayOf(getString(R.string.density_compact), getString(R.string.density_normal), getString(R.string.density_large)),
             get = { Prefs.density(this) },

@@ -12,6 +12,13 @@ object Prefs {
 
     private fun sp(ctx: Context) = ctx.getSharedPreferences(FILE, Context.MODE_PRIVATE)
 
+    /** 0=system region, 1=yy-MM-dd, 2=dd.MM.yy, 3=MM/dd/yy. */
+    fun dateFormat(ctx: Context): Int = sp(ctx).getInt("date_format", 0).coerceIn(0, 3)
+
+    fun setDateFormat(ctx: Context, mode: Int) {
+        sp(ctx).edit().putInt("date_format", mode.coerceIn(0, 3)).apply()
+    }
+
     /** Row height density: 0=compact 1=normal (default) 2=roomy. Only affects row
      * height / icon size; font size is controlled by [textSize]. */
     fun density(ctx: Context): Int = sp(ctx).getInt(KEY_DENSITY, 1)
@@ -437,7 +444,7 @@ object Prefs {
      * returning from settings, MainActivity recreates. */
     fun uiSignature(ctx: Context): String = listOf(
         density(ctx), textSize(ctx), thumbs(ctx), thumbsGrid(ctx), thumbsGridNames(ctx), gridCell(ctx),
-        showHidden(ctx), rowDivider(ctx), sniffTypes(ctx),
+        showHidden(ctx), rowDivider(ctx), sniffTypes(ctx), dateFormat(ctx),
     ).joinToString(",")
 
     /** Last active queue id (NOW or a named playlist), used by cold-start resume to locate the right list. */

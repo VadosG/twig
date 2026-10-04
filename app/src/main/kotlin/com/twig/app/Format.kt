@@ -1,5 +1,8 @@
 package com.twig.app
 
+import android.content.Context
+import android.content.res.Resources
+import java.text.DateFormat
 import java.text.DecimalFormat
 import java.util.Date
 import java.text.SimpleDateFormat
@@ -7,7 +10,9 @@ import java.util.Locale
 
 /** Lightweight formatting utilities, avoiding extra dependencies. */
 object Format {
-    private val dateFmt = SimpleDateFormat("yy-MM-dd HH:mm", Locale.getDefault())
+    private data class DateFormats(val locale: Locale, val mode: Int, val date: DateFormat, val time: DateFormat)
+    // File properties can be fetched concurrently; DateFormat is not thread-safe.
+    private val dates = ThreadLocal<DateFormats>()
     private val sizeFmt = DecimalFormat("#.#")
 
     fun size(bytes: Long): String {
@@ -52,8 +57,29 @@ object Format {
         return if (fromMediaServer) null else size(file.size)
     }
 
-    fun time(millis: Long): String =
-        if (millis <= 0) "" else dateFmt.format(Date(millis))
+    fun time(millis: Long, ctx: Context): String {
+        if (millis <= 0) return ""
+        // AppCompat's app language must not override the user's regional date order.
+        val locale = Resources.getSystem().configuration.locales[0]
+        val mode = Prefs.dateFormat(ctx)
+        val formats = dates.get()?.takeIf { it.locale == locale && it.mode == mode }
+            ?: DateFormats(
+                locale, mode,
+                when (mode) {
+                    1 -> SimpleDateFormat("yy-MM-dd", locale)
+                    2 -> SimpleDateFormat("dd.MM.yy", locale)
+                    3 -> SimpleDateFormat("MM/dd/yy", locale)
+                    else -> DateFormat.getDateInstance(DateFormat.SHORT, locale)
+                },
+                SimpleDateFormat("HH:mm", locale),
+            ).also { dates.set(it) }
+        // Refresh the timezone too: a running app may cross timezones without restarting.
+        val zone = java.util.TimeZone.getDefault()
+        formats.date.timeZone = zone
+        formats.time.timeZone = zone
+        val date = Date(millis)
+        return "${formats.date.format(date)} ${formats.time.format(date)}"
+    }
 
     /** Each server / repository has a unique scheme = type + hash (see PaneViewModel.schemeForConn) */
     private val SCHEME_TYPES =

@@ -1305,7 +1305,7 @@ class CompareActivity : AppCompatActivity() {
             if (n.isDir) v.icon.setImageResource(R.drawable.ic_folder) else FileIcons.bind(v.icon, f)
             v.name.text = n.name
             v.name.setTextColor(nameColor(n))
-            v.meta.text = if (n.isDir) "" else "${Format.size(f.size)}  ${Format.time(f.lastModified)}"
+            v.meta.text = if (n.isDir) "" else "${Format.size(f.size)}  ${Format.time(f.lastModified, this@CompareActivity)}"
             v.check.visibility = View.VISIBLE
             v.check.setColorFilter(
                 ContextCompat.getColor(this@CompareActivity, if (isSel) R.color.accent else R.color.text_secondary),

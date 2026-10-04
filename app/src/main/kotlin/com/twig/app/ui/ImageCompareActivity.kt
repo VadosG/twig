@@ -116,7 +116,7 @@ class ImageCompareActivity : AppCompatActivity() {
     private fun sideInfo(side: String, f: XFile, d: Decoded?): String {
         val dim = if (d == null) getString(R.string.img_cmp_undecodable)
         else "${(d.bmp.width * d.actual).toInt()}×${(d.bmp.height * d.actual).toInt()}"
-        return "$side · $dim · ${Format.size(f.size)} · ${Format.time(f.lastModified)}"
+        return "$side · $dim · ${Format.size(f.size)} · ${Format.time(f.lastModified, this)}"
     }
 
     /** The subtitle states only the conclusion: whether the sizes match, which side has more pixels — that's the first thing you want to know when looking at them side by side. */
