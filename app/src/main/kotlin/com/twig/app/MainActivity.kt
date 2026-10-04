@@ -385,6 +385,7 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
     }
 
     override fun onPause() {
+        b.panes.finishTransition()
         super.onPause()
         // Drop the callback: it captures this Activity, leaving it in place is a reference to an already-destroyed UI
         WebShare.onStateChanged = null
@@ -580,13 +581,13 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
     private fun isLandscape() =
         resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-    private fun applyLayoutMode() {
+    private fun applyLayoutMode(animateSwipe: Boolean = false) {
         val land = isLandscape()
-        b.paneA.visibility = if (land || activeIndex == 0) View.VISIBLE else View.GONE
-        b.paneB.visibility = if (land || activeIndex == 1) View.VISIBLE else View.GONE
+        b.paneA.visibility = View.VISIBLE
+        b.paneB.visibility = View.VISIBLE
         b.stripMid.root.visibility = if (land) View.VISIBLE else View.GONE
-        b.stripLeft.root.visibility = if (!land && activeIndex == 1) View.VISIBLE else View.GONE
-        b.stripRight.root.visibility = if (!land && activeIndex == 0) View.VISIBLE else View.GONE
+        b.stripLeft.root.visibility = View.GONE
+        b.stripRight.root.visibility = if (!land) View.VISIBLE else View.GONE
         // Landscape has no Toolbar (vertical space is precious); its right-side buttons move into the strip's top pinned row
         b.toolbar.visibility = if (land) View.GONE else View.VISIBLE
         // Landscape's height can't fit a full single column, so the strip becomes two columns (width doubles)
@@ -594,6 +595,7 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
             applyStripColumns(s, land)
             applyStripTop(s, land)
         }
+        b.panes.showPane(activeIndex, animateSwipe && !land)
         paneAt(0)?.setActive(activeIndex == 0)
         paneAt(1)?.setActive(activeIndex == 1)
         renderClipBar() // active pane changed, the paste target follows
@@ -614,11 +616,11 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
         }
     }
 
-    private fun setActiveIndex(i: Int) {
+    private fun setActiveIndex(i: Int, animateSwipe: Boolean = false) {
         if (activeIndex != i) {
             activeIndex = i
             Prefs.setActivePane(this, i)
-            applyLayoutMode()
+            applyLayoutMode(animateSwipe && Prefs.swipeAnimation(this))
             invalidateOptionsMenu() // the swap icon direction follows the active pane (including swipe / touch switch)
             // The two panes can land on sources with different capabilities (one local, one a media server); switching active pane means recomputing the action strip — ★ must happen **after** activeIndex updates, otherwise we still read the previous pane
             syncStripEnabled()
@@ -711,7 +713,7 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
 
     override fun onPaneSwipe(velocityX: Float) {
         // Swipe left (negative velocity) → show right pane; swipe right → left pane
-        if (!isLandscape()) setActiveIndex(if (velocityX < 0) 1 else 0)
+        if (!isLandscape()) setActiveIndex(if (velocityX < 0) 1 else 0, animateSwipe = true)
     }
 
     override fun onClipTargetChanged() {
