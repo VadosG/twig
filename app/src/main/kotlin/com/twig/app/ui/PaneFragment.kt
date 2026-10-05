@@ -2119,11 +2119,7 @@ class PaneFragment : Fragment() {
                 if (node.fav.kind == "restic" && saved == null) {
                     promptFavoriteRestic(node)
                 } else {
-                    AlertDialog.Builder(requireContext())
-                        .setTitle(R.string.restic_repo)
-                        .setMessage(err ?: getString(R.string.err_failed))
-                        .setPositiveButton(R.string.dialog_ok, null)
-                        .show()
+                    toast(err ?: getString(R.string.err_operation_failed))
                 }
             }
         }

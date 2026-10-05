@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import com.twig.app.ConnectionStore
 import com.twig.app.Connections
+import com.twig.app.Favorite
 import com.twig.app.SavedConnection
 import com.twig.core.FsRegistry
 import com.twig.core.XFile
@@ -89,6 +90,71 @@ class SlowExpandRaceTest {
 
     private fun row(name: String) =
         vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().single { it.file.name == name }
+
+    private fun failingFavorite(): PaneViewModel.FavoriteNode {
+        val conn = SavedConnection(type = "sftp", host = "favorite-failure.test", user = "u")
+        ConnectionStore.save(app, conn)
+        FsRegistry.register(FakeFileSystem(
+            Connections.schemeOf(conn), dirs = mapOf("/broken" to emptyList()),
+            failing = setOf("/broken"),
+        ))
+        val fav = Favorite("Broken", "conn", "/broken", connLabel = conn.label())
+        vm.addFavorite(fav)
+        return vm.state.value.rows.filterIsInstance<PaneViewModel.FavoriteNode>().single { it.fav.id == fav.id }
+    }
+
+    @Test
+    fun `an active favorite failure still reports its actual error`() = runTest(dispatcher) {
+        val favorite = failingFavorite()
+        val errors = mutableListOf<String?>()
+        vm.toggleFavorite(favorite, null) { ok, err -> if (!ok) errors += err }
+        advanceUntilIdle()
+
+        org.junit.Assert.assertEquals(listOf("listing failed: /broken"), errors)
+    }
+
+    @Test
+    fun `a favorite failure is silent after opening another directory`() = runTest(dispatcher) {
+        vm.revealPath(server("favorite-directory.test"))
+        advanceUntilIdle()
+        val favorite = failingFavorite()
+        val errors = mutableListOf<String?>()
+        vm.io = hold
+        vm.toggleFavorite(favorite, null) { ok, err -> if (!ok) errors += err }
+        advanceUntilIdle()
+
+        vm.io = dispatcher
+        vm.toggle(row("quick"))
+        advanceUntilIdle()
+        hold.release()
+        advanceUntilIdle()
+
+        assertTrue("abandoned favorite must not report a failure", errors.isEmpty())
+        assertTrue("the later directory stays expanded", row("quick").expanded)
+    }
+
+    @Test
+    fun `a favorite failure is silent after opening another favorite`() = runTest(dispatcher) {
+        val root = server("favorite-switch.test")
+        val conn = ConnectionStore.all(app).single { Connections.schemeOf(it) == root.scheme }
+        val quick = Favorite("Quick", "conn", "/quick", connLabel = conn.label())
+        vm.addFavorite(quick)
+        val favorite = failingFavorite()
+        val errors = mutableListOf<String?>()
+        vm.io = hold
+        vm.toggleFavorite(favorite, null) { ok, err -> if (!ok) errors += err }
+        advanceUntilIdle()
+
+        vm.io = dispatcher
+        val quickRow = vm.state.value.rows.filterIsInstance<PaneViewModel.FavoriteNode>().single { it.fav.id == quick.id }
+        vm.toggleFavorite(quickRow, null) { ok, err -> if (!ok) errors += err }
+        advanceUntilIdle()
+        hold.release()
+        advanceUntilIdle()
+
+        assertTrue("abandoned favorite must not report a failure", errors.isEmpty())
+        assertTrue(vm.state.value.rows.filterIsInstance<PaneViewModel.FavoriteNode>().single { it.fav.id == quick.id }.expanded)
+    }
 
     /**
      * ★ An abandoned row must **stop spinning immediately**. The request cannot be

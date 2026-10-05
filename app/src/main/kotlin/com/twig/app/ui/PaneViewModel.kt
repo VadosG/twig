@@ -2182,7 +2182,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
                             }
                             rebuild(); onResult(true, null)
                         },
-                        { rebuild(); onResult(false, it.message) },
+                        { rebuild(); if (mine) onResult(false, it.message) },
                     )
                 }
             }
