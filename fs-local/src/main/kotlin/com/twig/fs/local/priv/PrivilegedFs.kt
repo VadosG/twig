@@ -43,7 +43,7 @@ class PrivilegedFs(val shell: PrivilegedShell) {
      * the ordinary per-directory path. Listing failures leave the partial scan intact,
      * matching the size scanners' best-effort handling of unreadable directories.
      */
-    fun walkForSize(
+    fun walk(
         path: String,
         maxDepth: Int,
         stopped: () -> Boolean,

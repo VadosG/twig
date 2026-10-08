@@ -80,10 +80,10 @@ class LocalFileSystem(
     }
 
     /** Visits descendants without sorting; unreadable subtrees use one privileged scan. */
-    fun walkForSize(
+    fun walk(
         dir: XFile,
         maxDepth: Int,
-        readEntry: (File) -> XFile,
+        readEntry: (File) -> XFile = ::toXFile,
         stopped: () -> Boolean,
         visit: (XFile) -> Unit,
     ) {
@@ -94,7 +94,7 @@ class LocalFileSystem(
             if (depth >= maxDepth) continue
             val children = File(parent.path).listFiles()
             if (children == null) {
-                fallback?.walkForSize(File(parent.path).absolutePath, maxDepth - depth, stopped, visit)
+                fallback?.walk(File(parent.path).absolutePath, maxDepth - depth, stopped, visit)
                 continue
             }
             for (child in children) {

@@ -21,7 +21,7 @@ internal fun walkLocalForSize(
     stopped: () -> Boolean,
     visit: (XFile) -> Unit,
 ) {
-    (FsRegistry.of(dir) as LocalFileSystem).walkForSize(dir, maxDepth, ::localSizeEntry, stopped, visit)
+    (FsRegistry.of(dir) as LocalFileSystem).walk(dir, maxDepth, ::localSizeEntry, stopped, visit)
 }
 
 private fun localSizeEntry(file: File): XFile = try {

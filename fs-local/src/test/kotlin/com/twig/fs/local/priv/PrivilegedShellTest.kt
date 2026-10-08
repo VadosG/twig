@@ -95,7 +95,7 @@ class PrivilegedShellTest {
         val link = File(root, "dir| with\nnewline")
         java.nio.file.Files.createSymbolicLink(link.toPath(), outside.toPath())
         val actual = ArrayList<com.twig.core.XFile>()
-        fs.walkForSize(root.path, 64, { false }, actual::add)
+        fs.walk(root.path, 64, { false }, actual::add)
         assertEquals(3, actual.size)
         assertEquals(5L, actual.single { it.path == file.path }.size)
         assertTrue(actual.single { it.path == link.path }.isDir)
@@ -126,7 +126,7 @@ exec /usr/bin/find "${'$'}@"
         PrivilegedShell(launcher).use { oldShell ->
             assertTrue(oldShell.connect())
             val actual = ArrayList<com.twig.core.XFile>()
-            PrivilegedFs(oldShell).walkForSize(root.path, 1, { false }, actual::add)
+            PrivilegedFs(oldShell).walk(root.path, 1, { false }, actual::add)
             assertEquals(fs.list(root.path)!!.associateBy { it.path }, actual.associateBy { it.path })
             assertEquals("fallback must still enforce entry budget", 2, actual.size)
         }
@@ -153,7 +153,7 @@ exec /usr/bin/find "${'$'}@"
             children.filter { it.isDir }.forEach { queue.addLast(it.path) }
         }
         val actual = ArrayList<com.twig.core.XFile>()
-        fs.walkForSize(root.path, 64, { false }, actual::add)
+        fs.walk(root.path, 64, { false }, actual::add)
         assertEquals(expected.associateBy { it.path }, actual.associateBy { it.path })
         assertEquals(expected.size, actual.size)
     }
@@ -166,7 +166,7 @@ exec /usr/bin/find "${'$'}@"
         val link = File(tmp.root, "start")
         java.nio.file.Files.createSymbolicLink(link.toPath(), root.toPath())
         val actual = ArrayList<com.twig.core.XFile>()
-        fs.walkForSize(link.path, 1, { false }, actual::add)
+        fs.walk(link.path, 1, { false }, actual::add)
         assertEquals(listOf(File(link, "sub").path), actual.map { it.path })
         assertTrue(actual.single().isDir)
     }
@@ -186,7 +186,7 @@ exec /usr/bin/find "${'$'}@"
         PrivilegedShell(launcher).use { scanningShell ->
             assertTrue(scanningShell.connect())
             val scanned = ArrayList<com.twig.core.XFile>()
-            PrivilegedFs(scanningShell).walkForSize(root.path, 64, { scanned.size >= 2 }, scanned::add)
+            PrivilegedFs(scanningShell).walk(root.path, 64, { scanned.size >= 2 }, scanned::add)
             assertEquals(2, scanned.size)
             assertEquals("one session plus one scan", 2, spawned.size)
             assertEquals("scan process was closed", 1, destroyed)
@@ -197,8 +197,8 @@ exec /usr/bin/find "${'$'}@"
     @Test
     fun `size walk handles empty and missing roots without inventing entries`() {
         val actual = ArrayList<com.twig.core.XFile>()
-        fs.walkForSize(tmp.newFolder("walkempty").path, 64, { false }, actual::add)
-        fs.walkForSize(File(tmp.root, "missing").path, 64, { false }, actual::add)
+        fs.walk(tmp.newFolder("walkempty").path, 64, { false }, actual::add)
+        fs.walk(File(tmp.root, "missing").path, 64, { false }, actual::add)
         assertTrue(actual.isEmpty())
     }
 
