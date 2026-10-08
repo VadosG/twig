@@ -4,6 +4,8 @@ import android.app.Application
 import android.os.Environment
 import androidx.test.core.app.ApplicationProvider
 import com.twig.core.XFile
+import com.twig.core.FileSystem
+import com.twig.core.FsRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -161,4 +163,61 @@ class PaneViewModelDuplicateRowTest {
             .filter { it.file.scheme == "zip" }.map { it.file.name }
         assertTrue("no entries came out of the archive: $names", names.containsAll(listOf("a.txt", "b.txt")))
     }
+
+    @Test
+    fun `storage reached from root expands in place and restores there`() = runTest(dispatcher) {
+        val local = FsRegistry.of("file")
+        // Model / -> storage -> emulated -> 0 without needing access to the host's /.
+        val ancestors = generateSequence(ext.parentFile) { it.parentFile }.toList().reversed()
+        FsRegistry.register(object : FileSystem by local {
+            override fun list(dir: XFile): List<XFile> {
+                val index = ancestors.indexOfFirst { it.path == dir.path }
+                return if (index >= 0) listOf(XFile(
+                    "file", ancestors.getOrNull(index + 1)?.path ?: ext.path, isDir = true,
+                )) else local.list(dir)
+            }
+        })
+        try {
+            vm.bootstrap()
+            advanceUntilIdle()
+            vm.toggle(vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>()
+                .single { it.file.scheme == "file" && it.file.path == "/" })
+            advanceUntilIdle()
+            for (path in ancestors.drop(1).map { it.path } + ext.path) {
+                val node = vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>()
+                    .first { it.file.path == path && it.depth > 0 }
+                assertEquals("duplicate row identity before opening $path", emptySet<String>(), dupes())
+                vm.toggle(node)
+                advanceUntilIdle()
+            }
+            fun PaneViewModel.storageRows() = state.value.rows.filterIsInstance<PaneViewModel.FileNode>()
+                .filter { it.file.path == ext.path }
+            assertEquals(2, vm.storageRows().size)
+            assertTrue(vm.storageRows().single { it.depth > 0 }.expanded)
+            assertTrue(!vm.storageRows().single { it.depth == 0 }.expanded)
+            assertTrue(vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>()
+                .single { it.file.scheme == "file" && it.file.path == "/" }.expanded)
+            assertEquals(emptySet<String>(), dupes())
+            assertTrue(keys().any { it.contains(archive.path) })
+
+            val restored = PaneViewModel(app).apply { io = dispatcher }
+            restored.bootstrap(vm.expandedDescriptors(), vm.currentDescriptor())
+            advanceUntilIdle()
+            assertTrue(restored.storageRows().single { it.depth > 0 }.expanded)
+            assertTrue(!restored.storageRows().single { it.depth == 0 }.expanded)
+            assertEquals(restored.storageRows().single { it.depth > 0 }.key, restored.state.value.currentKey)
+
+            // Up from a child must stay in this branch, then up from storage goes to emulated.
+            vm.toggle(vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>()
+                .first { it.file.path == archive.path })
+            advanceUntilIdle()
+            vm.up()
+            assertEquals(vm.storageRows().single { it.depth > 0 }.key, vm.state.value.currentKey)
+            vm.up()
+            assertEquals(ext.parent, vm.state.value.currentDir?.path)
+        } finally {
+            FsRegistry.register(local)
+        }
+    }
+
 }

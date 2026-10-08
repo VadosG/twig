@@ -51,6 +51,7 @@ class TreeKeysTest {
     @Test
     fun roundTripsEveryPersistableKind() {
         roundTrip("f:file:/sdcard/Download")
+        roundTrip("${TreeKeys.NESTED_STORAGE_PREFIX}f:file:/storage/emulated/0")
         roundTrip("f:apps:/user")
         roundTrip("f:sftp1a2b:/home/root/code")
         roundTrip("g:lan")

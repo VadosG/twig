@@ -24,6 +24,9 @@ import com.twig.core.XFile
  */
 object TreeKeys {
 
+    /** Storage-volume row reached through / rather than its top-level shortcut. */
+    const val NESTED_STORAGE_PREFIX = "nested:"
+
     /** Unique id for one row on the tree; a dozen tables inside the VM are indexed by it. */
     fun fileKey(file: XFile): String = "f:${file.scheme}:${file.path}"
 
@@ -47,6 +50,8 @@ object TreeKeys {
      */
     fun descriptorOf(key: String, connLabelOf: (scheme: String) -> String?): String? {
         val parts: List<String> = when {
+            key.startsWith("${NESTED_STORAGE_PREFIX}f:file:") ->
+                listOf("nestedfile", key.removePrefix("${NESTED_STORAGE_PREFIX}f:file:"))
             key.startsWith("f:file:") -> listOf("file", key.removePrefix("f:file:"))
             key.startsWith("f:${AppsFileSystem.SCHEME}:") ->
                 listOf("apps", key.removePrefix("f:${AppsFileSystem.SCHEME}:"))
@@ -83,6 +88,7 @@ object TreeKeys {
         val p = d.split('\t')
         return when (p.getOrNull(0)) {
             "file" -> p.getOrNull(1)?.let { "f:file:$it" }
+            "nestedfile" -> p.getOrNull(1)?.let { "${NESTED_STORAGE_PREFIX}f:file:$it" }
             "apps" -> p.getOrNull(1)?.let { "f:${AppsFileSystem.SCHEME}:$it" }
             "conn" -> {
                 val label = p.getOrNull(1) ?: return null
@@ -104,7 +110,7 @@ object TreeKeys {
     fun dirOfDescriptor(d: String, schemeOfConn: (label: String) -> String?): XFile? {
         val p = d.split('\t')
         return when (p.getOrNull(0)) {
-            "file" -> p.getOrNull(1)?.let { XFile("file", it, isDir = true) }
+            "file", "nestedfile" -> p.getOrNull(1)?.let { XFile("file", it, isDir = true) }
             "apps" -> p.getOrNull(1)?.let {
                 XFile(AppsFileSystem.SCHEME, it, isDir = true, canWrite = false)
             }

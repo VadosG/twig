@@ -103,7 +103,8 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
          * the only way DiffUtil identifies rows, and two rows with the same key get
          * confused (symptom: one of them expands empty). The external mount subtree
          * carries this prefix as a whole, so it is fully separate from the original
-         * location; regular use leaves it as an empty string.
+         * location. A storage volume reached below / also gets its own row prefix,
+         * while its children retain ordinary keys (only one branch stays open).
          */
         val keyPrefix: String = "",
     ) : Node {
@@ -405,6 +406,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     private val searchState = HashMap<String, SearchState>()
     /** Directory keys that have already had their auxiliary rows (properties card / search results) attached in this rebuild, to avoid duplicates when one directory appears in two places. */
     private val attachedKeys = HashSet<String>()
+    private val storageShortcutKeys = HashSet<String>()
 
     var currentDir: XFile? = null
     /** Most recently selected node key (any type: directory / server / group / favorite / restic). */
@@ -552,7 +554,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
         // spinner covers them, so they don't need their own pre-mark.
         for (p in parsed) when (p.getOrNull(0)) {
             "server" -> if (connFor(p[1]) != null) connecting.add("s:${p[1]}")
-            "file" -> loadingKeys.add(fileKey(XFile("file", p[1], isDir = true)))
+            "file", "nestedfile" -> loadingKeys.add(TreeKeys.keyOfDescriptor(p.joinToString("\t"), ::sessionSchemeOf)!!)
             "apps" -> loadingKeys.add(fileKey(XFile(AppsFileSystem.SCHEME, p[1], isDir = true)))
             "fav" -> if (FavoritesStore.contains(getApplication(), p[1])) connecting.add("fav:${p[1]}")
         }
@@ -569,7 +571,10 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
                     runCatching {
                         when (p[0]) {
                             "server" -> fetchServer(p[1])
-                            "file" -> fetchDir(XFile("file", p[1], isDir = true))
+                            "file", "nestedfile" -> fetchDir(
+                                XFile("file", p[1], isDir = true),
+                                TreeKeys.keyOfDescriptor(p.joinToString("\t"), ::sessionSchemeOf)!!,
+                            )
                             "apps" -> fetchDir(XFile(AppsFileSystem.SCHEME, p[1], isDir = true, canWrite = false))
                             "conn" -> connFor(p[1])?.let { fetchDir(XFile(schemeForConn(it), p[2], isDir = true)) }
                             "fav" -> fetchFavoriteById(p[1])
@@ -580,7 +585,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
                 fetched?.let { applyRestored(it) }
                 when (p[0]) {
                     "server" -> connecting.remove("s:${p[1]}")
-                    "file" -> loadingKeys.remove(fileKey(XFile("file", p[1], isDir = true)))
+                    "file", "nestedfile" -> loadingKeys.remove(TreeKeys.keyOfDescriptor(p.joinToString("\t"), ::sessionSchemeOf)!!)
                     "apps" -> loadingKeys.remove(fileKey(XFile(AppsFileSystem.SCHEME, p[1], isDir = true)))
                     "fav" -> connecting.remove("fav:${p[1]}")
                     else -> Unit
@@ -633,7 +638,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
         val d = pendingCurrentDesc ?: return
         descToXFile(d)?.let {
             currentDir = it
-            currentKey = fileKey(it)
+            currentKey = TreeKeys.keyOfDescriptor(d, ::sessionSchemeOf) ?: fileKey(it)
             pendingCurrentDesc = null
         }
     }
@@ -680,8 +685,8 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
         return Restored("s:$label", root, listChildren(root)) // via listChildren so git/restic get detected
     }
 
-    private fun fetchDir(dir: XFile): Restored =
-        Restored(fileKey(dir), dir, listChildren(dir)) // via listChildren so git/restic get detected
+    private fun fetchDir(dir: XFile, key: String = fileKey(dir)): Restored =
+        Restored(key, dir, listChildren(dir)) // via listChildren so git/restic get detected
 
     /** Reconnect / unlock the directory a favorite points at (a restic favorite without a stored password fails — it stays folded, same as a manual expand). */
     private fun fetchFavoriteById(id: String): Restored? {
@@ -713,7 +718,8 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     fun currentDescriptor(): String? {
         val cur = currentDir ?: return pendingCurrentDesc
         return when {
-            cur.scheme == "file" -> "file\t${cur.path}"
+            cur.scheme == "file" -> if (currentKey?.startsWith(TreeKeys.NESTED_STORAGE_PREFIX) == true)
+                "nestedfile\t${cur.path}" else "file\t${cur.path}"
             cur.scheme == AppsFileSystem.SCHEME -> "apps\t${cur.path}"
             schemeToConn.containsKey(cur.scheme) -> "conn\t${schemeToConn[cur.scheme]!!.label()}\t${cur.path}"
             else -> pendingCurrentDesc
@@ -849,7 +855,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
      */
     fun currentSelection(): XFile? = currentKey?.let { k ->
         keyFile[k]?.takeIf {
-            fileKey(it) == k && it.path != "/" &&
+            fileKey(it) == k.removePrefix(TreeKeys.NESTED_STORAGE_PREFIX) && it.path != "/" &&
                 !(
                     it.scheme == "file" &&
                         (
@@ -1392,9 +1398,12 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Of the expanded directories, who contains [file] — return that row's key and XFile. */
     private fun parentRow(file: XFile): Pair<String, XFile>? {
-        val k = children.entries.firstOrNull { (_, list) ->
+        val parents = children.entries.filter { (_, list) ->
             list.any { it.scheme == file.scheme && it.path == file.path }
-        }?.key ?: return null
+        }
+        // A storage directory can have a cached listing in both tree locations.
+        // Up must follow the visible branch, not a collapsed shortcut's old cache.
+        val k = (parents.firstOrNull { it.key in expanded } ?: parents.firstOrNull())?.key ?: return null
         return keyFile[k]?.let { k to it }
     }
 
@@ -1465,6 +1474,8 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
      * next expansion re-fetches.
      */
     fun invalidate(dir: XFile) {
+        keyFile.entries.filter { it.value.scheme == dir.scheme && it.value.path == dir.path }
+            .forEach { children.remove(it.key) }
         children.remove(fileKey(dir))
     }
 
@@ -2502,6 +2513,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     private fun rebuild() {
         val rows = ArrayList<Node>()
         attachedKeys.clear()
+        storageShortcutKeys.clear()
         showHidden = Prefs.showHidden(getApplication()) // Read once per round, not once per directory from SharedPreferences.
         val lock = lockRoot
         if (lock != null) {
@@ -2564,25 +2576,34 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
         /** See [FileNode.keyPrefix]; the whole subtree must carry it, otherwise archive entries would clash with the row at their original location. */
         keyPrefix: String = "",
     ) {
-        val key = keyPrefix + fileKey(file)
+        // Storage shortcuts also occur below / at their real paths. Distinguish
+        // that row from the shortcut so accordion ancestry and DiffUtil stay local.
+        // Children retain ordinary keys: only one branch is expanded at a time.
+        val fileKey = fileKey(file)
+        if (file.scheme == "file" && file.isDir && depth == 0 && label != null && keyPrefix.isEmpty()) {
+            storageShortcutKeys.add(fileKey)
+        }
+        val rowPrefix = if (keyPrefix.isEmpty() && depth > 0 && fileKey in storageShortcutKeys)
+            TreeKeys.NESTED_STORAGE_PREFIX else keyPrefix
+        val key = rowPrefix + fileKey
         val expandable = file.isDir || expandableArchive(file, key)
         if (expandable) keyFile[key] = file
         val exp = expandable && expanded.contains(key)
         // A directory with a search result hangs shows the chevron as "expanded" (even if not actually expanded) — visually echoing the search-result virtual directory below; this only affects the icon, the actual children list is still only fetched/rendered when exp is true, so a collapsed directory that starts a search won't also show its original files/dirs below.
         rows += FileNode(
             file, depth, expandable, exp || searchState.containsKey(key),
-            label, capacity, busy(key), keyPrefix,
+            label, capacity, busy(key), rowPrefix,
         )
         addAttachments(rows, file, depth)
         if (exp) {
             // Put the git virtual root first, no need to dig through a pile of real files.
             // Don't use the display name frozen at registration in gitInfo (after switching branches it'd keep showing the old one); read GitFileSystem.displayName instead — it follows the latest branch in statusCache.
-            gitInfo[key]?.let { (s, gl) ->
+            gitInfo[fileKey(file)]?.let { (s, gl) ->
                 val live = (runCatching { FsRegistry.of(s) }.getOrNull() as? GitFileSystem)?.displayName ?: gl
                 addFile(rows, XFile(s, "/", isDir = true, displayName = live, canWrite = false), depth + 1)
             }
             visible(children[key]).forEach { addFile(rows, it, depth + 1, keyPrefix = keyPrefix) }
-            if (resticRepos.contains(key)) addRestic(rows, file, depth + 1)
+            if (resticRepos.contains(fileKey(file))) addRestic(rows, file, depth + 1)
         }
     }
 
