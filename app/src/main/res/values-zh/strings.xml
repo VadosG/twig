@@ -155,6 +155,7 @@
     <string name="language_system">跟随系统</string>
     <string name="language_zh">中文</string>
     <string name="language_en">English</string>
+    <string name="language_ru">Русский</string>
     <string name="action_settings">设置</string>
     <string name="action_view_mode">视图</string>
     <string name="action_thumbs">缩略图</string>
