@@ -1214,6 +1214,8 @@ class PaneFragment : Fragment() {
         val started = runCatching { Transfers.start(requireContext().applicationContext, session) }
             .getOrElse { toast(it.message ?: getString(R.string.err_failed)); return }
         if (!started) { toast(getString(R.string.transfer_busy)); return }
+        // The session owns its source list now; dismiss the clipboard bar immediately.
+        if ((session.work as? Transfers.Work.Copy)?.fromClipboard == true) FileClipboard.clear()
         showTransferBox()
     }
 
@@ -1246,8 +1248,6 @@ class PaneFragment : Fragment() {
     fun finishTransfer(s: Transfers.Session) {
         adapter.clearSelection()
         clearMapSelection()
-        // Once paste finishes, we're done: moved sources no longer exist, and after a copy this round is also over (re-paste = re-stash).
-        if ((s.work as? Transfers.Work.Copy)?.fromClipboard == true) FileClipboard.clear()
         viewModel.refresh()
         host?.siblingOf(this)?.viewModel?.refresh()
         val r = s.finished ?: return
