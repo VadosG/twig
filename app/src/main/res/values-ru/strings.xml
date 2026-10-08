@@ -895,4 +895,5 @@
     <string name="date_format_ymd">YY-MM-DD</string>
     <string name="date_format_dmy">DD.MM.YY</string>
     <string name="date_format_mdy">MM/DD/YY</string>
+    <string name="viewer_load_external_resources">Загрузить внешние ресурсы</string>
 </resources>

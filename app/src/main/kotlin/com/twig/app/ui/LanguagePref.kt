@@ -6,7 +6,7 @@ import androidx.core.os.LocaleListCompat
 import com.twig.app.R
 
 /**
- * App language (follow system / Chinese / English). The top-bar menu and the settings page share this single
+ * App language (follow system / Chinese / English / Russian). The top-bar menu and the settings page share this single
  * candidate list and read/write logic — duplicating them in two places inevitably diverges (a one-off ordering
  * difference makes the radio button select a different language).
  *
@@ -18,12 +18,13 @@ import com.twig.app.R
 object LanguagePref {
 
     /** One-to-one with [labels]; empty string = follow system. */
-    private val TAGS = arrayOf("", "zh", "en")
+    private val TAGS = arrayOf("", "zh", "en", "ru")
 
     fun labels(ctx: Context): Array<String> = arrayOf(
         ctx.getString(R.string.language_system),
         ctx.getString(R.string.language_zh),
         ctx.getString(R.string.language_en),
+        ctx.getString(R.string.language_ru),
     )
 
     /** Index of the current selection; if a different language is stored (or none was ever selected), it all counts as "follow system". */
