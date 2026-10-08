@@ -63,6 +63,20 @@ class LocalFileSystem(
         return sorted(children.map { toXFile(it) })
     }
 
+    /**
+     * Unsorted listing for recursive size scans. The Android caller supplies a
+     * single stat(2) reader instead of querying type, length, time and permissions
+     * separately for every entry. Keep elevation here so thread-local opt-out and
+     * unreadable-directory fallback behave exactly like ordinary listings.
+     * Entries omit permissions and are only suitable for scan results, not access checks.
+     */
+    fun listForSize(dir: XFile, readEntry: (File) -> XFile): List<XFile> {
+        val children = File(dir.path).listFiles()
+            ?: return elevated(dir.path)
+                ?: throw FsException("Cannot read directory (permission?): ${dir.path}")
+        return children.map(readEntry)
+    }
+
     /** Directories first, then by name case-insensitively — the conventional file manager sort. */
     private fun sorted(items: List<XFile>): List<XFile> = items
         .sortedWith(compareByDescending<XFile> { it.isDir }.thenBy { it.name.lowercase() })

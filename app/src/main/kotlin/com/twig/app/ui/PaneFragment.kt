@@ -741,6 +741,15 @@ class PaneFragment : Fragment() {
 
     /** Tile menu = Select + tree's directory/file long-press menu (shared) + Delete. */
     private fun treemapMenu(e: TreemapEntry) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val file = withContext(Dispatchers.IO) { sizeScanActionFile(e.file) }
+            if (_b == null || !mapMode) return@launch
+            e.file = file
+            showTreemapMenu(e)
+        }
+    }
+
+    private fun showTreemapMenu(e: TreemapEntry) {
         val actions = ArrayList<MenuAct>()
         actions.item(getString(R.string.action_select), R.drawable.ic_sel_check) { toggleMapSelection(e) }
         actions += commonFileActions(e.file, includeDelete = false)

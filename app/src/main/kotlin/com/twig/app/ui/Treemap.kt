@@ -7,7 +7,7 @@ import com.twig.fs.archive.Archives
 
 /** A treemap node: directories hold a child list and accumulate size, files are leaves. */
 class TreemapEntry(
-    val file: XFile,
+    var file: XFile,
     val isDir: Boolean,
     var size: Long,
     val children: MutableList<TreemapEntry>?,
@@ -58,7 +58,7 @@ class TreemapScanner(private val cacheDir: java.io.File) {
 
     private fun scanInto(dir: TreemapEntry) {
         if (stop) return
-        val kids = runCatching { FsRegistry.of(dir.file).list(dir.file) }.getOrDefault(emptyList())
+        val kids = runCatching { listForSize(dir.file) }.getOrDefault(emptyList())
         for (k in kids) {
             if (stop || scanned >= MAX_ENTRIES) return
             scanned++

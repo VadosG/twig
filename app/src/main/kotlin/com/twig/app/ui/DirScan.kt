@@ -1,6 +1,5 @@
 package com.twig.app.ui
 
-import com.twig.core.FsRegistry
 import com.twig.core.XFile
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +50,7 @@ fun scanDirStat(root: XFile, io: CoroutineDispatcher = Dispatchers.IO): Flow<Dir
     while (queue.isNotEmpty() && files + dirs < DIR_SCAN_MAX_ENTRIES) {
         coroutineContext.ensureActive()
         val (dir, depth) = queue.removeFirst()
-        val list = runCatching { FsRegistry.of(dir).list(dir) }.getOrDefault(emptyList())
+        val list = runCatching { listForSize(dir) }.getOrDefault(emptyList())
         for (f in list) {
             if (f.isDir) {
                 dirs++
