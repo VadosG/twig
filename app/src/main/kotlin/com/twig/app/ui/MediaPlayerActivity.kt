@@ -497,7 +497,7 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
             try {
                 if (OpenFiles.typeExt(file) == "m2ts") {
                     prepareM2ts(p, file)
-                } else if (file.scheme == "file") {
+                } else if (OpenFiles.directlyReadable(file)) {
                     p.setMediaItem(MediaItem.fromUri(Uri.fromFile(java.io.File(file.path))))
                 } else {
                     // The URI must carry a real extension (see [MediaSources]): DefaultExtractorsFactory
@@ -536,7 +536,7 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
      * shouldn't be ambiguous in theory, but better safe).
      */
     private suspend fun prepareM2ts(p: ExoPlayer, file: XFile) {
-        val local = file.scheme == "file"
+        val local = OpenFiles.directlyReadable(file)
         // Detecting the packet size needs to read the file header; non-local sources also need
         // to open a connection first (SFTP/SMB/... blocking socket IO) — move to a background
         // thread, same reason as networkEager in preparePlayer.

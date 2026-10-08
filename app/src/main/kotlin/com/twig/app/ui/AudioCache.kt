@@ -87,7 +87,7 @@ object AudioCache {
 
     /** In the background, download the whole track into the cache (used for prefetching the next track). */
     fun prefetch(file: XFile) {
-        if (file.scheme == "file") return
+        if (com.twig.app.OpenFiles.directlyReadable(file)) return
         val e = entryOf(file)
         prefetchExec.execute { runCatching { e.downloadAll() } }
     }

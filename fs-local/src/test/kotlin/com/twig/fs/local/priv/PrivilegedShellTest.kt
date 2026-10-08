@@ -42,6 +42,51 @@ class PrivilegedShellTest {
     }
 
     @Test
+    fun `random reads seek across blocks and preserve quoted newline paths`() {
+        val bytes = ByteArray(200_000) { (it * 31).toByte() }
+        val file = File(tmp.root, "random ' with\nnewline.bin").apply { writeBytes(bytes) }
+        fs.openRandom(file.path).use { source ->
+            assertEquals(bytes.size.toLong(), source.length())
+            val buffer = ByteArray(117)
+            for (position in listOf(131077L, 131084L, 17L, 65534L, 199990L)) {
+                var n = 0
+                val expected = minOf(100, bytes.size - position.toInt())
+                while (n < expected) {
+                    val read = source.readAt(position + n, buffer, 5 + n, expected - n)
+                    assertTrue(read > 0)
+                    n += read
+                }
+                org.junit.Assert.assertArrayEquals(bytes.copyOfRange(position.toInt(), position.toInt() + expected), buffer.copyOfRange(5, 5 + n))
+            }
+            assertEquals(-1, source.readAt(bytes.size.toLong(), buffer, 0, 1))
+            assertEquals(0, source.readAt(0, buffer, 0, 0))
+        }
+        assertTrue(shell.exec("echo still-alive").ok)
+    }
+
+    @Test
+    fun `random read reaches sparse file tail beyond four gigabytes`() {
+        val file = tmp.newFile("sparse.bin")
+        val position = (1L shl 32) + 123
+        java.io.RandomAccessFile(file, "rw").use { it.seek(position); it.write(byteArrayOf(9, 8, 7)) }
+        fs.openRandom(file.path).use { source ->
+            val buffer = ByteArray(3)
+            assertEquals(position + 3, source.length())
+            assertEquals(3, source.readAt(position, buffer, 0, buffer.size))
+            org.junit.Assert.assertArrayEquals(byteArrayOf(9, 8, 7), buffer)
+        }
+    }
+
+    @Test
+    fun `failed random read is an error rather than empty content`() {
+        val file = tmp.newFile("removed.bin").apply { writeText("payload") }
+        fs.openRandom(file.path).use { source ->
+            assertTrue(file.delete())
+            assertThrows(java.io.IOException::class.java) { source.readAt(0, ByteArray(8), 0, 8) }
+        }
+    }
+
+    @Test
     fun `size walk preserves newline filenames as one record`() {
         val root = tmp.newFolder("walknewline")
         val file = File(root, "pipe| and\nnewline.bin").apply { writeText("12345") }

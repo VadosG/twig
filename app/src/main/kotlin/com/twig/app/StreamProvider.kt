@@ -95,7 +95,7 @@ class StreamProvider : ContentProvider() {
         val ctx = ctx()
         if ("w" in mode) throw SecurityException(ctx.getString(R.string.stream_read_only))
         val f = decode(ctx, uri)
-        if (f.scheme == "file") {
+        if (OpenFiles.directlyReadable(f)) {
             return ParcelFileDescriptor.open(File(f.path), ParcelFileDescriptor.MODE_READ_ONLY)
         }
         val fs = FsRegistry.of(f)
@@ -117,7 +117,12 @@ class StreamProvider : ContentProvider() {
                 return ParcelFileDescriptor.open(local, ParcelFileDescriptor.MODE_READ_ONLY)
             }
             val sm = ctx.getSystemService(Context.STORAGE_SERVICE) as StorageManager
-            val src = fs.openRandom(f)
+            val raw = fs.openRandom(f)
+            // Small, scattered framework reads should hit cached blocks rather than
+            // start a privileged dd process for every seek.
+            val src = if (f.scheme == "file") {
+                com.twig.app.ui.BufferedRandomSource(raw, block = 1 shl 18, maxBlocks = 8, ahead = 0)
+            } else raw
             val size = if (f.size > 0) f.size else src.length()
             return sm.openProxyFileDescriptor(
                 ParcelFileDescriptor.MODE_READ_ONLY,

@@ -1,6 +1,7 @@
 package com.twig.fs.local.priv
 
 import com.twig.core.XFile
+import com.twig.core.RandomSource
 import com.twig.fs.local.LocalFileSystem
 import com.twig.fs.local.priv.PrivilegedShell.Companion.quote
 import java.io.InputStream
@@ -170,6 +171,50 @@ class PrivilegedFs(val shell: PrivilegedShell) {
 
     /** Reads a file. EOF of the one-shot `cat` is the end of the file. */
     fun openInput(path: String): InputStream = shell.openInput("cat ${quote(path)}")
+
+    /** dd seeks on its input file; only the remainder of one block is skipped in the pipe.
+     * Sequential reads reuse that pipe, while a seek closes it and starts at the new block.
+     * No whole-file copy or scan from byte zero, including for MP4's trailing moov.
+     */
+    fun openRandom(path: String): RandomSource {
+        val result = shell.exec("stat -L -c '%s' ${quote(path)}", quiet = true)
+        val size = result.lines.firstOrNull()?.trim()?.toLongOrNull()
+        if (!result.ok || size == null) throw IOException("Cannot stat file: $path")
+        return object : RandomSource {
+            private var input: InputStream? = null
+            private var pos = -1L
+            private var closed = false
+
+            @Synchronized override fun readAt(position: Long, buffer: ByteArray, offset: Int, length: Int): Int {
+                check(!closed) { "Source is closed" }
+                require(position >= 0 && offset >= 0 && length >= 0 && offset <= buffer.size - length)
+                if (length == 0) return 0
+                if (position != pos || input == null) {
+                    input?.close()
+                    input = null
+                    val block = 65536L
+                    val stream = shell.openInput("exec dd if=${quote(path)} bs=$block skip=${position / block}")
+                    input = stream
+                    var remaining = position % block
+                    while (remaining > 0) {
+                        val n = stream.skip(remaining)
+                        if (n > 0) remaining -= n
+                        else if (stream.read() < 0) break else remaining--
+                    }
+                    pos = position
+                }
+                val n = input!!.read(buffer, offset, length)
+                if (n > 0) pos += n
+                return n
+            }
+            override fun length(): Long = size
+            @Synchronized override fun close() {
+                closed = true
+                input?.close()
+                input = null
+            }
+        }
+    }
 
     /**
      * Writes a file. `cat >` truncates and `cat >>` appends, matching the

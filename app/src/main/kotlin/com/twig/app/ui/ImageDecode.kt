@@ -10,7 +10,6 @@ import android.graphics.RectF
 import android.media.ExifInterface
 import com.twig.app.OpenFiles
 import com.twig.core.XFile
-import java.io.File
 import kotlin.math.roundToInt
 
 /**
@@ -44,7 +43,7 @@ class Decoded(
 )
 
 internal fun decodeImage(ctx: Context, file: XFile): Decoded? {
-    val local = if (file.scheme == "file") File(file.path) else OpenFiles.materialize(ctx, file)
+    val local = OpenFiles.materialize(ctx, file)
     val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
     BitmapFactory.decodeFile(local.absolutePath, opts)
     if (opts.outWidth <= 0 || opts.outHeight <= 0) return null

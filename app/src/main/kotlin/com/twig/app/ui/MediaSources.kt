@@ -17,7 +17,8 @@ import java.io.File
 /**
  * Shared helper that builds a media3 [MediaSource] from an [XFile].
  *
- * - Local (scheme=="file"): [FileDataSource].
+ * - Directly readable local paths: [FileDataSource]. Restricted local paths use
+ *   the filesystem's privileged random reads, like other sources.
  * - Other sources: the URI must carry a real extension (`twig:///media.<ext>`, the triple slash
  *   puts the extension in the path); otherwise DefaultExtractorsFactory cannot recognize the
  *   container and falls back to a fixed sniff order (MP3 before AVI causes misdetection).
@@ -66,7 +67,7 @@ object MediaSources {
      * connection that's still being reused).
      */
     fun lazy(file: XFile): MediaSource {
-        if (file.scheme == "file") {
+        if (com.twig.app.OpenFiles.directlyReadable(file)) {
             return ProgressiveMediaSource.Factory(FileDataSource.Factory())
                 .createMediaSource(MediaItem.fromUri(Uri.fromFile(File(file.path))))
         }

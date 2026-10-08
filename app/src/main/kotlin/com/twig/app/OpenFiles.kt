@@ -113,12 +113,13 @@ object OpenFiles {
     fun isArchive(file: XFile): Boolean = !file.isDir && file.extension in ARCHIVE_EXT
 
     /**
-     * Materializes a non-local source (zip/ftp/etc.) into the cache directory and
-     * returns the local copy. Local files are returned as-is. Blocking IO; call from
-     * a worker thread.
+     * Returns a directly readable local file, copying into cache when necessary.
+     * Restricted local paths (e.g. Android/data via Shizuku) also need a copy:
+     * platform decoders cannot use the filesystem's privileged stream fallback.
+     * Blocking IO; call from a worker thread.
      */
     fun materialize(context: Context, file: XFile): File {
-        if (file.scheme == "file") return File(file.path)
+        if (directlyReadable(file)) return File(file.path)
         val dir = CacheDirs.dir(context, CacheDirs.OPEN)
         // Prefix the filename with a hash of source + path. Using just file.name
         // would let same-named files in different directories (the ever-present
@@ -135,6 +136,9 @@ object OpenFiles {
     }
 
     private const val COPY_BUFFER_SIZE = 1 shl 20
+
+    /** Platform path APIs cannot use LocalFileSystem's root/Shizuku fallback. */
+    fun directlyReadable(file: XFile): Boolean = file.scheme == "file" && File(file.path).canRead()
 
     /**
      * Reads a stream into a byte array with a large buffer. ★ Do NOT use

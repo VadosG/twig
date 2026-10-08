@@ -3,10 +3,12 @@ package com.twig.fs.local
 import com.twig.core.FileSystem
 import com.twig.core.FsException
 import com.twig.core.XFile
+import com.twig.core.RandomSource
 import com.twig.fs.local.priv.PrivilegedFs
 import com.twig.fs.local.priv.PrivilegedShell
 import java.io.File
 import java.io.InputStream
+import java.io.IOException
 import java.io.OutputStream
 
 /**
@@ -114,6 +116,24 @@ class LocalFileSystem(
         runCatching { File(file.path).inputStream() }.getOrElse { e ->
             fallback?.openInput(file.path) ?: throw e
         }
+
+    override fun randomAccessEfficient(): Boolean = true
+
+    override fun openRandom(file: XFile): RandomSource {
+        val raf = try {
+            java.io.RandomAccessFile(file.path, "r")
+        } catch (e: IOException) {
+            return fallback?.openRandom(file.path) ?: throw e
+        }
+        return object : RandomSource {
+            @Synchronized override fun readAt(position: Long, buffer: ByteArray, offset: Int, length: Int): Int {
+                raf.seek(position)
+                return raf.read(buffer, offset, length)
+            }
+            override fun length(): Long = raf.length()
+            override fun close() = raf.close()
+        }
+    }
 
     /**
      * The notification moment for a write is **stream close**, not open — the

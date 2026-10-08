@@ -687,7 +687,7 @@ object Thumbs {
                 // device-dependent and not guaranteed — use GlFrameGrabber +
                 // M2tsStrippingDataSource uniformly, same path as the player.
                 genVideoM2tsFrame(ctx, file)
-            } else if (file.scheme == "file") {
+            } else if (OpenFiles.directlyReadable(file)) {
                 withRetriever { r ->
                     r.setDataSource(file.path)
                     pickRepresentativeFrame(r, file, durationMsOf(r))
@@ -708,7 +708,7 @@ object Thumbs {
         // its MPEG-4 video repaired before the decoder sees it (packed bitstream split apart,
         // stuffing chunks dropped), and a file whose first frames are 1-byte `7f` stuffing kills
         // the codec outright — which is what "this one never produced a thumbnail" was.
-        if (file.scheme == "file") {
+        if (OpenFiles.directlyReadable(file)) {
             val mediaItem = MediaItem.fromUri(Uri.fromFile(File(file.path)))
             return GlFrameGrabber.grab(
                 ctx, mediaItem, null, VIDEO_FRAME_DIVISOR, VIDEO_TIMEOUT_MS, MediaSources.extractors(),
@@ -729,7 +729,7 @@ object Thumbs {
     }
 
     private fun genVideoM2tsFrame(ctx: Context, file: XFile): Bitmap? {
-        val local = file.scheme == "file"
+        val local = OpenFiles.directlyReadable(file)
         val shared = if (local) null else BufferedRandomSource(FsRegistry.of(file).openRandom(file))
         try {
             val rawPacketSize = detectM2tsPacketSize(file, shared)
@@ -1840,7 +1840,7 @@ object Thumbs {
         // The source (media server) already carries an album cover as a ready-made small image — use it, while the path below would have to drag in the whole song's bytes just to find the embedded image.
         genCover(file, maxEdge)?.let { return it }
         val pic = runCatching {
-            if (file.scheme == "file") {
+            if (OpenFiles.directlyReadable(file)) {
                 withRetriever { r -> r.setDataSource(file.path); r.embeddedPicture }
             } else {
                 FsRegistry.of(file).openRandom(file).use { src ->
@@ -1869,7 +1869,7 @@ object Thumbs {
     /** MMR reads the embedded cover (mp3 ID3 APIC / FLAC PICTURE / m4a covr). Local files get the path directly; other sources get a random-access data source so MMR reads on demand — mp3/flac covers sit in the file header, but m4a's covr lives in moov (possibly at the tail), and [NetVideoDataSource]'s block cache + read cap keep the traffic bounded. */
     private fun embeddedAudioCover(file: XFile): Bitmap? {
         val pic = runCatching {
-            if (file.scheme == "file") {
+            if (OpenFiles.directlyReadable(file)) {
                 withRetriever { r ->
                     r.setDataSource(file.path)
                     r.embeddedPicture
@@ -1896,7 +1896,7 @@ object Thumbs {
     private fun genPdf(ctx: Context, file: XFile): Bitmap? {
         val opened = when (file.scheme) {
             "file" -> runCatching {
-                ParcelFileDescriptor.open(File(file.path), ParcelFileDescriptor.MODE_READ_ONLY)
+                ctx.contentResolver.openFileDescriptor(com.twig.app.StreamProvider.uriFor(ctx, file), "r")
             }.getOrNull()
             com.twig.app.SafFileSystem.SCHEME ->
                 runCatching { ctx.contentResolver.openFileDescriptor(Uri.parse(file.path), "r") }.getOrNull()

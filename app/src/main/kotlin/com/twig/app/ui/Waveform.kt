@@ -103,7 +103,7 @@ object Waveform {
         val extractor = MediaExtractor()
         var netSource: RandomSource? = null
         try {
-            if (file.scheme == "file") {
+            if (com.twig.app.OpenFiles.directlyReadable(file)) {
                 extractor.setDataSource(file.path)
             } else {
                 // Network source: uses AudioCache's per-track shared disk cache — while the

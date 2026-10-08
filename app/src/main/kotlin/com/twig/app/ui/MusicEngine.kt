@@ -12,6 +12,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import com.twig.app.Connections
+import com.twig.app.OpenFiles
 import com.twig.app.Playlist
 import com.twig.app.PlaylistStore
 import com.twig.app.PlaylistTrack
@@ -457,7 +458,7 @@ object MusicEngine {
     private fun mmrMeta(ctx: Context, file: XFile, track: PlaylistTrack): PlaylistTrack? = runCatching {
         val mmr = MediaMetadataRetriever()
         try {
-            if (file.scheme == "file") mmr.setDataSource(file.path)
+            if (OpenFiles.directlyReadable(file)) mmr.setDataSource(file.path)
             else mmr.setDataSource(ctx, StreamProvider.uriFor(ctx, file))
             val title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)?.takeIf { it.isNotBlank() }
                 ?: track.name.substringBeforeLast('.')
