@@ -1,0 +1,1 @@
+Fix opening restricted local images, video and audio. Improve folder size scans, space analysis and file search speed, especially in Android/data. Fix internal storage jumping to the top-level shortcut when opened below /. Close the clipboard bar when paste starts. Update Russian translation.
