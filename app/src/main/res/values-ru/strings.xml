@@ -80,7 +80,7 @@
     <string name="strip_history">Недавние</string>
     <string name="history_title">Недавние местоположения</string>
     <string name="history_empty">Пока нет недавних местоположений — откройте файл (или представление Git), и папка появится здесь</string>
-    <string name="history_clear">Чисто</string>
+    <string name="history_clear">Очистить</string>
     <string name="history_git_prefix">Git · %1$s</string>
     <string name="history_conn_missing">Это соединение больше не существует</string>
     <string name="search_hint">Символ подстановки (например, *.jpg) или обычный текст</string>
@@ -366,6 +366,7 @@
     <string name="viewer_wrap">Перенос слов</string>
     <string name="viewer_line_numbers">Номера строк</string>
     <string name="viewer_search">Поиск</string>
+    <string name="viewer_load_external_resources">Загрузить внешние ресурсы</string>
     <string name="viewer_text_bigger">Увеличить текст</string>
     <string name="viewer_text_smaller">Уменьшить текст</string>
     <string name="hex_search_text">TXT</string>
@@ -875,11 +876,12 @@
     <string name="exit_lock_hint">Блокировка оставит всё это работающим — чтобы вернуться, достаточно просто ввести главный пароль.</string>
     <plurals name="exit_running_term">
         <item quantity="one">%1$d сессия терминала</item>
+        <item quantity="few">%1$d сессии терминала</item>
         <item quantity="other">%1$d сессий терминала</item>
     </plurals>
 
     <!-- About -->
-    <string name="settings_section_about">Об</string>
+    <string name="settings_section_about">О приложении</string>
     <string name="settings_about">О Twig</string>
     <string name="about_version">Версия %1$s (%2$d)</string>
     <string name="about_body">%1$s\nЛицензия: GPL-3.0-only\n\nИсходный код, вопросы и релизы:\n%2$s</string>
@@ -895,5 +897,4 @@
     <string name="date_format_ymd">YY-MM-DD</string>
     <string name="date_format_dmy">DD.MM.YY</string>
     <string name="date_format_mdy">MM/DD/YY</string>
-    <string name="viewer_load_external_resources">Загрузить внешние ресурсы</string>
 </resources>
