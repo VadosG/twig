@@ -4,6 +4,7 @@ import com.twig.core.FsRegistry
 import com.twig.core.XFile
 import com.twig.fs.archive.ArchiveFileSystem
 import com.twig.fs.archive.Archives
+import com.twig.fs.local.LocalFileSystem
 
 /** A treemap node: directories hold a child list and accumulate size, files are leaves. */
 class TreemapEntry(
@@ -24,8 +25,8 @@ class TreemapEntry(
 class TreemapException(message: String) : RuntimeException(message)
 
 /**
- * Full recursive scan of a directory / archive into a [TreemapEntry] tree via
- * FileSystem.list(); works the same for any source. [scanned]/[bytes] are polled
+ * Full recursive scan of a directory / archive into a [TreemapEntry] tree.
+ * Local scans stream privileged subtrees; other sources use FileSystem.list(). [scanned]/[bytes] are polled
  * by the UI for progress; set [stop] to wind down (e.g. when leaving the occupying
  * view). Blocking IO — must be called from a worker thread.
  */
@@ -52,8 +53,34 @@ class TreemapScanner(private val cacheDir: java.io.File) {
             afs.rootOf(if (needLocal) localArchive(target) else target)
         }
         val root = TreemapEntry(rootFile, true, 0, ArrayList(), null)
-        scanInto(root)
+        if (FsRegistry.of(rootFile) is LocalFileSystem) scanLocal(root) else scanInto(root)
         return root
+    }
+
+    private fun scanLocal(root: TreemapEntry) {
+        val dirs = HashMap<String, TreemapEntry>()
+        dirs[java.io.File(root.file.path).absolutePath] = root
+        val order = ArrayList<TreemapEntry>().apply { add(root) }
+        walkLocalForSize(root.file, Int.MAX_VALUE, { stop || scanned >= MAX_ENTRIES }) { file ->
+            val parent = dirs[file.parentPath] ?: return@walkLocalForSize
+            scanned++
+            val size = if (file.isDir) 0L else file.size.coerceAtLeast(0)
+            val child = TreemapEntry(file, file.isDir, size, if (file.isDir) ArrayList() else null, parent)
+            parent.children!!.add(child)
+            if (file.isDir) {
+                dirs[file.path] = child
+                order.add(child)
+            } else {
+                parent.size += size
+                bytes += size
+            }
+        }
+        // Both walkers deliver parents before descendants. Reverse order folds
+        // directory totals upward once, rather than once per file per ancestor.
+        for (dir in order.asReversed()) {
+            dir.children!!.sortByDescending { it.size }
+            dir.parent?.let { it.size += dir.size }
+        }
     }
 
     private fun scanInto(dir: TreemapEntry) {

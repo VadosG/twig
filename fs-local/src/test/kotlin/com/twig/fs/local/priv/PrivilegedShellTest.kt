@@ -42,6 +42,122 @@ class PrivilegedShellTest {
     }
 
     @Test
+    fun `size walk preserves newline filenames as one record`() {
+        val root = tmp.newFolder("walknewline")
+        val file = File(root, "pipe| and\nnewline.bin").apply { writeText("12345") }
+        val outside = tmp.newFolder("newlinetarget")
+        File(outside, "nested").writeText("1234567")
+        val link = File(root, "dir| with\nnewline")
+        java.nio.file.Files.createSymbolicLink(link.toPath(), outside.toPath())
+        val actual = ArrayList<com.twig.core.XFile>()
+        fs.walkForSize(root.path, 64, { false }, actual::add)
+        assertEquals(3, actual.size)
+        assertEquals(5L, actual.single { it.path == file.path }.size)
+        assertTrue(actual.single { it.path == link.path }.isDir)
+        assertEquals(7L, actual.single { it.path == File(link, "nested").path }.size)
+    }
+
+    @Test
+    fun `find without printf falls back to ordinary listings within depth budget`() {
+        val root = tmp.newFolder("oldfindtree")
+        File(root, "data").writeText("123")
+        val sub = File(root, "sub").apply { mkdir() }
+        File(sub, "deep").writeText("12345")
+        val bin = tmp.newFolder("oldfindbin")
+        File(bin, "find").apply {
+            writeText("""#!/bin/sh
+for twig_find_arg do
+  [ "${'$'}twig_find_arg" = '-printf' ] && exit 1
+done
+exec /usr/bin/find "${'$'}@"
+""")
+            assertTrue(setExecutable(true))
+        }
+        val launcher = PrivilegedLauncher { cmd ->
+            val builder = if (cmd == null) ProcessBuilder("/bin/sh") else ProcessBuilder("/bin/sh", "-c", cmd)
+            builder.environment()["PATH"] = "${bin.path}:${System.getenv("PATH")}"
+            JvmPrivilegedProcess(builder.start())
+        }
+        PrivilegedShell(launcher).use { oldShell ->
+            assertTrue(oldShell.connect())
+            val actual = ArrayList<com.twig.core.XFile>()
+            PrivilegedFs(oldShell).walkForSize(root.path, 1, { false }, actual::add)
+            assertEquals(fs.list(root.path)!!.associateBy { it.path }, actual.associateBy { it.path })
+            assertEquals("fallback must still enforce entry budget", 2, actual.size)
+        }
+    }
+
+    @Test
+    fun `size walk matches recursive listing including directory links and strange names`() {
+        val root = tmp.newFolder("walk ' | ")
+        File(root, "a|b ' \$file").writeText("123")
+        File(root, ".hidden").writeText("12")
+        val sub = File(root, "sub").apply { mkdir() }
+        File(sub, "deep").apply { mkdir() }
+        File(sub, "data").writeText("12345")
+        val outside = tmp.newFolder("outside")
+        File(outside, "linked").writeText("1234567")
+        java.nio.file.Files.createSymbolicLink(File(root, "link").toPath(), outside.toPath())
+        java.nio.file.Files.createSymbolicLink(File(root, "broken").toPath(), File(root, "missing").toPath())
+
+        val expected = ArrayList<com.twig.core.XFile>()
+        val queue = ArrayDeque<String>().apply { addLast(root.path) }
+        while (queue.isNotEmpty()) {
+            val children = fs.list(queue.removeFirst())!!
+            expected.addAll(children)
+            children.filter { it.isDir }.forEach { queue.addLast(it.path) }
+        }
+        val actual = ArrayList<com.twig.core.XFile>()
+        fs.walkForSize(root.path, 64, { false }, actual::add)
+        assertEquals(expected.associateBy { it.path }, actual.associateBy { it.path })
+        assertEquals(expected.size, actual.size)
+    }
+
+    @Test
+    fun `size walk follows starting directory link and respects depth limit`() {
+        val root = tmp.newFolder("walkdepth")
+        val sub = File(root, "sub").apply { mkdir() }
+        File(sub, "data").writeText("12345")
+        val link = File(tmp.root, "start")
+        java.nio.file.Files.createSymbolicLink(link.toPath(), root.toPath())
+        val actual = ArrayList<com.twig.core.XFile>()
+        fs.walkForSize(link.path, 1, { false }, actual::add)
+        assertEquals(listOf(File(link, "sub").path), actual.map { it.path })
+        assertTrue(actual.single().isDir)
+    }
+
+    @Test
+    fun `cancelling size walk destroys its process and leaves shared session usable`() {
+        val root = tmp.newFolder("walkstop")
+        repeat(50) { File(root, "f$it").writeText("data") }
+        val spawned = ArrayList<PrivilegedProcess>()
+        var destroyed = 0
+        val launcher = PrivilegedLauncher { cmd ->
+            val process = SuLauncher("/bin/sh").start(cmd)
+            object : PrivilegedProcess by process {
+                override fun destroy() { destroyed++; process.destroy() }
+            }.also { spawned.add(it) }
+        }
+        PrivilegedShell(launcher).use { scanningShell ->
+            assertTrue(scanningShell.connect())
+            val scanned = ArrayList<com.twig.core.XFile>()
+            PrivilegedFs(scanningShell).walkForSize(root.path, 64, { scanned.size >= 2 }, scanned::add)
+            assertEquals(2, scanned.size)
+            assertEquals("one session plus one scan", 2, spawned.size)
+            assertEquals("scan process was closed", 1, destroyed)
+            assertEquals("still usable", scanningShell.exec("echo 'still usable'").text)
+        }
+    }
+
+    @Test
+    fun `size walk handles empty and missing roots without inventing entries`() {
+        val actual = ArrayList<com.twig.core.XFile>()
+        fs.walkForSize(tmp.newFolder("walkempty").path, 64, { false }, actual::add)
+        fs.walkForSize(File(tmp.root, "missing").path, 64, { false }, actual::add)
+        assertTrue(actual.isEmpty())
+    }
+
+    @Test
     fun `connect reads back a uid`() {
         assertTrue(shell.uid >= 0)
         assertTrue(shell.alive())

@@ -1,11 +1,13 @@
 package com.twig.app.ui
 
 import com.twig.core.XFile
+import com.twig.core.FsRegistry
+import com.twig.fs.local.LocalFileSystem
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlin.coroutines.coroutineContext
 
@@ -26,25 +28,41 @@ private const val DIR_SCAN_UI_MS = 200L
 internal const val DIR_SCAN_MIN_SPIN_MS = 600L
 
 /**
- * Recursively count files / directories / total bytes under [root], BFS traversal,
+ * Recursively count files / directories / total bytes under [root],
  * emitting intermediate results as it scans (at most once every [DIR_SCAN_UI_MS], with
  * a guaranteed final emission that is the complete value).
  * A single directory listing failure (permission / network glitch) is skipped per the
  * existing convention of [scanSearch] / [TreemapScanner] and does not abort the whole
  * tally.
- * Cancellation is handled by the caller cancelling the coroutine — note that the one
- * network round-trip blocked inside `list()` is not interrupted and only exits at the
- * checkpoint after it returns.
+ * Local scans stream unreadable subtrees through one privileged command and check
+ * cancellation per entry. Other backends use BFS; a network round-trip blocked
+ * inside `list()` only exits at the checkpoint after it returns.
  *
  * This only "fetches data"; accumulation and persistence are done by the collector
  * (main thread), per [PaneViewModel]'s "tree state is only written on the main thread"
  * rule; [io] is injectable so unit tests can use a test dispatcher to drive it through.
  */
-fun scanDirStat(root: XFile, io: CoroutineDispatcher = Dispatchers.IO): Flow<DirStat> = flow {
+fun scanDirStat(root: XFile, io: CoroutineDispatcher = Dispatchers.IO): Flow<DirStat> = channelFlow {
     var files = 0
     var dirs = 0
     var bytes = 0L
     var lastUi = 0L
+    if (FsRegistry.of(root) is LocalFileSystem) {
+        val context = coroutineContext
+        walkLocalForSize(root, DIR_SCAN_MAX_DEPTH + 1,
+            { context.ensureActive(); files + dirs >= DIR_SCAN_MAX_ENTRIES },
+        ) { file ->
+            if (file.isDir) dirs++ else { files++; bytes += file.size.coerceAtLeast(0) }
+            val now = android.os.SystemClock.elapsedRealtime()
+            if (now - lastUi > DIR_SCAN_UI_MS) {
+                lastUi = now
+                trySend(DirStat(files, dirs, bytes))
+            }
+        }
+        context.ensureActive()
+        send(DirStat(files, dirs, bytes))
+        return@channelFlow
+    }
     val queue = ArrayDeque<Pair<XFile, Int>>()
     queue.addLast(root to 0)
     while (queue.isNotEmpty() && files + dirs < DIR_SCAN_MAX_ENTRIES) {
@@ -63,8 +81,8 @@ fun scanDirStat(root: XFile, io: CoroutineDispatcher = Dispatchers.IO): Flow<Dir
         val now = android.os.SystemClock.elapsedRealtime()
         if (now - lastUi > DIR_SCAN_UI_MS) {
             lastUi = now
-            emit(DirStat(files, dirs, bytes))
+            send(DirStat(files, dirs, bytes))
         }
     }
-    emit(DirStat(files, dirs, bytes))
+    send(DirStat(files, dirs, bytes))
 }.flowOn(io)

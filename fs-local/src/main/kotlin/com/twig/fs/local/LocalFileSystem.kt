@@ -77,6 +77,33 @@ class LocalFileSystem(
         return children.map(readEntry)
     }
 
+    /** Visits descendants without sorting; unreadable subtrees use one privileged scan. */
+    fun walkForSize(
+        dir: XFile,
+        maxDepth: Int,
+        readEntry: (File) -> XFile,
+        stopped: () -> Boolean,
+        visit: (XFile) -> Unit,
+    ) {
+        val pending = ArrayDeque<Pair<XFile, Int>>()
+        pending.addLast(dir to 0)
+        while (pending.isNotEmpty() && !stopped()) {
+            val (parent, depth) = pending.removeFirst()
+            if (depth >= maxDepth) continue
+            val children = File(parent.path).listFiles()
+            if (children == null) {
+                fallback?.walkForSize(File(parent.path).absolutePath, maxDepth - depth, stopped, visit)
+                continue
+            }
+            for (child in children) {
+                if (stopped()) return
+                val file = readEntry(child)
+                visit(file)
+                if (file.isDir && depth + 1 < maxDepth) pending.addLast(file to (depth + 1))
+            }
+        }
+    }
+
     /** Directories first, then by name case-insensitively — the conventional file manager sort. */
     private fun sorted(items: List<XFile>): List<XFile> = items
         .sortedWith(compareByDescending<XFile> { it.isDir }.thenBy { it.name.lowercase() })

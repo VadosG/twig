@@ -4,6 +4,7 @@ import com.twig.core.XFile
 import com.twig.fs.local.LocalFileSystem
 import com.twig.fs.local.priv.PrivilegedShell.Companion.quote
 import java.io.InputStream
+import java.io.IOException
 import java.io.OutputStream
 
 /**
@@ -19,6 +20,94 @@ import java.io.OutputStream
  * Every command here is built with [quote]d paths — see the note on that function.
  */
 class PrivilegedFs(val shell: PrivilegedShell) {
+
+    @Volatile private var findPrintf: Boolean? = null
+
+    private fun supportsFindPrintf(): Boolean {
+        findPrintf?.let { return it }
+        // Probe the complete format: older Android find versions lack -printf.
+        // The probe must end in a newline for the shared shell's marker framing.
+        val result = shell.exec("find / -maxdepth 0 -printf '%M|%s|%T@|%p\\0\\n'", quiet = true)
+        return (result.ok && result.lines.any {
+            it.endsWith('\u0000') && parseFind(it.dropLast(1)) != null
+        }).also { findPrintf = it }
+    }
+
+    /**
+     * Streams an entire subtree in one find invocation instead of one command per
+     * directory. A separate process keeps cancellation out of the shared shell's
+     * framing; exec lets closing the stream kill find itself. -printf reuses find's
+     * own metadata, avoiding toybox's oversized -exec stat batches (E2BIG). NUL
+     * records preserve filenames containing newlines. Older find versions keep
+     * the ordinary per-directory path. Listing failures leave the partial scan intact,
+     * matching the size scanners' best-effort handling of unreadable directories.
+     */
+    fun walkForSize(
+        path: String,
+        maxDepth: Int,
+        stopped: () -> Boolean,
+        visit: (XFile) -> Unit,
+    ) {
+        if (stopped()) return
+        if (!supportsFindPrintf()) {
+            walkByListing(path, maxDepth, stopped, visit)
+            return
+        }
+        val pending = ArrayDeque<Pair<String, Int>>()
+        pending.addLast(path to maxDepth)
+        while (pending.isNotEmpty() && !stopped()) {
+            val (root, depth) = pending.removeFirst()
+            if (depth <= 0) continue
+            val prefix = root.trimEnd('/') + "/"
+            val cmd = "exec find -H ${quote(root)} -mindepth 1 -maxdepth $depth -printf '%M|%s|%T@|%p\\0'"
+            try {
+                shell.openInput(cmd).reader().buffered(1 shl 16).use { reader ->
+                    val buffer = CharArray(1 shl 14)
+                    val record = StringBuilder()
+                    while (!stopped()) {
+                        val n = reader.read(buffer)
+                        if (n < 0) break
+                        for (i in 0 until n) {
+                            if (buffer[i] != '\u0000') { record.append(buffer[i]); continue }
+                            if (stopped()) return@use
+                            val entry = parseFind(record.toString())
+                            record.setLength(0)
+                            if (entry == null || !entry.path.startsWith(prefix)) continue
+                            val file = if (entry.isLink) {
+                                // Query only the target mode: printing its filename
+                                // through stat's line format would lose newlines.
+                                val target = shell.exec("stat -L -c '%f' ${quote(entry.path)}", quiet = true)
+                                    .lines.firstOrNull()?.trim()?.toIntOrNull(16)
+                                entry.toXFile().copy(isDir = target != null && target and S_IFMT == S_IFDIR)
+                            } else entry.toXFile()
+                            visit(file)
+                            // find -H follows only its starting path. Scan directory
+                            // links separately, within the same depth/entry budget.
+                            if (entry.isLink && file.isDir) {
+                                val usedDepth = entry.path.substring(prefix.length).count { it == '/' } + 1
+                                pending.addLast(entry.path to (depth - usedDepth))
+                            }
+                        }
+                    }
+                }
+            } catch (_: IOException) {
+                // find may exit non-zero after delivering readable siblings.
+            }
+        }
+    }
+
+    private fun walkByListing(path: String, maxDepth: Int, stopped: () -> Boolean, visit: (XFile) -> Unit) {
+        val pending = ArrayDeque<Pair<String, Int>>().apply { addLast(path to 0) }
+        while (pending.isNotEmpty() && !stopped()) {
+            val (root, depth) = pending.removeFirst()
+            if (depth >= maxDepth) continue
+            for (file in list(root) ?: emptyList()) {
+                if (stopped()) return
+                visit(file)
+                if (file.isDir) pending.addLast(file.path to (depth + 1))
+            }
+        }
+    }
 
     /**
      * Lists a directory in a single process.
@@ -139,6 +228,18 @@ class PrivilegedFs(val shell: PrivilegedShell) {
         const val S_IFMT = 0xF000
         const val S_IFDIR = 0x4000
         const val S_IFLNK = 0xA000
+
+        /** `%M|%s|%T@|%p` from GNU/toybox find; split only the metadata fields. */
+        fun parseFind(record: String): Entry? {
+            val a = record.indexOf('|'); if (a <= 0) return null
+            val b = record.indexOf('|', a + 1); if (b < 0) return null
+            val c = record.indexOf('|', b + 1); if (c < 0) return null
+            val mode = when (record[0]) { 'd' -> S_IFDIR; 'l' -> S_IFLNK; else -> 0x8000 }
+            val size = record.substring(a + 1, b).toLongOrNull() ?: return null
+            val time = record.substring(b + 1, c).substringBefore('.').toLongOrNull() ?: return null
+            val path = record.substring(c + 1).takeIf { it.isNotEmpty() } ?: return null
+            return Entry(mode, size, time, path)
+        }
 
         /** `%f|%s|%Y|%n` → raw mode (hex), size, mtime (seconds), name. */
         fun parseStat(line: String): Entry? {
