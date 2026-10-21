@@ -174,10 +174,6 @@ class TrashStore(
         if (relative.isEmpty()) stored else File(stored, relative).path
     }
 
-    fun parentMissing(entry: Entry, relative: String = ""): Boolean = synchronized(lock) {
-        !File(originalPath(entry, relative)).parentFile!!.isDirectory
-    }
-
     fun restore(entry: Entry, name: String = entry.name, createParents: Boolean = false) =
         restoreItem(entry, "", name, createParents)
 

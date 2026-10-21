@@ -71,7 +71,6 @@
     <string name="treemap_empty">Boş klasör</string>
     <string name="treemap_reveal">Diğer panelde göster</string>
     <string name="menu_swap_pane">Diğer panele geç</string>
-    <string name="treemap_confirm_delete">%1$s (%2$s) silinsin mi?</string>
     <string name="strip_term">Terminal</string>
     <string name="strip_swap">Paneller</string>
     <string name="strip_menu">Menü</string>
@@ -126,7 +125,6 @@
     <string name="perm_needed_msg">Twig depolamayı gezmek için tüm dosyalara erişim izni ister. Sonraki ayarlar sayfasında etkinleştirin.</string>
     <string name="perm_go_settings">Ayarları aç</string>
     <string name="empty_dir">(Boş klasör)</string>
-    <string name="confirm_delete">Seçili %1$d öğe silinsin mi?</string>
     <string name="msg_no_selection">Seçim yok</string>
     <string name="msg_done">Tamamlandı</string>
     <string name="msg_done_refused">Tamamlandı — geçersiz adlı %1$d öğe atlandı (örn. «..»)</string>
@@ -335,7 +333,6 @@
     <string name="compare_sync_unreadable">%1$d klasör okunamadı ve dokunulmayacak (örn. %2$s). Yeniden tarayın.</string>
     <string name="compare_sync_unreadable_only">Bazı klasörler okunamadı; güvenli eşitleme yok. Yeniden tarayın.</string>
     <string name="compare_sync_wait_scan">Tarama sürüyor; eşitlemeden önce bitmesini bekleyin</string>
-    <string name="compare_delete_confirm">%2$s tarafından %1$d öğe silinsin mi? Geri alınamaz.</string>
     <string name="compare_exclude_this">Bu öğeyi hariç tut</string>
     <string name="compare_excludes">Hariç tutma kuralları</string>
     <string name="compare_excludes_hint">Her satıra bir kural. * ve ? tüm adlarla; / içeren kurallar köke göre göreli yolla eşleşir.</string>

@@ -71,7 +71,6 @@
     <string name="treemap_empty">Pasta vazia</string>
     <string name="treemap_reveal">Mostrar no outro painel</string>
     <string name="menu_swap_pane">Ir para o outro painel</string>
-    <string name="treemap_confirm_delete">Excluir %1$s (%2$s)?</string>
     <string name="strip_term">Terminal</string>
     <string name="strip_swap">Painéis</string>
     <string name="strip_menu">Menu</string>
@@ -126,7 +125,6 @@
     <string name="perm_needed_msg">Twig precisa de acesso a todos os arquivos. Ative-o na próxima tela de configurações.</string>
     <string name="perm_go_settings">Abrir configurações</string>
     <string name="empty_dir">(Pasta vazia)</string>
-    <string name="confirm_delete">Excluir os %1$d itens selecionados?</string>
     <string name="msg_no_selection">Nada selecionado</string>
     <string name="msg_done">Concluído</string>
     <string name="msg_done_refused">Concluído — ignorados %1$d itens com nomes inválidos (ex.: «..»)</string>
@@ -335,7 +333,6 @@
     <string name="compare_sync_unreadable">%1$d pastas ilegíveis ficarão intactas (ex.: %2$s). Analise novamente.</string>
     <string name="compare_sync_unreadable_only">Há pastas ilegíveis; nada pode ser sincronizado com segurança. Analise novamente.</string>
     <string name="compare_sync_wait_scan">Análise em andamento — aguarde para sincronizar</string>
-    <string name="compare_delete_confirm">Excluir %1$d itens do lado %2$s? Não pode ser desfeito.</string>
     <string name="compare_exclude_this">Excluir este item da comparação</string>
     <string name="compare_excludes">Regras de exclusão</string>
     <string name="compare_excludes_hint">Uma regra por linha. * e ? correspondem a nomes completos; regras com / correspondem ao caminho relativo à raiz.</string>

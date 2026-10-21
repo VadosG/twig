@@ -312,7 +312,6 @@ class SettingsActivity : AppCompatActivity() {
         switchRow(getString(R.string.settings_trash_enabled), getString(R.string.settings_trash_enabled_desc),
             get = { Prefs.trashEnabled(this) }, set = { Prefs.setTrashEnabled(this, it) })
 
-
         section(getString(R.string.settings_section_security))
         actionRow(getString(R.string.settings_master_pw), SecurityUi.masterSubtitle(this)) { sub ->
             SecurityUi.showMaster(this) { sub.text = SecurityUi.masterSubtitle(this) }

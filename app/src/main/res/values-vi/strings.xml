@@ -71,7 +71,6 @@
     <string name="treemap_empty">Thư mục trống</string>
     <string name="treemap_reveal">Hiện ở khung kia</string>
     <string name="menu_swap_pane">Chuyển sang khung kia</string>
-    <string name="treemap_confirm_delete">Xóa %1$s (%2$s)?</string>
     <string name="strip_term">Dòng lệnh</string>
     <string name="strip_swap">Khung</string>
     <string name="strip_menu">Menu</string>
@@ -126,7 +125,6 @@
     <string name="perm_needed_msg">Twig cần quyền truy cập mọi tệp để duyệt bộ nhớ. Hãy bật trong trang cài đặt tiếp theo.</string>
     <string name="perm_go_settings">Mở cài đặt</string>
     <string name="empty_dir">(Thư mục trống)</string>
-    <string name="confirm_delete">Xóa %1$d mục đã chọn?</string>
     <string name="msg_no_selection">Chưa chọn mục nào</string>
     <string name="msg_done">Xong</string>
     <string name="msg_done_refused">Xong — bỏ qua %1$d mục có tên không thể ghi (vd. «..»)</string>
@@ -335,7 +333,6 @@
     <string name="compare_sync_unreadable">Không đọc được %1$d thư mục nên sẽ giữ nguyên (vd. %2$s). Quét lại để thử.</string>
     <string name="compare_sync_unreadable_only">Một số thư mục không đọc được nên không thể đồng bộ an toàn. Hãy quét lại.</string>
     <string name="compare_sync_wait_scan">Vẫn đang quét; chờ xong trước khi đồng bộ</string>
-    <string name="compare_delete_confirm">Xóa %1$d mục ở bên %2$s? Không thể hoàn tác.</string>
     <string name="compare_exclude_this">Loại trừ mục này</string>
     <string name="compare_excludes">Quy tắc loại trừ</string>
     <string name="compare_excludes_hint">Mỗi dòng một quy tắc. * và ? khớp toàn bộ tên; quy tắc có / khớp đường dẫn tương đối từ gốc.</string>

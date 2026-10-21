@@ -71,7 +71,6 @@
     <string name="treemap_empty">目錄為空</string>
     <string name="treemap_reveal">對側顯示</string>
     <string name="menu_swap_pane">切換到另一面板</string>
-    <string name="treemap_confirm_delete">刪除 %1$s(%2$s)?</string>
     <string name="strip_term">終端</string>
     <string name="strip_swap">切換</string>
     <string name="strip_menu">選單</string>
@@ -126,7 +125,6 @@
     <string name="perm_needed_msg">Twig 需要"所有檔案訪問"許可權才能瀏覽儲存。請在接下來的設定頁中開啟。</string>
     <string name="perm_go_settings">去設定</string>
     <string name="empty_dir">(空目錄)</string>
-    <string name="confirm_delete">確定刪除選中的 %1$d 項?</string>
     <string name="msg_no_selection">未選擇任何項</string>
     <string name="msg_done">完成</string>
     <string name="msg_done_refused">完成,跳過 %1$d 項:名稱無法寫入(例如 “..”)</string>
@@ -335,7 +333,6 @@
     <string name="compare_sync_unreadable">%1$d 個資料夾讀取失敗,將原樣保留(例如 %2$s)。重新掃描可再試一次。</string>
     <string name="compare_sync_unreadable_only">有資料夾讀取失敗,沒有可以安全同步的內容。重新掃描可再試一次。</string>
     <string name="compare_sync_wait_scan">還在掃描,等掃完再同步</string>
-    <string name="compare_delete_confirm">刪除%2$s側的 %1$d 項?不可撤銷。</string>
     <string name="compare_exclude_this">排除此項</string>
     <string name="compare_excludes">排除規則</string>
     <string name="compare_excludes_hint">一行一條。萬用字元 * 和 ? 按整個名字匹配;含斜槓的規則匹配相對根的路徑。</string>

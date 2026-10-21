@@ -105,7 +105,7 @@ class TrashStoreTest {
         val sub = fs.list(folder).single { it.name == "sub" }
         val nested = fs.item(fs.list(sub).single())
         assertEquals("sub/a.txt", nested.relative)
-        assertTrue(store.parentMissing(entry, nested.relative))
+        assertFalse(a.parentFile!!.isDirectory)
         assertThrows(IOException::class.java) { store.restoreItem(entry, nested.relative, "a.txt") }
         store.restoreItem(entry, nested.relative, "a.txt", true)
         assertEquals("a", a.readText())
@@ -193,7 +193,7 @@ class TrashStoreTest {
         val original = file("removed/folder/item.txt")
         val entry = trash(original)
         assertTrue(original.parentFile!!.delete())
-        assertTrue(store.parentMissing(entry))
+        assertFalse(original.parentFile!!.isDirectory)
         assertThrows(IOException::class.java) { store.restore(entry) }
         assertFalse(original.parentFile!!.exists())
         store.restore(entry, createParents = true)

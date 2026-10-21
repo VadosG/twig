@@ -71,7 +71,6 @@
     <string name="treemap_empty">Dossier vide</string>
     <string name="treemap_reveal">Afficher dans l’autre volet</string>
     <string name="menu_swap_pane">Passer à l’autre volet</string>
-    <string name="treemap_confirm_delete">Supprimer %1$s (%2$s) ?</string>
     <string name="strip_term">Terminal</string>
     <string name="strip_swap">Volets</string>
     <string name="strip_menu">Menu</string>
@@ -126,7 +125,6 @@
     <string name="perm_needed_msg">Twig a besoin de l’accès à tous les fichiers. Activez-le dans les paramètres qui suivent.</string>
     <string name="perm_go_settings">Ouvrir les paramètres</string>
     <string name="empty_dir">(Dossier vide)</string>
-    <string name="confirm_delete">Supprimer les %1$d éléments sélectionnés ?</string>
     <string name="msg_no_selection">Aucune sélection</string>
     <string name="msg_done">Terminé</string>
     <string name="msg_done_refused">Terminé — %1$d éléments aux noms interdits (ex. « .. ») ignorés</string>
@@ -335,7 +333,6 @@
     <string name="compare_sync_unreadable">%1$d dossiers illisibles resteront intacts (ex. %2$s). Relancez l’analyse.</string>
     <string name="compare_sync_unreadable_only">Des dossiers sont illisibles ; aucune synchronisation sûre possible. Relancez l’analyse.</string>
     <string name="compare_sync_wait_scan">Analyse en cours — attendez avant de synchroniser</string>
-    <string name="compare_delete_confirm">Supprimer %1$d éléments du côté %2$s ? Irréversible.</string>
     <string name="compare_exclude_this">Exclure cet élément</string>
     <string name="compare_excludes">Règles d’exclusion</string>
     <string name="compare_excludes_hint">Une règle par ligne. * et ? correspondent aux noms entiers ; une règle avec / correspond au chemin relatif à la racine.</string>

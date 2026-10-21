@@ -71,7 +71,6 @@
     <string name="treemap_empty">Пустая папка</string>
     <string name="treemap_reveal">Показать в другой панели</string>
     <string name="menu_swap_pane">Переключиться на другую панель</string>
-    <string name="treemap_confirm_delete">Удалить %1$s (%2$s)?</string>
     <!-- Short labels for the action strip's pinned top row (9sp, single line; long copy is truncated) -->
     <string name="strip_term">Термин.</string>
     <string name="strip_swap">Панели</string>
@@ -128,7 +127,6 @@
     <string name="perm_needed_msg">Twig необходим "Доступ ко всем файлам" для просмотра хранилища. Пожалуйста, включите его на следующей странице настроек.</string>
     <string name="perm_go_settings">Перейти в настройки</string>
     <string name="empty_dir">(Пустая папка)</string>
-    <string name="confirm_delete">Удалить выбранные %1$d элемента(ов)?</string>
     <string name="msg_no_selection">Ничего не выбрано</string>
     <string name="msg_done">Готово</string>
     <string name="msg_done_refused">Готово — пропущено %1$d записей(и), имена которых невозможно записать (например, "..")</string>
@@ -341,7 +339,6 @@
     <string name="compare_sync_unreadable">%1$d папок(и) не удалось прочитать, и они останутся без изменений (например, %2$s). Пересканируйте, чтобы попробовать снова.</string>
     <string name="compare_sync_unreadable_only">Некоторые папки не удалось прочитать, поэтому безопасно синхронизировать нечего. Пересканируйте, чтобы попробовать снова.</string>
     <string name="compare_sync_wait_scan">Сканирование продолжается — дождитесь его завершения перед синхронизацией</string>
-    <string name="compare_delete_confirm">Удалить %1$d элемент(ов) со стороны %2$s? Это действие нельзя отменить.</string>
     <string name="compare_exclude_this">Исключить этот элемент</string>
     <string name="compare_excludes">Правила исключения</string>
     <string name="compare_excludes_hint">Одно правило на строку. Символы подстановки * и ? соответствуют полным именам; правило, содержащее / соответствует пути относительно корня.</string>

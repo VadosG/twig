@@ -71,7 +71,6 @@
     <string name="treemap_empty">Leerer Ordner</string>
     <string name="treemap_reveal">Im anderen Bereich anzeigen</string>
     <string name="menu_swap_pane">Zum anderen Bereich wechseln</string>
-    <string name="treemap_confirm_delete">%1$s (%2$s) löschen?</string>
     <string name="strip_term">Terminal</string>
     <string name="strip_swap">Bereiche</string>
     <string name="strip_menu">Menü</string>
@@ -126,7 +125,6 @@
     <string name="perm_needed_msg">Twig braucht „Zugriff auf alle Dateien“. Bitte auf der folgenden Einstellungsseite aktivieren.</string>
     <string name="perm_go_settings">Einstellungen öffnen</string>
     <string name="empty_dir">(Leerer Ordner)</string>
-    <string name="confirm_delete">%1$d ausgewählte Einträge löschen?</string>
     <string name="msg_no_selection">Nichts ausgewählt</string>
     <string name="msg_done">Fertig</string>
     <string name="msg_done_refused">Fertig — %1$d Einträge mit unzulässigen Namen (z. B. „..“) übersprungen</string>
@@ -335,7 +333,6 @@
     <string name="compare_sync_unreadable">%1$d Ordner nicht lesbar, bleiben unverändert (z. B. %2$s). Erneut scannen.</string>
     <string name="compare_sync_unreadable_only">Ordner nicht lesbar; keine sichere Synchronisierung möglich. Erneut scannen.</string>
     <string name="compare_sync_wait_scan">Suche läuft noch — vor Synchronisierung warten</string>
-    <string name="compare_delete_confirm">%1$d Einträge auf %2$s löschen? Nicht rückgängig zu machen.</string>
     <string name="compare_exclude_this">Eintrag ausschließen</string>
     <string name="compare_excludes">Ausschlussregeln</string>
     <string name="compare_excludes_hint">Eine Regel pro Zeile. * und ? gelten für ganze Namen; Regeln mit / für den Pfad relativ zur Wurzel.</string>

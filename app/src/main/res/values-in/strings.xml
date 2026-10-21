@@ -71,7 +71,6 @@
     <string name="treemap_empty">Folder kosong</string>
     <string name="treemap_reveal">Tampilkan di panel lain</string>
     <string name="menu_swap_pane">Beralih ke panel lain</string>
-    <string name="treemap_confirm_delete">Hapus %1$s (%2$s)?</string>
     <string name="strip_term">Terminal</string>
     <string name="strip_swap">Panel</string>
     <string name="strip_menu">Menu</string>
@@ -126,7 +125,6 @@
     <string name="perm_needed_msg">Twig memerlukan akses semua file. Aktifkan di halaman pengaturan berikut.</string>
     <string name="perm_go_settings">Buka pengaturan</string>
     <string name="empty_dir">(Folder kosong)</string>
-    <string name="confirm_delete">Hapus %1$d item yang dipilih?</string>
     <string name="msg_no_selection">Tidak ada pilihan</string>
     <string name="msg_done">Selesai</string>
     <string name="msg_done_refused">Selesai — %1$d item dengan nama tidak valid (mis. «..») dilewati</string>
@@ -335,7 +333,6 @@
     <string name="compare_sync_unreadable">%1$d folder tidak terbaca dan dibiarkan utuh (mis. %2$s). Pindai ulang.</string>
     <string name="compare_sync_unreadable_only">Beberapa folder tidak terbaca; tidak ada yang aman disinkronkan. Pindai ulang.</string>
     <string name="compare_sync_wait_scan">Masih memindai — tunggu sebelum sinkronisasi</string>
-    <string name="compare_delete_confirm">Hapus %1$d item dari sisi %2$s? Tidak dapat diurungkan.</string>
     <string name="compare_exclude_this">Kecualikan item ini</string>
     <string name="compare_excludes">Aturan pengecualian</string>
     <string name="compare_excludes_hint">Satu aturan per baris. * dan ? cocok dengan nama lengkap; aturan berisi / cocok dengan jalur relatif dari akar.</string>

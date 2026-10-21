@@ -4,7 +4,6 @@ project(twigpty C)
 # Small app-owned helpers: PTY allocation and atomic trash moves; no third-party code.
 add_library(twigpty SHARED twigpty.c trash.c)
 
-
 # ★ Reproducible builds: without this the GNU build-id differs between machines.
 # The linker computes it before the .so is stripped, over an image that still
 # carries absolute source paths in its debug info — so /home/me/... and

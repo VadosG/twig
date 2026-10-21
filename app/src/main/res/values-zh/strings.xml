@@ -71,7 +71,6 @@
     <string name="treemap_empty">目录为空</string>
     <string name="treemap_reveal">对侧显示</string>
     <string name="menu_swap_pane">切换到另一面板</string>
-    <string name="treemap_confirm_delete">删除 %1$s(%2$s)?</string>
     <!-- Short labels for the action strip's pinned top row (9sp, single line; long copy is truncated) -->
     <string name="strip_term">终端</string>
     <string name="strip_swap">切换</string>
@@ -128,7 +127,6 @@
     <string name="perm_needed_msg">Twig 需要"所有文件访问"权限才能浏览存储。请在接下来的设置页中开启。</string>
     <string name="perm_go_settings">去设置</string>
     <string name="empty_dir">(空目录)</string>
-    <string name="confirm_delete">确定删除选中的 %1$d 项?</string>
     <string name="msg_no_selection">未选择任何项</string>
     <string name="msg_done">完成</string>
     <string name="msg_done_refused">完成,跳过 %1$d 项:名称无法写入(例如 “..”)</string>
@@ -338,7 +336,6 @@
     <string name="compare_sync_unreadable">%1$d 个文件夹读取失败,将原样保留(例如 %2$s)。重新扫描可再试一次。</string>
     <string name="compare_sync_unreadable_only">有文件夹读取失败,没有可以安全同步的内容。重新扫描可再试一次。</string>
     <string name="compare_sync_wait_scan">还在扫描,等扫完再同步</string>
-    <string name="compare_delete_confirm">删除%2$s侧的 %1$d 项?不可撤销。</string>
     <string name="compare_exclude_this">排除此项</string>
     <string name="compare_excludes">排除规则</string>
     <string name="compare_excludes_hint">一行一条。通配符 * 和 ? 按整个名字匹配;含斜杠的规则匹配相对根的路径。</string>

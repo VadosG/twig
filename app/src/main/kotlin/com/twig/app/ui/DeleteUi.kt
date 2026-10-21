@@ -52,26 +52,26 @@ object DeleteUi {
             if (context is LifecycleOwner && !context.lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED))
                 return@launch
             val enabled = Prefs.trashEnabled(app)
-            val eligible = plan.count { it.volume != null }
-            val useTrash = CheckBox(context).apply {
+            val useTrash = if (enabled && plan.any { it.volume != null }) CheckBox(context).apply {
                 id = android.R.id.checkbox
                 text = context.getString(R.string.trash_use)
                 isChecked = true
-                visibility = if (enabled && eligible > 0) android.view.View.VISIBLE else android.view.View.GONE
-            }
-            val content = LinearLayout(context).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = android.view.Gravity.END or android.view.Gravity.CENTER_VERTICAL
-                val dp = resources.displayMetrics.density
-                val pad = (24 * dp).toInt()
-                setPadding(pad, (8 * dp).toInt(), pad, 0)
-                addView(useTrash)
+            } else null
+            val content = useTrash?.let { checkbox ->
+                LinearLayout(context).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = android.view.Gravity.END or android.view.Gravity.CENTER_VERTICAL
+                    val dp = resources.displayMetrics.density
+                    val pad = (24 * dp).toInt()
+                    setPadding(pad, (8 * dp).toInt(), pad, 0)
+                    addView(checkbox)
+                }
             }
             confirmation(context, plan.map { it.file.name })
-                .setView(content.takeIf { enabled && eligible > 0 })
+                .setView(content)
                 .setOnDismissListener { onDismiss?.invoke() }
                 .setPositiveButton(R.string.strip_delete) { _, _ ->
-                    val recycle = enabled && useTrash.isChecked
+                    val recycle = useTrash?.isChecked == true
                     scope.launch {
                         val busy = AlertDialog.Builder(context).setMessage(R.string.trash_busy).setCancelable(false).show()
                         val result = try {

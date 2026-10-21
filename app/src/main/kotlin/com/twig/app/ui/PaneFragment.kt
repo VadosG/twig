@@ -1827,7 +1827,7 @@ class PaneFragment : Fragment() {
     /** Deleted entries remain read-only; inspection and export use their virtual source. */
     private fun trashFileActions(node: PaneViewModel.FileNode): List<MenuAct> {
         val file = node.file
-        if (file.path == "/" || file.path.startsWith("/@status/")) return emptyList()
+        if (file.path == "/") return emptyList()
         val actions = ArrayList<MenuAct>()
         actions.item(getString(R.string.file_info), R.drawable.ic_info) { viewModel.toggleInfo(node) }
         if (!file.canRead) return actions // A deleted symlink can be inspected/restored, never followed.

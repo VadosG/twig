@@ -71,7 +71,6 @@
     <string name="treemap_empty">खाली फ़ोल्डर</string>
     <string name="treemap_reveal">दूसरे पैनल में दिखाएँ</string>
     <string name="menu_swap_pane">दूसरे पैनल पर जाएँ</string>
-    <string name="treemap_confirm_delete">%1$s (%2$s) हटाएँ?</string>
     <string name="strip_term">टर्मिनल</string>
     <string name="strip_swap">पैनल</string>
     <string name="strip_menu">मेन्यू</string>
@@ -126,7 +125,6 @@
     <string name="perm_needed_msg">स्टोरेज देखने के लिए Twig को सभी फ़ाइलों तक पहुँच चाहिए। अगले सेटिंग पेज पर इसे सक्षम करें।</string>
     <string name="perm_go_settings">सेटिंग खोलें</string>
     <string name="empty_dir">(खाली फ़ोल्डर)</string>
-    <string name="confirm_delete">चुने गए %1$d आइटम हटाएँ?</string>
     <string name="msg_no_selection">कुछ नहीं चुना</string>
     <string name="msg_done">पूर्ण</string>
     <string name="msg_done_refused">पूर्ण — अमान्य नाम वाले %1$d आइटम छोड़े गए (जैसे «..»)</string>
@@ -335,7 +333,6 @@
     <string name="compare_sync_unreadable">%1$d फ़ोल्डर पढ़े नहीं जा सके, इन्हें नहीं छुएँगे (जैसे %2$s)। दोबारा स्कैन करें।</string>
     <string name="compare_sync_unreadable_only">कुछ फ़ोल्डर नहीं पढ़े जा सके; सुरक्षित सिंक संभव नहीं। दोबारा स्कैन करें।</string>
     <string name="compare_sync_wait_scan">स्कैन जारी है; सिंक करने से पहले पूरा होने दें</string>
-    <string name="compare_delete_confirm">%2$s पक्ष से %1$d आइटम हटाएँ? इसे पूर्ववत नहीं कर सकते।</string>
     <string name="compare_exclude_this">यह आइटम बाहर रखें</string>
     <string name="compare_excludes">बहिष्करण नियम</string>
     <string name="compare_excludes_hint">प्रति पंक्ति एक नियम। * और ? पूरे नाम से मिलते हैं; / वाला नियम मूल से सापेक्ष पथ से मिलता है।</string>

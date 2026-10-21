@@ -71,7 +71,6 @@
     <string name="treemap_empty">Carpeta vacía</string>
     <string name="treemap_reveal">Mostrar en el otro panel</string>
     <string name="menu_swap_pane">Cambiar al otro panel</string>
-    <string name="treemap_confirm_delete">¿Eliminar %1$s (%2$s)?</string>
     <string name="strip_term">Terminal</string>
     <string name="strip_swap">Paneles</string>
     <string name="strip_menu">Menú</string>
@@ -126,7 +125,6 @@
     <string name="perm_needed_msg">Twig necesita «Acceso a todos los archivos». Actívalo en la siguiente página de ajustes.</string>
     <string name="perm_go_settings">Ir a ajustes</string>
     <string name="empty_dir">(Carpeta vacía)</string>
-    <string name="confirm_delete">¿Eliminar los %1$d elementos seleccionados?</string>
     <string name="msg_no_selection">Nada seleccionado</string>
     <string name="msg_done">Hecho</string>
     <string name="msg_done_refused">Hecho: omitidos %1$d elementos con nombres no válidos (p. ej. «..»)</string>
@@ -335,7 +333,6 @@
     <string name="compare_sync_unreadable">%1$d carpetas ilegibles quedarán intactas (p. ej. %2$s). Vuelve a explorar.</string>
     <string name="compare_sync_unreadable_only">Hay carpetas ilegibles; no se puede sincronizar con seguridad. Vuelve a explorar.</string>
     <string name="compare_sync_wait_scan">Exploración en curso; espera antes de sincronizar</string>
-    <string name="compare_delete_confirm">¿Eliminar %1$d elementos del lado %2$s? No se puede deshacer.</string>
     <string name="compare_exclude_this">Excluir este elemento</string>
     <string name="compare_excludes">Reglas de exclusión</string>
     <string name="compare_excludes_hint">Una regla por línea. * y ? coinciden con nombres completos; una regla con / coincide con la ruta relativa a la raíz.</string>

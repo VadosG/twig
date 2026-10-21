@@ -71,7 +71,6 @@
     <string name="treemap_empty">مجلد فارغ</string>
     <string name="treemap_reveal">عرض في اللوحة الأخرى</string>
     <string name="menu_swap_pane">التبديل إلى اللوحة الأخرى</string>
-    <string name="treemap_confirm_delete">حذف %1$s (%2$s)؟</string>
     <string name="strip_term">الطرفية</string>
     <string name="strip_swap">اللوحات</string>
     <string name="strip_menu">القائمة</string>
@@ -126,7 +125,6 @@
     <string name="perm_needed_msg">يحتاج Twig إلى إذن الوصول إلى جميع الملفات لتصفح التخزين. فعّله في صفحة الإعدادات التالية.</string>
     <string name="perm_go_settings">فتح الإعدادات</string>
     <string name="empty_dir">(مجلد فارغ)</string>
-    <string name="confirm_delete">حذف العناصر المحددة (%1$d)؟</string>
     <string name="msg_no_selection">لا شيء محدد</string>
     <string name="msg_done">تم</string>
     <string name="msg_done_refused">تم — تخطي %1$d عنصر بأسماء لا يمكن كتابتها (مثل «..»)</string>
@@ -335,7 +333,6 @@
     <string name="compare_sync_unreadable">تعذرت قراءة %1$d مجلد ولن يتم تغييره (مثل %2$s). أعد الفحص للمحاولة.</string>
     <string name="compare_sync_unreadable_only">تعذرت قراءة بعض المجلدات، فلا شيء آمن للمزامنة. أعد الفحص.</string>
     <string name="compare_sync_wait_scan">الفحص مستمر؛ انتظر اكتماله قبل المزامنة</string>
-    <string name="compare_delete_confirm">حذف %1$d عنصر من الجانب %2$s؟ لا يمكن التراجع.</string>
     <string name="compare_exclude_this">استبعاد هذا العنصر</string>
     <string name="compare_excludes">قواعد الاستبعاد</string>
     <string name="compare_excludes_hint">قاعدة بكل سطر. * و ? تطابق الاسم كاملا؛ والقاعدة التي تحتوي / تطابق المسار النسبي للجذر.</string>

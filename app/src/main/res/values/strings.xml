@@ -71,7 +71,6 @@
     <string name="treemap_empty">Empty folder</string>
     <string name="treemap_reveal">Show in other pane</string>
     <string name="menu_swap_pane">Switch to other pane</string>
-    <string name="treemap_confirm_delete">Delete %1$s (%2$s)?</string>
     <!-- Short labels for the action strip's pinned top row (9sp, single line; long copy is truncated) -->
     <string name="strip_term">Term</string>
     <string name="strip_swap">Panes</string>
@@ -128,7 +127,6 @@
     <string name="perm_needed_msg">Twig needs "All files access" to browse storage. Please enable it on the settings page that follows.</string>
     <string name="perm_go_settings">Go to settings</string>
     <string name="empty_dir">(Empty folder)</string>
-    <string name="confirm_delete">Delete the selected %1$d item(s)?</string>
     <string name="msg_no_selection">Nothing selected</string>
     <string name="msg_done">Done</string>
     <string name="msg_done_refused">Done — skipped %1$d entry(ies) whose name cannot be written (e.g. "..")</string>
@@ -357,7 +355,6 @@
     <string name="compare_sync_unreadable">%1$d folder(s) could not be read and will be left untouched (e.g. %2$s). Rescan to try again.</string>
     <string name="compare_sync_unreadable_only">Some folders could not be read, so there is nothing safe to sync. Rescan to try again.</string>
     <string name="compare_sync_wait_scan">Still scanning — wait for it to finish before syncing</string>
-    <string name="compare_delete_confirm">Delete %1$d item(s) from the %2$s side? This cannot be undone.</string>
     <string name="compare_exclude_this">Exclude this item</string>
     <string name="compare_excludes">Exclude rules</string>
     <string name="compare_excludes_hint">One rule per line. Wildcards * and ? match whole names; a rule containing / matches the path relative to the root.</string>

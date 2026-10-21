@@ -71,7 +71,6 @@
     <string name="treemap_empty">Cartella vuota</string>
     <string name="treemap_reveal">Mostra nell’altro pannello</string>
     <string name="menu_swap_pane">Passa all’altro pannello</string>
-    <string name="treemap_confirm_delete">Eliminare %1$s (%2$s)?</string>
     <string name="strip_term">Terminale</string>
     <string name="strip_swap">Pannelli</string>
     <string name="strip_menu">Menu</string>
@@ -126,7 +125,6 @@
     <string name="perm_needed_msg">Twig richiede l’accesso a tutti i file. Attivalo nella pagina delle impostazioni seguente.</string>
     <string name="perm_go_settings">Apri impostazioni</string>
     <string name="empty_dir">(Cartella vuota)</string>
-    <string name="confirm_delete">Eliminare i %1$d elementi selezionati?</string>
     <string name="msg_no_selection">Nessuna selezione</string>
     <string name="msg_done">Completato</string>
     <string name="msg_done_refused">Completato — saltati %1$d elementi con nomi non validi (es. «..»)</string>
@@ -335,7 +333,6 @@
     <string name="compare_sync_unreadable">%1$d cartelle illeggibili resteranno intatte (es. %2$s). Ripeti la scansione.</string>
     <string name="compare_sync_unreadable_only">Cartelle illeggibili; nessuna sincronizzazione sicura possibile. Ripeti la scansione.</string>
     <string name="compare_sync_wait_scan">Scansione in corso — attendi prima di sincronizzare</string>
-    <string name="compare_delete_confirm">Eliminare %1$d elementi dal lato %2$s? Operazione irreversibile.</string>
     <string name="compare_exclude_this">Escludi questo elemento</string>
     <string name="compare_excludes">Regole di esclusione</string>
     <string name="compare_excludes_hint">Una regola per riga. * e ? corrispondono ai nomi interi; una regola con / corrisponde al percorso relativo alla radice.</string>

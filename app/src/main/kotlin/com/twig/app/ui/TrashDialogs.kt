@@ -20,17 +20,15 @@ import java.io.File
 
 /** Management actions stay in the pane; no second screen or navigation stack. */
 class TrashDialogs(private val ctx: Context, private val owner: LifecycleOwner, private val changed: () -> Unit) {
-    private val dialogs = mutableListOf<AlertDialog>()
     private val fs get() = FsRegistry.of("trash") as TrashFileSystem
     private val store get() = fs.store
     private fun active() = owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) && !Secrets.locked(ctx)
     private fun AlertDialog.track(): AlertDialog {
-        dialogs += this
         val observer = object : DefaultLifecycleObserver {
             override fun onStop(owner: LifecycleOwner) { dismiss() }
         }
         owner.lifecycle.addObserver(observer)
-        setOnDismissListener { dialogs.remove(this); owner.lifecycle.removeObserver(observer) }
+        setOnDismissListener { owner.lifecycle.removeObserver(observer) }
         return this
     }
     private fun error(e: Throwable) = Toast.makeText(ctx, e.message ?: ctx.getString(R.string.err_failed), Toast.LENGTH_LONG).show()
@@ -40,7 +38,7 @@ class TrashDialogs(private val ctx: Context, private val owner: LifecycleOwner, 
                 .setItems(arrayOf(ctx.getString(R.string.action_refresh), ctx.getString(R.string.trash_empty))) { _, which ->
                     if (which == 0) changed() else confirmEmpty()
                 }.show().track()
-        } else if (!file.path.startsWith("/@status/")) {
+        } else {
             owner.lifecycleScope.launch {
                 val result = withContext(Dispatchers.IO) { runCatching { fs.item(file) } }
                 if (!active()) return@launch
@@ -69,12 +67,13 @@ class TrashDialogs(private val ctx: Context, private val owner: LifecycleOwner, 
                 val name = input.text.toString()
                 owner.lifecycleScope.launch {
                     val result = withContext(Dispatchers.IO) { runCatching {
-                        store.parentMissing(item.entry, item.relative) to store.originalPath(item.entry, item.relative)
+                        val parent = File(store.originalPath(item.entry, item.relative)).parentFile!!
+                        parent.takeUnless { it.isDirectory }
                     } }
                     if (!active()) return@launch
-                    result.fold(onSuccess = { (missing, original) ->
-                        if (!missing) work { store.restoreItem(item.entry, item.relative, name) }
-                        else AlertDialog.Builder(ctx).setMessage(ctx.getString(R.string.trash_restore_parent, File(original).parent))
+                    result.fold(onSuccess = { missingParent ->
+                        if (missingParent == null) work { store.restoreItem(item.entry, item.relative, name) }
+                        else AlertDialog.Builder(ctx).setMessage(ctx.getString(R.string.trash_restore_parent, missingParent.path))
                             .setNegativeButton(R.string.dialog_cancel, null)
                             .setPositiveButton(R.string.trash_restore) { _, _ -> work { store.restoreItem(item.entry, item.relative, name, true) } }
                             .show().track()

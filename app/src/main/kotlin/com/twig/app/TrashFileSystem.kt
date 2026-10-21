@@ -20,6 +20,7 @@ class TrashFileSystem(private val ctx: Context, val store: TrashStore = TrashSto
     override fun root() = XFile(scheme, "/", true, canWrite = false, displayName = displayName)
     private fun failure(path: String): Nothing = throw IOException(ctx.getString(R.string.trash_failed, path))
     private fun token(entry: TrashStore.Entry) = Uri.encode(entry.directory.path)
+    private val order = compareBy<XFile> { !it.isDir }.thenBy { it.name.lowercase() }
     /** Listing metadata only: row binding must not stat or scan storage on the UI thread. */
     fun deletedAt(file: XFile): Long? = if (file.scheme == scheme)
         entries[file.path.removePrefix("/").substringBefore('/')]?.deletedAt?.takeIf { it > 0 }
@@ -52,17 +53,15 @@ class TrashFileSystem(private val ctx: Context, val store: TrashStore = TrashSto
         if (dir.path == "/") {
             val snapshot = store.snapshot()
             entries = snapshot.entries.associateBy(::token)
-            val rows = ArrayList<XFile>()
-            snapshot.entries.forEach { rows += node(it, "") }
             notices = snapshot.damaged.map { ctx.getString(R.string.trash_invalid, it) }
-            return rows.sortedWith(compareBy<XFile> { !it.isDir }.thenBy { it.name.lowercase() })
+            return snapshot.entries.map { node(it, "") }.sortedWith(order)
         }
         val item = item(dir)
         val payload = store.payload(item.entry, item.relative)
         if (!OsConstants.S_ISDIR(Os.lstat(payload.path).st_mode)) failure(dir.path)
         return (payload.listFiles() ?: failure(dir.path)).map {
             node(item.entry, if (item.relative.isEmpty()) it.name else "${item.relative}/${it.name}")
-        }.sortedWith(compareBy<XFile> { !it.isDir }.thenBy { it.name.lowercase() })
+        }.sortedWith(order)
     }
     override fun openInput(file: XFile): java.io.InputStream {
         val item = item(file)
