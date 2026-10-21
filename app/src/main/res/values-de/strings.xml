@@ -1038,9 +1038,11 @@
     <string name="batch_template_error">Ungültige Vorlage oder fehlendes Änderungsdatum</string>
     <string name="batch_titlecase">Titelschreibung (Englisch)</string>
     <string name="batch_insert">Einfügen</string>
-    <string name="batch_insert_text">Einzufügender Text</string>
+    <string name="batch_insert_text">Text</string>
     <string name="batch_insert_offset">Versatz</string>
     <string name="batch_insert_begin">Vom Anfang (links)</string>
     <string name="batch_insert_end">Vom Ende (rechts)</string>
     <string name="batch_insert_invalid_offset">Einen gültigen nichtnegativen ganzzahligen Versatz eingeben</string>
+    <string name="batch_insert_overwrite">Einfügen / Überschreiben</string>
+    <string name="batch_overwrite">Überschreiben</string>
 </resources>

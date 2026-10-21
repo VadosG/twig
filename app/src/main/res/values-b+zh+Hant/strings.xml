@@ -1037,9 +1037,11 @@
     <string name="batch_template_error">範本無效或缺少修改日期</string>
     <string name="batch_titlecase">標題大小寫（英語）</string>
     <string name="batch_insert">插入</string>
-    <string name="batch_insert_text">插入文字</string>
+    <string name="batch_insert_text">文字</string>
     <string name="batch_insert_offset">偏移量</string>
     <string name="batch_insert_begin">從開頭（左端）</string>
     <string name="batch_insert_end">從末尾（右端）</string>
     <string name="batch_insert_invalid_offset">請輸入有效的非負整數偏移量</string>
+    <string name="batch_insert_overwrite">插入／覆寫</string>
+    <string name="batch_overwrite">覆寫</string>
 </resources>

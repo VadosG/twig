@@ -1038,9 +1038,11 @@
     <string name="batch_template_error">Modèle non valide ou date de modification absente</string>
     <string name="batch_titlecase">Casse de titre (anglais)</string>
     <string name="batch_insert">Insérer</string>
-    <string name="batch_insert_text">Texte à insérer</string>
+    <string name="batch_insert_text">Texte</string>
     <string name="batch_insert_offset">Décalage</string>
     <string name="batch_insert_begin">Depuis le début (gauche)</string>
     <string name="batch_insert_end">Depuis la fin (droite)</string>
     <string name="batch_insert_invalid_offset">Saisissez un décalage entier positif ou nul valide</string>
+    <string name="batch_insert_overwrite">Insérer / écraser</string>
+    <string name="batch_overwrite">Écraser</string>
 </resources>

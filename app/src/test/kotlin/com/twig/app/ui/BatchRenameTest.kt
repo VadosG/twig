@@ -21,8 +21,8 @@ class BatchRenameTest {
         regex: Boolean = false, matchCase: Boolean = false, width: Int = 1,
         start: String = "1", numberFirst: Boolean = false,
         insertion: String? = null, offset: String = "0", fromEnd: Boolean = false, letterCase: BatchRenameNames.LetterCase = BatchRenameNames.LetterCase.KEEP,
-        template: String? = null,
-    ) = BatchRenameNames.generate(files, part, numbering, find, replacement, regex, matchCase, width, start, numberFirst, insertion, offset, fromEnd, letterCase, template)
+        template: String? = null, overwrite: Boolean = false,
+    ) = BatchRenameNames.generate(files, part, numbering, find, replacement, regex, matchCase, width, start, numberFirst, insertion, offset, fromEnd, letterCase, template, overwrite)
 
     @Test fun `preview columns stay aligned on first measurement and after rebinding long names`() {
         val row = BatchRenameDialog.NameColumns(context)
@@ -113,8 +113,18 @@ class BatchRenameTest {
             assertEquals("0", offset.text.toString())
             val direction = spinners.single { it.adapter.getItem(0) == activity.getString(com.twig.app.R.string.batch_insert_begin) }
             assertEquals(0, direction.selectedItemPosition)
-            byHint(com.twig.app.R.string.batch_insert_text).setText("pre_")
+            val text = byHint(com.twig.app.R.string.batch_insert_text)
+            val operation = spinners.single { it.adapter.getItem(0) == activity.getString(com.twig.app.R.string.batch_insert) }
+            assertEquals(0, operation.selectedItemPosition)
+            text.setText("Old")
             assertTrue(apply.isEnabled)
+            operation.setSelection(1)
+            org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
+            assertFalse("Overwriting Old with Old must leave the preview unchanged", apply.isEnabled)
+            text.setText("New")
+            assertTrue(apply.isEnabled)
+            operation.setSelection(0)
+            org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
             direction.setSelection(1)
             org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
             assertTrue(apply.isEnabled)
@@ -166,6 +176,33 @@ class BatchRenameTest {
         assertEquals(listOf("a😀_b.txt"), generate(files, insertion = "_", offset = "2"))
         assertEquals(listOf("a😀_b.txt"), generate(files, insertion = "_", offset = "1", fromEnd = true))
         assertEquals(listOf("a_😀b.txt"), generate(files, insertion = "_", offset = "2", fromEnd = true))
+    }
+
+    @Test fun `overwrite replaces characters to the right of the shared insertion position`() {
+        val files = listOf(file("abcdef.txt"))
+        assertEquals(listOf("XYcdef.txt"), generate(files, insertion = "XY", overwrite = true))
+        assertEquals(listOf("abXYef.txt"), generate(files, insertion = "XY", offset = "2", overwrite = true))
+        assertEquals(listOf("abcdXY.txt"), generate(files, insertion = "XY", offset = "2", fromEnd = true, overwrite = true))
+        assertEquals(listOf("abcdefXY.txt"), generate(files, insertion = "XY", fromEnd = true, overwrite = true))
+        assertEquals(listOf("abcdef.txt"), generate(files, insertion = "", offset = "2", overwrite = true))
+    }
+
+    @Test fun `overwrite extends short names and respects the selected part`() {
+        assertEquals(listOf("aXYZ.txt"), generate(listOf(file("abc.txt")), insertion = "XYZ", offset = "1", overwrite = true))
+        assertEquals(listOf("abcXYZ.txt"), generate(listOf(file("abc.txt")), insertion = "XYZ", offset = "99", overwrite = true))
+        assertEquals(listOf("XYZ.txt"), generate(listOf(file("abc.txt")), insertion = "XYZ", offset = "99", fromEnd = true, overwrite = true))
+        val files = listOf(file("Photo.JPG"), file("README"), file("Folder.v1", true))
+        assertEquals(listOf("Photo.PNG", "README.PNG", "Folder.v1"),
+            generate(files, BatchRenameNames.Part.EXTENSION, insertion = "PNG", overwrite = true))
+        assertEquals(listOf("Photo.PNG"), generate(files.take(1), BatchRenameNames.Part.FULL,
+            insertion = "PNG", offset = "3", fromEnd = true, overwrite = true))
+    }
+
+    @Test fun `overwrite handles Unicode code points and invalid offsets like insertion`() {
+        assertEquals(listOf("aXb.txt"), generate(listOf(file("a😀b.txt")), insertion = "X", offset = "1", overwrite = true))
+        assertEquals(listOf("a😀b.txt"), generate(listOf(file("axb.txt")), insertion = "😀", offset = "1", overwrite = true))
+        assertEquals(listOf("aXY.txt"), generate(listOf(file("a😀b.txt")), insertion = "XY", offset = "2", fromEnd = true, overwrite = true))
+        assertTrue(runCatching { generate(listOf(file("a.txt")), insertion = "X", offset = "-1", overwrite = true) }.isFailure)
     }
 
     @Test fun `case conversion is independent of device locale and respects scope`() {

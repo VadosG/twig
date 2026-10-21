@@ -1038,9 +1038,11 @@
     <string name="batch_template_error">Plantilla no válida o falta la fecha de modificación</string>
     <string name="batch_titlecase">Mayúsculas de título (inglés)</string>
     <string name="batch_insert">Insertar</string>
-    <string name="batch_insert_text">Texto a insertar</string>
+    <string name="batch_insert_text">Texto</string>
     <string name="batch_insert_offset">Desplazamiento</string>
     <string name="batch_insert_begin">Desde el principio (izquierda)</string>
     <string name="batch_insert_end">Desde el final (derecha)</string>
     <string name="batch_insert_invalid_offset">Introduce un desplazamiento entero no negativo válido</string>
+    <string name="batch_insert_overwrite">Insertar / sobrescribir</string>
+    <string name="batch_overwrite">Sobrescribir</string>
 </resources>

@@ -1038,9 +1038,11 @@
     <string name="batch_template_error">Modello non valido o data di modifica assente</string>
     <string name="batch_titlecase">Maiuscole del titolo (inglese)</string>
     <string name="batch_insert">Inserisci</string>
-    <string name="batch_insert_text">Testo da inserire</string>
+    <string name="batch_insert_text">Testo</string>
     <string name="batch_insert_offset">Scostamento</string>
     <string name="batch_insert_begin">Dall’inizio (sinistra)</string>
     <string name="batch_insert_end">Dalla fine (destra)</string>
     <string name="batch_insert_invalid_offset">Inserisci uno scostamento intero non negativo valido</string>
+    <string name="batch_insert_overwrite">Inserisci / sovrascrivi</string>
+    <string name="batch_overwrite">Sovrascrivi</string>
 </resources>

@@ -1074,9 +1074,11 @@
     <string name="batch_template_error">Недопустимый шаблон или отсутствует дата изменения</string>
     <string name="batch_titlecase">Регистр заголовка (английский)</string>
     <string name="batch_insert">Вставить</string>
-    <string name="batch_insert_text">Текст для вставки</string>
+    <string name="batch_insert_text">Текст</string>
     <string name="batch_insert_offset">Смещение</string>
     <string name="batch_insert_begin">От начала (слева)</string>
     <string name="batch_insert_end">От конца (справа)</string>
     <string name="batch_insert_invalid_offset">Введите допустимое целое неотрицательное смещение</string>
+    <string name="batch_insert_overwrite">Вставка / перезапись</string>
+    <string name="batch_overwrite">Перезапись</string>
 </resources>

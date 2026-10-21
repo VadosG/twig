@@ -1108,9 +1108,11 @@
     <string name="batch_template_error">Invalid template or missing modification date</string>
     <string name="batch_titlecase">Title Case (English)</string>
     <string name="batch_insert">Insert</string>
-    <string name="batch_insert_text">Text to insert</string>
+    <string name="batch_insert_text">Text</string>
     <string name="batch_insert_offset">Offset</string>
     <string name="batch_insert_begin">From beginning (left)</string>
     <string name="batch_insert_end">From end (right)</string>
     <string name="batch_insert_invalid_offset">Enter a valid nonnegative whole-number offset</string>
+    <string name="batch_insert_overwrite">Insert / overwrite</string>
+    <string name="batch_overwrite">Overwrite</string>
 </resources>

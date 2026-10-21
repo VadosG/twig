@@ -1042,9 +1042,11 @@
     <string name="batch_template_error">القالب غير صالح أو تاريخ التعديل غير متوفر</string>
     <string name="batch_titlecase">حالة أحرف العنوان (الإنجليزية)</string>
     <string name="batch_insert">إدراج</string>
-    <string name="batch_insert_text">النص المراد إدراجه</string>
+    <string name="batch_insert_text">النص</string>
     <string name="batch_insert_offset">الإزاحة</string>
     <string name="batch_insert_begin">من البداية (اليسار)</string>
     <string name="batch_insert_end">من النهاية (اليمين)</string>
     <string name="batch_insert_invalid_offset">أدخل إزاحة صحيحة بعدد صحيح غير سالب</string>
+    <string name="batch_insert_overwrite">إدراج / استبدال</string>
+    <string name="batch_overwrite">استبدال</string>
 </resources>

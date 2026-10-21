@@ -57,7 +57,7 @@ internal object BatchRenameNames {
         files: List<XFile>, part: Part, numbering: Boolean, find: String, replacement: String,
         regex: Boolean, matchCase: Boolean, width: Int, start: String, numberFirst: Boolean,
         insertion: String? = null, offset: String = "0", fromEnd: Boolean = false, letterCase: LetterCase = LetterCase.KEEP,
-        template: String? = null,
+        template: String? = null, overwrite: Boolean = false,
     ): List<String> {
         val pattern = if (!numbering && regex && find.isNotEmpty()) {
             Regex(find, if (matchCase) emptySet() else setOf(RegexOption.IGNORE_CASE))
@@ -96,11 +96,14 @@ internal object BatchRenameNames {
                 }
             }
             val changed = if (insertion != null) {
-                // Count Unicode code points so an insertion never splits a surrogate pair.
+                // Count Unicode code points so neither boundary splits a surrogate pair.
                 val length = old.codePointCount(0, old.length)
                 val distance = insertOffset.coerceAtMost(length)
-                val position = old.offsetByCodePoints(0, if (fromEnd) length - distance else distance)
-                old.substring(0, position) + insertion + old.substring(position)
+                val index = if (fromEnd) length - distance else distance
+                val position = old.offsetByCodePoints(0, index)
+                val end = if (overwrite) old.offsetByCodePoints(position,
+                    minOf(insertion.codePointCount(0, insertion.length), length - index)) else position
+                old.substring(0, position) + insertion + old.substring(end)
             } else when (letterCase) {
                 LetterCase.LOWER -> old.lowercase(Locale.ROOT)
                 LetterCase.UPPER -> old.uppercase(Locale.ROOT)
@@ -143,7 +146,7 @@ internal object BatchRenameDialog {
         val content = column().apply { setPadding(px(16), 0, px(16), px(8)) }
         val part = spinner(listOf(R.string.batch_name_only, R.string.batch_ext_only, R.string.batch_name_ext))
         val method = spinner(listOf(R.string.batch_replace, R.string.batch_numbering,
-            R.string.batch_insert, R.string.batch_change_case, R.string.batch_template))
+            R.string.batch_insert_overwrite, R.string.batch_change_case, R.string.batch_template))
         val partLabel = label(R.string.batch_apply_to)
         content.addView(partLabel); content.addView(part)
         content.addView(method)
@@ -169,13 +172,14 @@ internal object BatchRenameDialog {
         numberBox.addView(label(R.string.batch_start)); numberBox.addView(start); numberBox.addView(order)
         content.addView(numberBox)
         val insertBox = column()
+        val operation = spinner(listOf(R.string.batch_insert, R.string.batch_overwrite))
         val insertion = EditText(context).apply { setHint(R.string.batch_insert_text); setSingleLine() }
         val offset = EditText(context).apply {
             setHint(R.string.batch_insert_offset)
             inputType = InputType.TYPE_CLASS_NUMBER; setSingleLine(); setText("0")
         }
         val direction = spinner(listOf(R.string.batch_insert_begin, R.string.batch_insert_end))
-        insertBox.addView(insertion)
+        insertBox.addView(operation); insertBox.addView(insertion)
         insertBox.addView(label(R.string.batch_insert_offset)); insertBox.addView(offset)
         insertBox.addView(direction); content.addView(insertBox)
         val letterCase = spinner(listOf(R.string.batch_lowercase, R.string.batch_uppercase, R.string.batch_titlecase))
@@ -220,7 +224,8 @@ internal object BatchRenameDialog {
                     offset = offset.text.toString(), fromEnd = direction.selectedItemPosition == 1,
                     letterCase = if (mode == 3) BatchRenameNames.LetterCase.entries[letterCase.selectedItemPosition + 1]
                         else BatchRenameNames.LetterCase.KEEP,
-                    template = if (mode == 4) template.text.toString() else null)
+                    template = if (mode == 4) template.text.toString() else null,
+                    overwrite = operation.selectedItemPosition == 1)
             }
             names = result.getOrDefault(emptyList())
             preview.names = names; preview.notifyDataSetChanged()
@@ -243,7 +248,7 @@ internal object BatchRenameDialog {
             override fun afterTextChanged(s: Editable?) {}
         }
         listOf(find, replacement, start, insertion, offset, template).forEach { it.addTextChangedListener(watcher) }
-        listOf(part, method, width, order, letterCase, direction).forEach {
+        listOf(part, method, width, order, letterCase, direction, operation).forEach {
             it.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) = update()
                 override fun onNothingSelected(parent: AdapterView<*>?) {}

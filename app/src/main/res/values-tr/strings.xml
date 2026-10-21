@@ -1038,9 +1038,11 @@
     <string name="batch_template_error">Geçersiz şablon veya değiştirilme tarihi eksik</string>
     <string name="batch_titlecase">Başlık Düzeni (İngilizce)</string>
     <string name="batch_insert">Ekle</string>
-    <string name="batch_insert_text">Eklenecek metin</string>
+    <string name="batch_insert_text">Metin</string>
     <string name="batch_insert_offset">Ofset</string>
     <string name="batch_insert_begin">Baştan (sol)</string>
     <string name="batch_insert_end">Sondan (sağ)</string>
     <string name="batch_insert_invalid_offset">Geçerli, negatif olmayan bir tam sayı ofseti girin</string>
+    <string name="batch_insert_overwrite">Ekle / üzerine yaz</string>
+    <string name="batch_overwrite">Üzerine yaz</string>
 </resources>

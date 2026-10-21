@@ -1037,9 +1037,11 @@
     <string name="batch_template_error">Mẫu không hợp lệ hoặc thiếu ngày sửa đổi</string>
     <string name="batch_titlecase">Viết hoa tiêu đề (tiếng Anh)</string>
     <string name="batch_insert">Chèn</string>
-    <string name="batch_insert_text">Văn bản cần chèn</string>
+    <string name="batch_insert_text">Văn bản</string>
     <string name="batch_insert_offset">Độ lệch</string>
     <string name="batch_insert_begin">Từ đầu (trái)</string>
     <string name="batch_insert_end">Từ cuối (phải)</string>
     <string name="batch_insert_invalid_offset">Nhập độ lệch là số nguyên không âm hợp lệ</string>
+    <string name="batch_insert_overwrite">Chèn / ghi đè</string>
+    <string name="batch_overwrite">Ghi đè</string>
 </resources>

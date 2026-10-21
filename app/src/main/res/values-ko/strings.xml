@@ -1038,9 +1038,11 @@
     <string name="batch_template_error">템플릿이 잘못되었거나 수정 날짜가 없습니다</string>
     <string name="batch_titlecase">제목 대소문자 (영어)</string>
     <string name="batch_insert">삽입</string>
-    <string name="batch_insert_text">삽입할 텍스트</string>
+    <string name="batch_insert_text">텍스트</string>
     <string name="batch_insert_offset">오프셋</string>
     <string name="batch_insert_begin">시작부터 (왼쪽)</string>
     <string name="batch_insert_end">끝부터 (오른쪽)</string>
     <string name="batch_insert_invalid_offset">유효한 0 이상의 정수 오프셋을 입력하세요</string>
+    <string name="batch_insert_overwrite">삽입 / 덮어쓰기</string>
+    <string name="batch_overwrite">덮어쓰기</string>
 </resources>

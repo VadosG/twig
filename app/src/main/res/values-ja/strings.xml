@@ -1038,9 +1038,11 @@
     <string name="batch_template_error">テンプレートが無効か、更新日がありません</string>
     <string name="batch_titlecase">タイトルケース（英語）</string>
     <string name="batch_insert">挿入</string>
-    <string name="batch_insert_text">挿入するテキスト</string>
+    <string name="batch_insert_text">テキスト</string>
     <string name="batch_insert_offset">オフセット</string>
     <string name="batch_insert_begin">先頭から（左端）</string>
     <string name="batch_insert_end">末尾から（右端）</string>
     <string name="batch_insert_invalid_offset">有効な 0 以上の整数のオフセットを入力してください</string>
+    <string name="batch_insert_overwrite">挿入／上書き</string>
+    <string name="batch_overwrite">上書き</string>
 </resources>

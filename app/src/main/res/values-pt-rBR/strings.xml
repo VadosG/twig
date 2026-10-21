@@ -1038,9 +1038,11 @@
     <string name="batch_template_error">Modelo inválido ou data de modificação ausente</string>
     <string name="batch_titlecase">Maiúsculas de título (inglês)</string>
     <string name="batch_insert">Inserir</string>
-    <string name="batch_insert_text">Texto a inserir</string>
+    <string name="batch_insert_text">Texto</string>
     <string name="batch_insert_offset">Deslocamento</string>
     <string name="batch_insert_begin">Do início (esquerda)</string>
     <string name="batch_insert_end">Do fim (direita)</string>
     <string name="batch_insert_invalid_offset">Insira um deslocamento inteiro não negativo válido</string>
+    <string name="batch_insert_overwrite">Inserir / sobrescrever</string>
+    <string name="batch_overwrite">Sobrescrever</string>
 </resources>

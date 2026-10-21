@@ -1038,9 +1038,11 @@
     <string name="batch_template_error">अमान्य टेम्पलेट या संशोधन तिथि उपलब्ध नहीं है</string>
     <string name="batch_titlecase">शीर्षक अक्षर शैली (अंग्रेज़ी)</string>
     <string name="batch_insert">सम्मिलित करें</string>
-    <string name="batch_insert_text">सम्मिलित करने का पाठ</string>
+    <string name="batch_insert_text">पाठ</string>
     <string name="batch_insert_offset">ऑफ़सेट</string>
     <string name="batch_insert_begin">आरंभ से (बाएँ)</string>
     <string name="batch_insert_end">अंत से (दाएँ)</string>
     <string name="batch_insert_invalid_offset">मान्य गैर-ऋणात्मक पूर्णांक ऑफ़सेट दर्ज करें</string>
+    <string name="batch_insert_overwrite">सम्मिलित करें / अधिलेखित करें</string>
+    <string name="batch_overwrite">अधिलेखित करें</string>
 </resources>

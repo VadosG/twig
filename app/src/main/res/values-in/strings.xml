@@ -1038,9 +1038,11 @@
     <string name="batch_template_error">Templat tidak valid atau tanggal perubahan tidak tersedia</string>
     <string name="batch_titlecase">Huruf Judul (Inggris)</string>
     <string name="batch_insert">Sisipkan</string>
-    <string name="batch_insert_text">Teks yang disisipkan</string>
+    <string name="batch_insert_text">Teks</string>
     <string name="batch_insert_offset">Offset</string>
     <string name="batch_insert_begin">Dari awal (kiri)</string>
     <string name="batch_insert_end">Dari akhir (kanan)</string>
     <string name="batch_insert_invalid_offset">Masukkan offset bilangan bulat nonnegatif yang valid</string>
+    <string name="batch_insert_overwrite">Sisipkan / timpa</string>
+    <string name="batch_overwrite">Timpa</string>
 </resources>
