@@ -12,7 +12,7 @@ Native Kotlin and XML views, no Material library, minimal dependencies. When
 something can reasonably be written by hand, it is: WebDAV, S3 signing, git and
 restic are all implemented from scratch.
 
-**Version 1.14.0** (versionCode 305) · minSdk 24 / targetSdk 34 / compileSdk 36 ·
+**Version 1.15.0** (versionCode 306) · minSdk 24 / targetSdk 34 / compileSdk 36 ·
 [GPL-3.0](LICENSE)
 
 <p align="center">
@@ -104,7 +104,7 @@ S3, restic repositories and Jellyfin/Emby libraries expand in place. Keep two
 sources side by side: compress an SMB folder into a local zip, or copy a file
 from a remote archive straight to an FTP server.
 
-**Small and resource-conscious.** The 1.14.0 full build's arm64-v8a download measures 8.19 MiB,
+**Small and resource-conscious.** The 1.15.0 full build's arm64-v8a download measures 8.25 MiB,
 including the terminal, network backends and media player. Dependencies are added
 only after their APK cost is measured.
 
@@ -144,22 +144,22 @@ only after their APK cost is measured.
 
 ## Size
 
-Measured on the 1.14.0 release builds (R8 + resource shrinking; MiB = 1,048,576 bytes):
+Measured on the 1.15.0 release builds (R8 + resource shrinking; MiB = 1,048,576 bytes):
 
 | | Size |
 |---|---|
-| Full APK (`arm64-v8a` + `x86_64`) | 10.33 MiB |
-| Libre APK (`arm64-v8a` + `x86_64`) | 10.28 MiB |
-| **Per-device download (`arm64-v8a`)** | **8.19 MiB** |
+| Full APK (`arm64-v8a` + `x86_64`) | 10.38 MiB |
+| Libre APK (`arm64-v8a` + `x86_64`) | 10.34 MiB |
+| **Per-device download (`arm64-v8a`)** | **8.25 MiB** |
 
 Where it goes (compressed entries inside the full `arm64-v8a` APK):
 
 | Component | Size |
 |---|---|
-| `classes*.dex` (all our code plus every JVM dependency) | 3.04 MiB |
+| `classes*.dex` (all our code plus every JVM dependency) | 3.05 MiB |
 | `libffmpegJNI.so` | 1.39 MiB |
 | Bouncy Castle data files | 1.18 MiB |
-| Resources (`resources.arsc` + `res`) | 1.71 MiB |
+| Resources (`resources.arsc` + `res`) | 1.75 MiB |
 | `libsamba_jni.so` (libsmb2) | 484 KiB |
 | `libtwigzstd` / `libtermux` / `libtwigpty` | 109 KiB |
 

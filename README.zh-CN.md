@@ -10,7 +10,7 @@
 一个要「进去」的界面。原生 Kotlin + XML View,不引入 Material 库,依赖压到最低。
 能手写就手写——WebDAV、S3 签名、git、restic 全部从零实现。
 
-**版本 1.14.0**(versionCode 305)· minSdk 24 / targetSdk 34 / compileSdk 36 ·
+**版本 1.15.0**(versionCode 306)· minSdk 24 / targetSdk 34 / compileSdk 36 ·
 [GPL-3.0](LICENSE)
 
 <p align="center">
@@ -99,7 +99,7 @@ F-Droid 自动跟踪正式版标签，完成构建与仓库发布流程后提供
 Jellyfin/Emby 媒体库都就地展开。两侧可以放不同来源:把 SMB 上的目录压成本地 zip,
 或把远程压缩包里的文件直接复制到 FTP 服务器。
 
-**体积小，资源友好。** 1.14.0 full 构建的 arm64-v8a 单设备下载实测为 8.19 MiB,包含终端、
+**体积小，资源友好。** 1.15.0 full 构建的 arm64-v8a 单设备下载实测为 8.25 MiB,包含终端、
 网络存储后端和媒体播放器。新增依赖前先测量 APK 增量。
 
 **这些工具可以一起用。**
@@ -129,22 +129,22 @@ Jellyfin/Emby 媒体库都就地展开。两侧可以放不同来源:把 SMB 上
 
 ## 体积
 
-1.14.0 release 构建实测(R8 + 资源裁剪;1 MiB = 1,048,576 字节):
+1.15.0 release 构建实测(R8 + 资源裁剪;1 MiB = 1,048,576 字节):
 
 | | 大小 |
 |---|---|
-| Full APK(`arm64-v8a` + `x86_64`) | 10.33 MiB |
-| Libre APK(`arm64-v8a` + `x86_64`) | 10.28 MiB |
-| **单设备下载(`arm64-v8a`)** | **8.19 MiB** |
+| Full APK(`arm64-v8a` + `x86_64`) | 10.38 MiB |
+| Libre APK(`arm64-v8a` + `x86_64`) | 10.34 MiB |
+| **单设备下载(`arm64-v8a`)** | **8.25 MiB** |
 
 构成(full `arm64-v8a` APK 内条目的压缩后大小):
 
 | 组件 | 大小 |
 |---|---|
-| `classes*.dex`(自研代码 + 全部 JVM 依赖) | 3.04 MiB |
+| `classes*.dex`(自研代码 + 全部 JVM 依赖) | 3.05 MiB |
 | `libffmpegJNI.so` | 1.39 MiB |
 | Bouncy Castle 的数据文件 | 1.18 MiB |
-| 资源(`resources.arsc` + `res`) | 1.71 MiB |
+| 资源(`resources.arsc` + `res`) | 1.75 MiB |
 | `libsamba_jni.so`(libsmb2) | 484 KiB |
 | `libtwigzstd` / `libtermux` / `libtwigpty` | 109 KiB |
 
