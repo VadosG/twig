@@ -15,6 +15,8 @@ class TrashFileSystem(private val ctx: Context, val store: TrashStore = TrashSto
     override val displayName get() = ctx.getString(R.string.trash_title)
     data class Item(val entry: TrashStore.Entry, val relative: String)
     @Volatile private var entries = emptyMap<String, TrashStore.Entry>()
+    @Volatile var notices: List<String> = emptyList()
+        private set
     override fun root() = XFile(scheme, "/", true, canWrite = false, displayName = displayName)
     private fun failure(path: String): Nothing = throw IOException(ctx.getString(R.string.trash_failed, path))
     private fun token(entry: TrashStore.Entry) = Uri.encode(entry.directory.path)
@@ -52,11 +54,7 @@ class TrashFileSystem(private val ctx: Context, val store: TrashStore = TrashSto
             entries = snapshot.entries.associateBy(::token)
             val rows = ArrayList<XFile>()
             snapshot.entries.forEach { rows += node(it, "") }
-            val notices = snapshot.damaged.map { ctx.getString(R.string.trash_invalid, it) }
-            notices.forEachIndexed { index, text -> rows += XFile(scheme, "/@status/$index", false,
-                canRead = false, canWrite = false, displayName = text) }
-            if (rows.isEmpty()) rows += XFile(scheme, "/@status/empty", false, canRead = false,
-                canWrite = false, displayName = ctx.getString(R.string.trash_no_items))
+            notices = snapshot.damaged.map { ctx.getString(R.string.trash_invalid, it) }
             return rows.sortedWith(compareBy<XFile> { !it.isDir }.thenBy { it.name.lowercase() })
         }
         val item = item(dir)

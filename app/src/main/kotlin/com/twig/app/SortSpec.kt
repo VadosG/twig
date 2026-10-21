@@ -18,18 +18,18 @@ data class SortSpec(
     val reversed: Boolean = false,
     val folderBy: FolderSortKey = FolderSortKey.NAME,
 ) {
-    fun comparator(): Comparator<XFile> {
+    fun comparator(dateOf: (XFile) -> Long = { it.lastModified }): Comparator<XFile> {
         val fileBase: Comparator<XFile> = when (by) {
             FileSortKey.NAME -> compareBy { it.name.lowercase() }
             FileSortKey.SIZE -> compareBy { it.size }
             FileSortKey.EXT -> compareBy<XFile> { it.extension }.thenBy { it.name.lowercase() }
-            FileSortKey.DATE -> compareBy { it.lastModified }
+            FileSortKey.DATE -> compareBy { dateOf(it) }
         }
         val fileCmp = if (reversed) fileBase.reversed() else fileBase
         val folderCmp: Comparator<XFile> = when (folderBy) {
             FolderSortKey.NAME -> compareBy { it.name.lowercase() }
-            FolderSortKey.DATE_OLD -> compareBy { it.lastModified }
-            FolderSortKey.DATE_NEW -> compareByDescending { it.lastModified }
+            FolderSortKey.DATE_OLD -> compareBy { dateOf(it) }
+            FolderSortKey.DATE_NEW -> compareByDescending { dateOf(it) }
         }
         return Comparator { a, b ->
             when {

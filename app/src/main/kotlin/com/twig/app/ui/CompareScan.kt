@@ -318,7 +318,7 @@ fun scanCompare(
     /** null = the listing failed; an absent side (f == null) is a genuine empty list. */
     fun list(f: XFile?): List<XFile>? =
         if (f == null) emptyList()
-        else runCatching { FsRegistry.of(f).list(f) }.getOrNull()
+        else runCatching { FsRegistry.of(f).list(f).filterNot(com.twig.app.TrashStore::isManagedDirectory) }.getOrNull()
 
     /** Returns the aggregate state of this directory's subtree. */
     suspend fun walk(

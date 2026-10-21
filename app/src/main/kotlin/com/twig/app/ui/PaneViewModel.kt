@@ -136,7 +136,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Per-group action item, e.g. "Add server…". */
-    data class ActionNode(val id: String, val label: String, override val depth: Int = 1) : Node {
+    data class ActionNode(val id: String, val label: String, override val depth: Int = 1, val informational: Boolean = false) : Node {
         override val key: String get() = "a:$id"
     }
 
@@ -510,7 +510,10 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     private fun sortList(key: String, list: List<XFile>): List<XFile> {
         if (keepsServerOrder(key)) return list
         val app = getApplication<Application>()
-        val cmp = sort.comparator()
+        val cmp = sort.comparator { file ->
+            if (file.scheme == "trash") (FsRegistry.of(file) as? com.twig.app.TrashFileSystem)?.deletedAt(file) ?: 0L
+            else file.lastModified
+        }
         val grid = Prefs.thumbsGrid(app)
         // Both off (tree list + no thumbnails): no grouping, matching the long-standing behavior.
         if (!Prefs.thumbs(app) && grid == 0) return SortRules.sorted(list, cmp, null)
@@ -1633,9 +1636,10 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
                     val accessChanged = listing.dataRootAccess?.let { (path, readable) ->
                         (path in readableDataRoots) != readable
                     } == true
+                    val noticesChanged = listing.trashNotices?.let { it != trashNotices } == true
                     val sorted = sortList(key, applyListing(listing))
                     rememberCounts(key, sorted)
-                    if (accessChanged && key in expanded) changed = true
+                    if ((accessChanged || noticesChanged) && key in expanded) changed = true
                     if (cached == sorted) continue
                     children[key] = sorted
                     if (key in expanded) changed = true
@@ -2503,6 +2507,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private val readableDataRoots = mutableSetOf<String>()
+    private var trashNotices: List<String> = emptyList()
 
     /**
      * One listing's result: children + whatever was **incidentally discovered** this time.
@@ -2515,6 +2520,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     private class Listing(
         val children: List<XFile>,
         val dataRootAccess: Pair<String, Boolean>? = null,
+        val trashNotices: List<String>? = null,
         /** This directory itself is a restic repository (value is `fileKey(dir)`). */
         val resticRepo: String? = null,
         /** This directory contains a .git; the data source has been built and registered in FsRegistry, pending registration in the VM's reverse-lookup table. */
@@ -2537,6 +2543,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
      * deterministically derived from keys).
      */
     private fun applyListing(l: Listing): List<XFile> {
+        l.trashNotices?.let { trashNotices = it }
         l.dataRootAccess?.let { (path, readable) ->
             if (readable) readableDataRoots.add(path) else readableDataRoots.remove(path)
         }
@@ -2592,6 +2599,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
             }
             Listing(
                 children = kids,
+                trashNotices = (fs as? com.twig.app.TrashFileSystem)?.notices?.takeIf { file.path == "/" },
                 dataRootAccess = if (AndroidDataAccess.isRoot(file)) file.path to (listed.getOrNull()?.let {
                     AndroidDataAccess.instance?.hasFullListing(file, it) == true
                 } == true) else null,
@@ -2908,6 +2916,14 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
                 addFile(rows, XFile(s, "/", isDir = true, displayName = live, canWrite = false), depth + 1)
             }
             visible(children[key]).forEach { addFile(rows, it, depth + 1, keyPrefix = keyPrefix) }
+            if (file.scheme == "trash" && file.path == "/" && children.containsKey(key)) {
+                val notices = trashNotices.ifEmpty {
+                    if (children[key].isNullOrEmpty()) listOf(str(R.string.trash_no_items)) else emptyList()
+                }
+                notices.forEachIndexed { index, text ->
+                    rows += ActionNode("trash_notice:$key:$index", text, depth + 1, informational = true)
+                }
+            }
             if (AndroidDataAccess.isRoot(file) && file.path !in readableDataRoots) {
                 rows += ActionNode(AndroidDataAccess.ACTION_PREFIX + file.path,
                     str(R.string.android_data_grant), depth + 1)

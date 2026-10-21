@@ -234,6 +234,27 @@ class TrashStore(
     }
 
     companion object {
+        /** Compare/sync must never copy or erase a volume's recovery store as ordinary content. */
+        fun isManagedDirectory(file: XFile): Boolean {
+            if (file.scheme != "file" || !file.isDir || file.name != DIRECTORY) return false
+            return runCatching {
+                val directory = File(file.path)
+                if (directory.canonicalFile != directory.absoluteFile) return@runCatching false
+                val marker = File(directory, MARKER)
+                AtomicFile(marker).openRead().use { input ->
+                    if (marker.canonicalFile != marker.absoluteFile) return@use false
+                    val bytes = ByteArray(64 * 1024 + 1)
+                    var length = 0
+                    while (length < bytes.size) {
+                        val n = input.read(bytes, length, bytes.size - length)
+                        if (n <= 0) break
+                        length += n
+                    }
+                    length < bytes.size && JSONObject(String(bytes, 0, length, Charsets.UTF_8)).optInt("version") > 0
+                }
+            }.getOrDefault(false)
+        }
+
         const val DIRECTORY = ".TwigTrash"
         private const val MARKER = "format.json"
         private const val INFO = "info.json"

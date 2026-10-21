@@ -70,3 +70,13 @@ The source was compiled and exercised on the host with two concurrent moves to o
 destination: only one wins and the losing source survives. A native probe on the test
 phone also verified no-overwrite, emoji filenames and directory moves on shared storage.
 This verifies filesystem behavior, not a user walkthrough of the Android UI.
+
+Review regressions (2026-10-21): comparison scans exclude local .TwigTrash directories
+with a Twig format marker, on either side. Otherwise a later mirror sync sees its own
+recovery store as a target-only extra and permanently deletes it, even with Use trash
+checked. An unmarked same-named ordinary directory keeps normal compare/sync behavior.
+TrashFileSystem.list returns only real payloads; empty/damaged notices are nonselectable
+pane action rows, not XFile placeholders that corrupt counts and copy plans. Carry
+notices through Listing and include changes in quiet-refresh equality checks.
+Date sorting in the trash uses cached deletion dates for files and directories via
+SortSpec's date accessor, while XFile.lastModified remains the actual payload mtime.

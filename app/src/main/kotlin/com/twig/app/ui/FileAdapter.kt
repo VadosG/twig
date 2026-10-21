@@ -1074,10 +1074,11 @@ class FileAdapter(
             b.name.text = node.label
             b.name.alpha = 0.6f
             setMeta(null)
-            b.icon.setImageResource(R.drawable.ic_add)
+            b.icon.setImageResource(if (node.informational) R.drawable.ic_info else R.drawable.ic_add)
             setIndicator(null)
             b.check.visibility = View.GONE
-            b.root.setOnClickListener { onClick(node) }
+            b.root.setOnClickListener(if (node.informational) null else View.OnClickListener { onClick(node) })
+            b.root.isClickable = !node.informational
             b.root.setOnLongClickListener { false }
         }
 
