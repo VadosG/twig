@@ -1014,4 +1014,22 @@
     <string name="shortcut_pick_command">Escolha uma pasta local ou um local SSH (SFTP)</string>
     <string name="cmd_use_privileged">Usar sessão privilegiada (%1$s)</string>
     <string name="android_data_hide_system">Ocultar pastas de aplicativos do sistema</string>
+
+    <!-- Local shared-storage trash -->
+    <string name="trash_title">Lixeira</string>
+    <string name="trash_restore">Restaurar</string>
+    <string name="trash_delete_permanently">Excluir permanentemente</string>
+    <string name="trash_empty">Esvaziar lixeira</string>
+    <string name="trash_no_items">A lixeira está vazia</string>
+    <string name="trash_restore_parent">A pasta original não existe: %1$s. Criar e restaurar?</string>
+    <string name="trash_restore_name">Restaurar como</string>
+    <string name="trash_busy">Processando…</string>
+    <string name="trash_invalid">Registro danificado. Arquivos mantidos em: %1$s</string>
+    <string name="trash_failed">Não foi possível concluir esta operação: %1$s</string>
+    <string name="settings_trash_enabled">Ativar lixeira</string>
+    <string name="settings_trash_enabled_desc">Somente armazenamento local compartilhado com gravação direta (interno, cartões SD e unidades USB). Rede e caminhos protegidos não são compatíveis. Quando desativada, a exclusão é permanente; ative novamente para restaurar o conteúdo existente.</string>
+    <string name="trash_use">Usar lixeira</string>
+    <string name="trash_original_path">Local original</string>
+    <string name="trash_deleted_at">Data de exclusão</string>
+    <string name="trash_storage">Volume de armazenamento</string>
 </resources>

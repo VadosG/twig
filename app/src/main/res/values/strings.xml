@@ -1084,4 +1084,22 @@
     <string name="shortcut_pick_command">Choose a local directory or SSH (SFTP) location</string>
     <string name="cmd_use_privileged">Use privileged session (%1$s)</string>
     <string name="android_data_hide_system">Hide system app folders</string>
+
+    <!-- Local shared-storage trash -->
+    <string name="trash_title">Trash</string>
+    <string name="trash_restore">Restore</string>
+    <string name="trash_delete_permanently">Delete permanently</string>
+    <string name="trash_empty">Empty trash</string>
+    <string name="trash_no_items">The trash is empty</string>
+    <string name="trash_restore_parent">The original folder is missing: %1$s. Create it and restore?</string>
+    <string name="trash_restore_name">Restore as</string>
+    <string name="trash_busy">Working…</string>
+    <string name="trash_invalid">Damaged trash entry. Files retained at: %1$s</string>
+    <string name="trash_failed">Could not complete the trash operation: %1$s</string>
+    <string name="settings_trash_enabled">Enable trash</string>
+    <string name="settings_trash_enabled_desc">Only directly writable local shared storage (internal storage, SD cards and USB drives). Network and protected paths are excluded. When off, deletion is permanent; enable trash again to recover existing items.</string>
+    <string name="trash_use">Use trash</string>
+    <string name="trash_original_path">Original location</string>
+    <string name="trash_deleted_at">Deleted</string>
+    <string name="trash_storage">Storage volume</string>
 </resources>

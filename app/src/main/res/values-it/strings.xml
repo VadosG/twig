@@ -1014,4 +1014,22 @@
     <string name="shortcut_pick_command">Scegli una cartella locale o una posizione SSH (SFTP)</string>
     <string name="cmd_use_privileged">Usa sessione privilegiata (%1$s)</string>
     <string name="android_data_hide_system">Nascondi cartelle delle app di sistema</string>
+
+    <!-- Local shared-storage trash -->
+    <string name="trash_title">Cestino</string>
+    <string name="trash_restore">Ripristina</string>
+    <string name="trash_delete_permanently">Elimina definitivamente</string>
+    <string name="trash_empty">Svuota cestino</string>
+    <string name="trash_no_items">Il cestino è vuoto</string>
+    <string name="trash_restore_parent">La cartella originale non esiste: %1$s. Crearla e ripristinare?</string>
+    <string name="trash_restore_name">Ripristina come</string>
+    <string name="trash_busy">Operazione in corso…</string>
+    <string name="trash_invalid">Voce danneggiata. File conservati in: %1$s</string>
+    <string name="trash_failed">Impossibile completare questa operazione: %1$s</string>
+    <string name="settings_trash_enabled">Abilita cestino</string>
+    <string name="settings_trash_enabled_desc">Solo memoria locale condivisa direttamente scrivibile (memoria interna, schede SD e unità USB). Esclusi rete e percorsi protetti. Se disattivato, la cancellazione è definitiva; riattivalo per recuperare i contenuti esistenti.</string>
+    <string name="trash_use">Usa cestino</string>
+    <string name="trash_original_path">Posizione originale</string>
+    <string name="trash_deleted_at">Data di eliminazione</string>
+    <string name="trash_storage">Volume di archiviazione</string>
 </resources>

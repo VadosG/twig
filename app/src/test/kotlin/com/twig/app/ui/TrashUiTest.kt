@@ -1,0 +1,298 @@
+package com.twig.app.ui
+
+import android.app.Application
+import android.os.Environment
+import android.os.Looper
+import android.widget.EditText
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.test.core.app.ApplicationProvider
+import com.twig.app.R
+import com.twig.app.Prefs
+import com.twig.app.TrashFileSystem
+import com.twig.app.TrashOsShadow
+import com.twig.app.TrashMovesShadow
+import com.twig.app.TrashStore
+import com.twig.core.FsRegistry
+import com.twig.core.XFile
+import com.twig.fs.local.LocalFileSystem
+import org.junit.Assert.*
+import org.junit.Before
+import org.junit.After
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.Robolectric
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows.shadowOf
+import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowDialog
+import java.io.File
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
+
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34], application = Application::class, shadows = [TrashOsShadow::class, TrashMovesShadow::class])
+class TrashUiTest {
+    class Host : AppCompatActivity() {
+        override fun onCreate(state: android.os.Bundle?) { setTheme(R.style.Theme_Twig); super.onCreate(state) }
+    }
+    private val app = ApplicationProvider.getApplicationContext<Application>()
+    private lateinit var root: File
+    private lateinit var original: File
+    @Before fun setup() {
+        root = Environment.getExternalStorageDirectory().canonicalFile.apply { mkdirs() }
+        original = File(root, "trash-ui-test.txt").apply { writeText("keep me") }
+        LocalFileSystem.documentAccess = null
+        Prefs.setTrashEnabled(app, true)
+        FsRegistry.register(LocalFileSystem())
+        FsRegistry.register(TrashFileSystem(app))
+    }
+    @After fun cleanup() {
+        original.delete()
+        File(root, TrashStore.DIRECTORY).deleteRecursively()
+    }
+    private fun waitFor(condition: () -> Boolean) {
+        val deadline = System.nanoTime() + 5_000_000_000
+        while (!condition() && System.nanoTime() < deadline) {
+            shadowOf(Looper.getMainLooper()).idle()
+            Thread.sleep(10)
+        }
+        shadowOf(Looper.getMainLooper()).idle()
+        assertTrue("background operation did not finish", condition())
+    }
+    private fun dialogAfter(previous: android.app.Dialog?): AlertDialog {
+        waitFor { ShadowDialog.getLatestDialog() !== previous && ShadowDialog.getLatestDialog()?.isShowing == true }
+        return ShadowDialog.getLatestDialog() as AlertDialog
+    }
+    private fun file() = XFile("file", original.path, false, size = original.length())
+
+    @Test fun `cancel preserves files and a mixed selection shows only its count`() {
+        val host = Robolectric.buildActivity(Host::class.java).setup()
+        val deleted = AtomicInteger()
+        FsRegistry.register(object : com.twig.core.FileSystem by LocalFileSystem() {
+            override val scheme = "trash-test-remote"
+            override fun delete(file: XFile) { deleted.incrementAndGet() }
+        })
+        try {
+            val before = ShadowDialog.getLatestDialog()
+            DeleteUi.confirm(host.get(), host.get(), listOf(file())) { fail("cancel must not delete") }
+            val cancel = dialogAfter(before)
+            assertEquals(original.name, cancel.findViewById<TextView>(android.R.id.message)!!.text)
+            assertEquals(app.getString(R.string.strip_delete), cancel.findViewById<TextView>(androidx.appcompat.R.id.alertTitle)!!.text)
+            cancel.getButton(AlertDialog.BUTTON_NEGATIVE).performClick()
+            assertEquals("keep me", original.readText())
+            val finished = AtomicBoolean()
+            DeleteUi.confirm(host.get(), host.get(), listOf(file(), file().copy(scheme = "trash-test-remote", path = "/remote/test.txt"))) {
+                assertTrue(it); finished.set(true)
+            }
+            val confirm = dialogAfter(cancel)
+            val message = confirm.findViewById<TextView>(android.R.id.message)!!.text.toString()
+            assertEquals(app.getString(R.string.title_selected_count, 2), message)
+            confirm.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+            waitFor { finished.get() }
+            assertFalse(original.exists())
+            assertEquals(1, deleted.get())
+            val store = TrashStore(app)
+            store.restore(store.snapshot().entries.single())
+            assertEquals("keep me", original.readText())
+        } finally { host.pause().stop().destroy() }
+    }
+
+    @Test fun `inline trash controls restore an entry without a second activity`() {
+        val fs = FsRegistry.of("trash") as TrashFileSystem
+        fs.store.move(fs.store.plan(listOf(file())).single())
+        val deleted = fs.list(fs.root()).single()
+        val host = Robolectric.buildActivity(Host::class.java).setup()
+        val refreshed = AtomicBoolean()
+        try {
+            val previous = ShadowDialog.getLatestDialog()
+            TrashDialogs(host.get(), host.get()) { refreshed.set(true) }.show(deleted)
+            val action = dialogAfter(previous)
+            action.listView.performItemClick(action.listView.adapter.getView(0, null, action.listView), 0, 0)
+            val restore = dialogAfter(action)
+            assertNotNull(findEdit(restore.window!!.decorView))
+            restore.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+            waitFor { refreshed.get() }
+            assertEquals("keep me", original.readText())
+            assertTrue(fs.store.snapshot().entries.isEmpty())
+        } finally { host.pause().stop().destroy() }
+    }
+
+    @Test fun `unchecking trash keeps the compact confirmation and permanently deletes`() {
+        val host = Robolectric.buildActivity(Host::class.java).setup()
+        try {
+            val previous = ShadowDialog.getLatestDialog()
+            val finished = AtomicBoolean()
+            DeleteUi.confirm(host.get(), host.get(), listOf(file())) { assertTrue(it); finished.set(true) }
+            val dialog = dialogAfter(previous)
+            val checkbox = dialog.findViewById<android.widget.CheckBox>(android.R.id.checkbox)!!
+            assertTrue(checkbox.isChecked)
+            checkbox.performClick()
+            assertEquals(original.name,
+                dialog.findViewById<TextView>(android.R.id.message)!!.text)
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+            waitFor { finished.get() }
+            assertFalse(original.exists())
+            assertTrue(TrashStore(app).snapshot().entries.isEmpty())
+        } finally { host.pause().stop().destroy() }
+    }
+
+    @Test fun `globally disabling trash hides checkbox and keeps existing trash recoverable`() {
+        val fs = FsRegistry.of("trash") as TrashFileSystem
+        val entry = fs.store.move(fs.store.plan(listOf(file())).single())
+        original.writeText("new")
+        Prefs.setTrashEnabled(app, false)
+        val host = Robolectric.buildActivity(Host::class.java).setup()
+        try {
+            val previous = ShadowDialog.getLatestDialog()
+            val finished = AtomicBoolean()
+            DeleteUi.confirm(host.get(), host.get(), listOf(file())) { assertTrue(it); finished.set(true) }
+            val dialog = dialogAfter(previous)
+            assertNull(dialog.findViewById<android.widget.CheckBox>(android.R.id.checkbox))
+            assertEquals(original.name, dialog.findViewById<TextView>(android.R.id.message)!!.text)
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+            waitFor { finished.get() }
+            assertEquals(1, fs.list(fs.root()).size)
+            fs.store.restore(entry)
+            assertEquals("keep me", original.readText())
+        } finally { Prefs.setTrashEnabled(app, true); host.pause().stop().destroy() }
+    }
+
+    @Test fun `the main tree exposes one top-level trash entry with a theme-aware icon`() {
+        val vm = PaneViewModel(app)
+        vm.refreshTree()
+        val entry = vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().single { it.file.scheme == "trash" }
+        assertEquals(0, entry.depth)
+        assertTrue(entry.expandable)
+        assertFalse(entry.file.canWrite)
+        val adapter = FileAdapter(1, {}, {}, {}, { _, _ -> }, {}, thumbs = false)
+        adapter.submitList(listOf(entry))
+        val parent = android.widget.FrameLayout(android.view.ContextThemeWrapper(app, R.style.Theme_Twig))
+        val holder = adapter.createViewHolder(parent, adapter.getItemViewType(0))
+        adapter.bindViewHolder(holder, 0)
+        assertEquals(app.getString(R.string.trash_title), holder.itemView.findViewById<TextView>(R.id.name).text)
+        assertEquals(R.drawable.ic_trash,
+            shadowOf(holder.itemView.findViewById<android.widget.ImageView>(R.id.icon).drawable).createdFromResId)
+    }
+
+    @Test fun `pane expands trash directories one level at a time and refreshes after recovery`() {
+        val folder = File(root, "trash-ui-folder").apply { mkdirs() }
+        File(folder, ".hidden.txt").writeText("hidden")
+        File(folder, "nested").mkdir()
+        File(folder, "nested/deep.txt").writeText("deep")
+        val fs = FsRegistry.of("trash") as TrashFileSystem
+        fs.store.move(fs.store.plan(listOf(XFile("file", folder.path, true))).single())
+        val vm = PaneViewModel(app)
+        vm.refreshTree()
+        val rootNode = vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().single { it.file.scheme == "trash" }
+        vm.toggle(rootNode)
+        waitFor { vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().any { it.file.name == folder.name } }
+        val deleted = vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().single { it.file.name == folder.name }
+        vm.toggle(deleted)
+        waitFor { vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().any { it.file.name == ".hidden.txt" } }
+        assertFalse(vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().any { it.file.name == "deep.txt" })
+        val nested = vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().single { it.file.name == "nested" }
+        vm.toggle(nested)
+        waitFor { vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().any { it.file.name == "deep.txt" } }
+        val deep = vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().single { it.file.name == "deep.txt" }
+        assertEquals(3, deep.depth)
+        val item = fs.item(deep.file)
+        fs.store.restoreItem(item.entry, item.relative, "deep.txt", true)
+        vm.refreshTrash()
+        waitFor { vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().any { it.file.name == folder.name } }
+        assertEquals(rootNode.key, vm.state.value.currentKey)
+        assertFalse(vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().any { it.file.name == "deep.txt" })
+        folder.deleteRecursively()
+    }
+
+    @Test fun `trash file and directory menus expose inspection and export and properties opens inline`() {
+        val fs = FsRegistry.of("trash") as TrashFileSystem
+        fs.store.move(fs.store.plan(listOf(file())).single())
+        val folder = File(root, "trash-menu-folder").apply { mkdirs() }
+        File(folder, "inside.txt").writeText("inside")
+        fs.store.move(fs.store.plan(listOf(XFile("file", folder.path, true))).single())
+        val host = Robolectric.buildActivity(Host::class.java).setup()
+        val fragment = PaneFragment()
+        try {
+            host.get().supportFragmentManager.beginTransaction().add(fragment, "trash-menu").commitNow()
+            val vm = fragment.viewModel
+            waitFor { vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().any { it.file.scheme == "trash" } }
+            val rootNode = vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().single { it.file.scheme == "trash" }
+            vm.toggle(rootNode)
+            waitFor { vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().any { it.file.name == original.name } }
+            val fileNode = vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().single { it.file.name == original.name }
+            val longClick = PaneFragment::class.java.getDeclaredMethod("longClickFile", PaneViewModel.FileNode::class.java).apply { isAccessible = true }
+            val previous = ShadowDialog.getLatestDialog()
+            longClick.invoke(fragment, fileNode)
+            val menu = dialogAfter(previous)
+            val labels = (0 until menu.listView.adapter.count).map { menu.listView.adapter.getItem(it).toString() }
+            listOf(R.string.trash_restore, R.string.file_info, R.string.strip_copy, R.string.strip_compress,
+                R.string.open_with_external, R.string.action_share, R.string.trash_delete_permanently).forEach {
+                assertTrue(app.getString(it), app.getString(it) in labels)
+            }
+            assertFalse(app.getString(R.string.strip_move) in labels)
+            assertFalse(app.getString(R.string.strip_rename) in labels)
+            val index = labels.indexOf(app.getString(R.string.file_info))
+            menu.listView.performItemClick(menu.listView.adapter.getView(index, null, menu.listView), index, index.toLong())
+            waitFor { vm.state.value.rows.filterIsInstance<PaneViewModel.InfoNode>().any { it.details?.sections?.isNotEmpty() == true } }
+            val info = vm.state.value.rows.filterIsInstance<PaneViewModel.InfoNode>().single()
+            assertEquals(original.path, info.details!!.sections.first().rows.toMap()[app.getString(R.string.trash_original_path)])
+            val dirNode = vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().single { it.file.name == folder.name }
+            longClick.invoke(fragment, dirNode)
+            val dirMenu = dialogAfter(menu)
+            val dirLabels = (0 until dirMenu.listView.adapter.count).map { dirMenu.listView.adapter.getItem(it).toString() }
+            listOf(R.string.file_info, R.string.action_refresh, R.string.strip_search, R.string.strip_map,
+                R.string.strip_copy, R.string.strip_compress).forEach { assertTrue(app.getString(it) in dirLabels) }
+            assertFalse(app.getString(R.string.open_with_external) in dirLabels)
+            dirMenu.dismiss()
+        } finally { host.pause().stop().destroy(); folder.deleteRecursively() }
+    }
+
+    @Test fun `disabling trash removes its expanded tree and enabling it again preserves recovery`() {
+        val fs = FsRegistry.of("trash") as TrashFileSystem
+        fs.store.move(fs.store.plan(listOf(file())).single())
+        val vm = PaneViewModel(app)
+        vm.refreshTree()
+        fun rootNode() = vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().single { it.file.scheme == "trash" && it.file.path == "/" }
+        vm.toggle(rootNode())
+        waitFor { vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().any { it.file.name == original.name } }
+        val signature = Prefs.uiSignature(app)
+        Prefs.setTrashEnabled(app, false)
+        assertNotEquals(signature, Prefs.uiSignature(app))
+        vm.resortAll() // Same retained VM path used when MainActivity recreates after settings.
+        assertFalse(vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().any { it.file.scheme == "trash" })
+        assertNull(vm.state.value.currentDir)
+        assertNull(vm.state.value.currentKey)
+        Prefs.setTrashEnabled(app, true)
+        vm.resortAll()
+        assertFalse(rootNode().expanded)
+        vm.toggle(rootNode())
+        waitFor { vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().any { it.file.name == original.name } }
+        fs.store.restore(fs.store.snapshot().entries.single())
+        assertEquals("keep me", original.readText())
+    }
+
+    @Test fun `trash rows show only deletion date while metadata retains original modification time`() {
+        val modified = 1_600_000_000_000L
+        assertTrue(original.setLastModified(modified))
+        val fs = FsRegistry.of("trash") as TrashFileSystem
+        val entry = fs.store.move(fs.store.plan(listOf(file())).single())
+        val deleted = fs.list(fs.root()).single()
+        assertEquals(modified, deleted.lastModified)
+        val adapter = FileAdapter(1, {}, {}, {}, { _, _ -> }, {}, thumbs = false)
+        val parent = android.widget.FrameLayout(android.view.ContextThemeWrapper(app, R.style.Theme_Twig))
+        val node = PaneViewModel.FileNode(deleted, 1, false, false)
+        adapter.submitList(listOf(node))
+        val holder = adapter.createViewHolder(parent, adapter.getItemViewType(0))
+        adapter.bindViewHolder(holder, 0)
+        assertEquals(com.twig.app.Format.time(entry.deletedAt, app), holder.itemView.findViewById<TextView>(R.id.meta).text.toString())
+        assertNotEquals(com.twig.app.Format.time(modified, app), holder.itemView.findViewById<TextView>(R.id.meta).text.toString())
+    }
+
+    private fun findEdit(view: android.view.View): EditText? {
+        if (view is EditText) return view
+        if (view is android.view.ViewGroup) for (i in 0 until view.childCount) findEdit(view.getChildAt(i))?.let { return it }
+        return null
+    }
+}

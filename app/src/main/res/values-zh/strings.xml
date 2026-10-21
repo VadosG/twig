@@ -1044,4 +1044,22 @@
     <string name="shortcut_pick_command">选择本地目录或 SSH（SFTP）位置</string>
     <string name="cmd_use_privileged">使用特权会话（%1$s）</string>
     <string name="android_data_hide_system">隐藏系统应用目录</string>
+
+    <!-- Local shared-storage trash -->
+    <string name="trash_title">回收站</string>
+    <string name="trash_restore">恢复</string>
+    <string name="trash_delete_permanently">永久删除</string>
+    <string name="trash_empty">清空回收站</string>
+    <string name="trash_no_items">回收站为空</string>
+    <string name="trash_restore_parent">原目录不存在：%1$s。是否创建并恢复？</string>
+    <string name="trash_restore_name">恢复为</string>
+    <string name="trash_busy">正在处理…</string>
+    <string name="trash_invalid">回收记录损坏，文件保留在：%1$s</string>
+    <string name="trash_failed">无法完成回收站操作：%1$s</string>
+    <string name="settings_trash_enabled">启用回收站</string>
+    <string name="settings_trash_enabled_desc">仅支持可直接写入的本地共享存储（内置存储、SD 卡、U 盘），不支持网络或受限目录。关闭后将彻底删除，重新启用后可还原已有内容。</string>
+    <string name="trash_use">使用回收站</string>
+    <string name="trash_original_path">原位置</string>
+    <string name="trash_deleted_at">删除时间</string>
+    <string name="trash_storage">所在存储</string>
 </resources>

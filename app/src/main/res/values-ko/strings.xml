@@ -1014,4 +1014,22 @@
     <string name="shortcut_pick_command">로컬 폴더 또는 SSH(SFTP) 위치를 선택하세요</string>
     <string name="cmd_use_privileged">권한 세션 사용(%1$s)</string>
     <string name="android_data_hide_system">시스템 앱 폴더 숨기기</string>
+
+    <!-- Local shared-storage trash -->
+    <string name="trash_title">휴지통</string>
+    <string name="trash_restore">복원</string>
+    <string name="trash_delete_permanently">영구 삭제</string>
+    <string name="trash_empty">휴지통 비우기</string>
+    <string name="trash_no_items">휴지통이 비어 있습니다</string>
+    <string name="trash_restore_parent">원래 폴더가 없습니다: %1$s. 만들고 복원할까요?</string>
+    <string name="trash_restore_name">다른 이름으로 복원</string>
+    <string name="trash_busy">처리 중…</string>
+    <string name="trash_invalid">기록이 손상되었습니다. 파일 보관 위치: %1$s</string>
+    <string name="trash_failed">작업을 완료할 수 없음: %1$s</string>
+    <string name="settings_trash_enabled">휴지통 사용</string>
+    <string name="settings_trash_enabled_desc">직접 쓸 수 있는 로컬 공유 저장소(내부 저장소, SD 카드, USB 드라이브)만 지원합니다. 네트워크와 보호된 경로는 지원하지 않습니다. 끄면 영구 삭제되며, 다시 켜면 기존 내용을 복원할 수 있습니다.</string>
+    <string name="trash_use">휴지통으로 이동</string>
+    <string name="trash_original_path">원래 위치</string>
+    <string name="trash_deleted_at">삭제 시간</string>
+    <string name="trash_storage">저장소</string>
 </resources>

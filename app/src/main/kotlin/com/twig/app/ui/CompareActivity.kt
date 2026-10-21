@@ -677,26 +677,15 @@ class CompareActivity : AppCompatActivity() {
             .show()
     }
 
-    /** Delete the selected items on the active side. Which side is deleted is shown in the confirmation dialog — this is irreversible, the user cannot be left to guess. */
+    /** Delete the selected items on the active side. Use the shared compact deletion confirmation. */
     private fun actionDelete() {
         val sel = prunedSelection()
         if (sel.isEmpty()) return toast(getString(R.string.msg_no_selection))
         val files = sel.mapNotNull { it.sideFile(activeSide) }
         if (files.isEmpty()) return toast(getString(R.string.compare_none_on_side))
-        AlertDialog.Builder(this)
-            .setTitle(R.string.compare_title)
-            .setMessage(getString(R.string.compare_delete_confirm, files.size, sideName(activeSide)))
-            .setNegativeButton(R.string.dialog_cancel, null)
-            .setPositiveButton(R.string.dialog_ok) { _, _ ->
-                lifecycleScope.launch {
-                    val err = withContext(Dispatchers.IO) {
-                        runCatching { files.forEach { FsRegistry.of(it).delete(it) } }.exceptionOrNull()
-                    }
-                    toast(err?.message ?: getString(R.string.msg_done))
-                    revalidate(sel) // revalidate the deleted items in place; do not rescan the whole tree
-                }
-            }
-            .show()
+        DeleteUi.confirm(this, this, files) {
+            revalidate(sel)
+        }
     }
 
     private fun actionTextDiff() {

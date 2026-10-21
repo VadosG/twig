@@ -467,7 +467,7 @@ class FileAdapter(
             }
 
             val titles = ArrayList(d.sections.map { it.title })
-            val hashIdx = if (node.selection || node.file.isDir) -1 else titles.size
+            val hashIdx = if (node.selection || node.file.isDir || !node.file.canRead) -1 else titles.size
             if (hashIdx >= 0) titles += ctx.getString(R.string.info_tab_hash)
             val cur = node.tab.coerceIn(0, titles.size - 1)
             buildTabs(node, titles, cur)
@@ -1114,6 +1114,7 @@ class FileAdapter(
          * Returns null when the entry has neither (virtual git entries etc.), which hides the line.
          */
         private fun fileMeta(file: XFile, bytes: Long = SizeProbes.known(file)): CharSequence? {
+            if (file.scheme == "trash") return dateMeta(file)
             // When size is unknown (media servers don't give byte counts for photos) don't show the whole segment, don't write "0 B"
             val known = if (bytes > 0) file.copy(size = bytes) else file
             val size = Format.sizeOrNull(known)?.takeIf { known.size > 0 || known.lastModified > 0 }
@@ -1131,11 +1132,14 @@ class FileAdapter(
         }
 
         private fun dateMeta(file: XFile): CharSequence? {
-            if (file.lastModified <= 0) return null
+            val time = if (file.scheme == "trash")
+                (FsRegistry.of(file) as? com.twig.app.TrashFileSystem)?.deletedAt(file) ?: 0L
+                else file.lastModified
+            if (time <= 0) return null
             val color = b.meta.currentTextColor
             val muted = androidx.core.graphics.ColorUtils.setAlphaComponent(color,
                 (android.graphics.Color.alpha(color) * IDLE_CHECK_ALPHA + 0.5f).toInt())
-            return SpannableStringBuilder(Format.time(file.lastModified, b.root.context)).apply {
+            return SpannableStringBuilder(Format.time(time, b.root.context)).apply {
                 setSpan(ForegroundColorSpan(muted), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }

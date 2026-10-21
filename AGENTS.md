@@ -230,6 +230,10 @@ each write `= null`.
   also why base FileSystem registration moved from MainActivity to
   `TwigApp.registerBaseFs` — these entry points can cold-start the process with no
   main UI present.
+- Trash: `TrashStore` keeps local shared-storage deletions on their original volume;
+  `DeleteUi` distinguishes recoverable and permanent deletion across pane/viewer/compare
+  entry points. `TrashFileSystem` expands in the pane; `TrashDialogs` restores or purges entries. No privileged, SAF or
+  network fallback for recycling. See [trash safety](docs/lessons/trash.md).
 - Security: `secure/Secrets` (two-layer Keystore/master-password encryption of sensitive
   fields) + `secure/Backup` (`.twigbak` config backup) + `ui/SecurityUi` (dialogs).
   See [docs/lessons/security.md](docs/lessons/security.md).
@@ -540,6 +544,10 @@ add its symptom here.
   *Explains*: music opening in the single-track player, no thumbnails or PDF previews, the
   green highlight disappearing on "Up", "why is there no *go to the containing folder* here",
   a local-to-SAF copy creating an empty document but writing to a bogus local path.
+- **[Trash and deletion](docs/lessons/trash.md)** — sync the recovery record before moving,
+  never replace a failed trash move with permanent deletion, preserve offline/corrupt
+  entries, and purge symlinks without following them.
+  *Explains*: how to recover interrupted moves and why Robolectric needs real lstat semantics.
 - **[Removable storage](docs/lessons/removable-storage.md)** — `getStorageVolumes()` does
   return invisible volumes, the event channels do not fire for them (the foreground UI
   polls), filter by `isPrimary` rather than `isRemovable`, and `/mnt/media_rw` needs

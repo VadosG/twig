@@ -1014,4 +1014,22 @@
     <string name="shortcut_pick_command">स्थानीय फ़ोल्डर या SSH (SFTP) स्थान चुनें</string>
     <string name="cmd_use_privileged">विशेषाधिकार सत्र का उपयोग करें (%1$s)</string>
     <string name="android_data_hide_system">सिस्टम ऐप के फ़ोल्डर छिपाएँ</string>
+
+    <!-- Local shared-storage trash -->
+    <string name="trash_title">कूड़ेदान</string>
+    <string name="trash_restore">पुनर्स्थापित करें</string>
+    <string name="trash_delete_permanently">हमेशा के लिए हटाएं</string>
+    <string name="trash_empty">कूड़ेदान खाली करें</string>
+    <string name="trash_no_items">कूड़ेदान खाली है</string>
+    <string name="trash_restore_parent">मूल फ़ोल्डर नहीं है: %1$s। बनाकर पुनर्स्थापित करें?</string>
+    <string name="trash_restore_name">इस नाम से पुनर्स्थापित करें</string>
+    <string name="trash_busy">प्रक्रिया जारी…</string>
+    <string name="trash_invalid">रिकॉर्ड खराब है। फ़ाइलें यहां सुरक्षित हैं: %1$s</string>
+    <string name="trash_failed">कार्रवाई पूरी नहीं हुई: %1$s</string>
+    <string name="settings_trash_enabled">ट्रैश सक्षम करें</string>
+    <string name="settings_trash_enabled_desc">केवल सीधे लिखने योग्य स्थानीय साझा स्टोरेज (आंतरिक स्टोरेज, SD कार्ड और USB ड्राइव)। नेटवर्क और सुरक्षित पथ समर्थित नहीं हैं। बंद होने पर स्थायी रूप से हटाया जाएगा; मौजूदा सामग्री बहाल करने के लिए इसे फिर सक्षम करें।</string>
+    <string name="trash_use">ट्रैश का उपयोग करें</string>
+    <string name="trash_original_path">मूल स्थान</string>
+    <string name="trash_deleted_at">हटाने का समय</string>
+    <string name="trash_storage">स्टोरेज वॉल्यूम</string>
 </resources>

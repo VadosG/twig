@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.22)
 project(twigpty C)
 
-# Only PTY allocation; no third-party code linked (~10KB).
-add_library(twigpty SHARED twigpty.c)
+# Small app-owned helpers: PTY allocation and atomic trash moves; no third-party code.
+add_library(twigpty SHARED twigpty.c trash.c)
 
 
 # ★ Reproducible builds: without this the GNU build-id differs between machines.

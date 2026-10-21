@@ -51,7 +51,7 @@ object FileInfo {
     /** Listing metadata first; no file reads or directory listings before the card appears. */
     fun initial(ctx: Context, file: XFile): Details = Details(buildList {
         add(basic(ctx, file, includeContents = false))
-        if (!file.isDir && (OpenFiles.isVideo(file) || OpenFiles.isAudio(file)))
+        if (!file.isDir && file.canRead && (OpenFiles.isVideo(file) || OpenFiles.isAudio(file)))
             add(Section(s(ctx, R.string.info_section_media), emptyList(), loading = true))
     })
 
@@ -67,7 +67,7 @@ object FileInfo {
             runCatching { (FsRegistry.of(file) as? MediaInfoSource)?.detailsOf(file) }.getOrNull()
         }
         sections += basic(ctx, file, remote)
-        if (!file.isDir) {
+        if (!file.isDir && file.canRead) {
             when {
                 remote != null -> remoteMedia(ctx, remote)?.let { sections += it }
                 OpenFiles.isImage(file) -> exif(ctx, file)?.let { sections += it }
@@ -89,9 +89,25 @@ object FileInfo {
     private fun basic(ctx: Context, file: XFile, remote: MediaDetails? = null, includeContents: Boolean = true): Section {
         val rows = ArrayList<Pair<String, String>>()
         rows += s(ctx, R.string.info_name) to file.name
-        // Media server paths are GUIDs, useless to show — when the server has a real path, show that
-        rows += s(ctx, R.string.info_path) to remote?.realPath?.ifEmpty { null }.orEmpty().ifEmpty { file.path }
-        if (file.scheme != "file") rows += s(ctx, R.string.info_source) to Format.schemeLabel(file.scheme)
+        val trash = if (file.scheme == "trash" && file.path != "/") (FsRegistry.of(file) as TrashFileSystem).let { fs ->
+            val item = fs.item(file)
+            val payload = fs.store.payload(item.entry, item.relative)
+            val st = android.system.Os.lstat(payload.path)
+            rows += s(ctx, R.string.info_source) to s(ctx, R.string.trash_title)
+            rows += s(ctx, R.string.trash_original_path) to (item.entry.original?.let {
+                if (item.relative.isEmpty()) it else java.io.File(it, item.relative).path
+            } ?: s(ctx, R.string.trash_invalid, item.entry.directory.path))
+            rows += s(ctx, R.string.info_path) to payload.path
+            rows += s(ctx, R.string.trash_storage) to item.entry.volume.path
+            if (item.entry.deletedAt > 0)
+                rows += s(ctx, R.string.trash_deleted_at) to Format.time(item.entry.deletedAt, ctx)
+            st
+        } else null
+        if (trash == null) {
+            // Media servers may provide a real path instead of their opaque id.
+            rows += s(ctx, R.string.info_path) to remote?.realPath?.ifEmpty { null }.orEmpty().ifEmpty { file.path }
+            if (file.scheme != "file") rows += s(ctx, R.string.info_source) to Format.schemeLabel(file.scheme)
+        }
         if (file.isDir) {
             rows += s(ctx, R.string.info_type) to s(ctx, R.string.info_folder)
             if (includeContents) runCatching { FsRegistry.of(file).list(file) }.getOrNull()?.let { kids ->
@@ -100,7 +116,8 @@ object FileInfo {
                     s(ctx, R.string.info_contains_value, dirs, kids.size - dirs)
             }
         } else {
-            rows += s(ctx, R.string.info_type) to OpenFiles.mimeOf(file.name)
+            rows += s(ctx, R.string.info_type) to if (trash != null && android.system.OsConstants.S_ISLNK(trash.st_mode))
+                "inode/symlink" else OpenFiles.mimeOf(file.name)
             // XFile.size in the listing may be 0 (media servers don't expose photo byte counts),
             // but the properties card only deals with one entry and the source will fetch it
             // specifically — use the real value when available
@@ -110,10 +127,11 @@ object FileInfo {
                     s(ctx, R.string.info_size_value, Format.size(bytes), "%,d".format(bytes))
             }
         }
-        if (file.lastModified > 0) rows += s(ctx, R.string.info_modified) to Format.time(file.lastModified, ctx)
-        rows += s(ctx, R.string.info_writable) to
+        val modified = trash?.st_mtime?.times(1000) ?: file.lastModified
+        if (modified > 0) rows += s(ctx, R.string.info_modified) to Format.time(modified, ctx)
+        if (trash == null) rows += s(ctx, R.string.info_writable) to
             s(ctx, if (file.canWrite) R.string.info_yes else R.string.info_no)
-        if (!file.isDir) rows += apps(ctx, file) // open-with merged into basic info
+        if (!file.isDir && file.canRead) rows += apps(ctx, file) // open-with merged into basic info
         return Section(s(ctx, R.string.info_section_basic), rows)
     }
 

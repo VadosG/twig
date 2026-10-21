@@ -1013,4 +1013,22 @@
     <string name="shortcut_pick_command">選擇本機目錄或 SSH（SFTP）位置</string>
     <string name="cmd_use_privileged">使用特權工作階段（%1$s）</string>
     <string name="android_data_hide_system">隱藏系統應用程式目錄</string>
+
+    <!-- Local shared-storage trash -->
+    <string name="trash_title">資源回收筒</string>
+    <string name="trash_restore">還原</string>
+    <string name="trash_delete_permanently">永久刪除</string>
+    <string name="trash_empty">清空資源回收筒</string>
+    <string name="trash_no_items">資源回收筒是空的</string>
+    <string name="trash_restore_parent">原資料夾不存在：%1$s。是否建立並還原？</string>
+    <string name="trash_restore_name">還原為</string>
+    <string name="trash_busy">處理中…</string>
+    <string name="trash_invalid">回收記錄損毀，檔案保留於：%1$s</string>
+    <string name="trash_failed">無法完成回收操作：%1$s</string>
+    <string name="settings_trash_enabled">啟用資源回收筒</string>
+    <string name="settings_trash_enabled_desc">僅支援可直接寫入的本機共用儲存空間（內建儲存空間、SD 卡、USB 隨身碟），不支援網路或受限目錄。關閉後將永久刪除，重新啟用後可還原已有內容。</string>
+    <string name="trash_use">使用資源回收筒</string>
+    <string name="trash_original_path">原始位置</string>
+    <string name="trash_deleted_at">刪除時間</string>
+    <string name="trash_storage">所在儲存空間</string>
 </resources>

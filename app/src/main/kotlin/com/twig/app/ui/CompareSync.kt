@@ -315,38 +315,35 @@ private fun runSync(
         return
     }
     val app = ctx.applicationContext
-    scope.launch {
-        // ★ runCatching per item: one delete failing (permission / busy) should not stall
-        // the rest of the batch — mirror-sync deletes are independent, and quitting
-        // halfway would just leave behind an unexplained mess of leftovers
-        val failed = withContext(Dispatchers.IO) {
-            deletes.count { runCatching { FsRegistry.of(it.file).delete(it.file) }.isFailure }
-        }
-        if (failed > 0) toastOn(ctx, ctx.getString(R.string.compare_sync_delete_failed, failed))
-        if (copies.isEmpty()) {
-            onStarted(deletes.map { it.key })
-            if (failed == 0) toastOn(ctx, ctx.getString(R.string.msg_done))
-            return@launch
-        }
-        val pairs = withContext(Dispatchers.IO) {
-            copies.mapNotNull { item ->
-                ensureDir(compareDestDir(dstRoot, item.key))?.let { item.file to it }
+    fun continueSync(deletesOk: Boolean) {
+        scope.launch {
+            if (copies.isEmpty()) {
+                onStarted(deletes.map { it.key })
+                if (deletesOk) toastOn(ctx, ctx.getString(R.string.msg_done))
+                return@launch
             }
+            val pairs = withContext(Dispatchers.IO) {
+                copies.mapNotNull { item ->
+                    ensureDir(compareDestDir(dstRoot, item.key))?.let { item.file to it }
+                }
+            }
+            if (pairs.isEmpty()) {
+                toastOn(ctx, ctx.getString(R.string.msg_dest_not_writable))
+                return@launch
+            }
+            val session = Transfers.Session(
+                Transfers.Work.Sync(pairs, move = false),
+                R.string.progress_copy,
+                Format.pathLabel(dstRoot), FileIcons.sourceIconRes(dstRoot.scheme), null,
+            ).apply { applyAll = CopyEngine.Decision.OVERWRITE }
+            val started = runCatching { Transfers.start(app, session) }
+                .getOrElse { toastOn(ctx, it.message ?: ctx.getString(R.string.err_failed)); return@launch }
+            if (!started) return@launch toastOn(ctx, ctx.getString(R.string.transfer_busy))
+            onStarted((copies + deletes).map { it.key })
         }
-        if (pairs.isEmpty()) {
-            toastOn(ctx, ctx.getString(R.string.msg_dest_not_writable))
-            return@launch
-        }
-        val session = Transfers.Session(
-            Transfers.Work.Sync(pairs, move = false),
-            R.string.progress_copy,
-            Format.pathLabel(dstRoot), FileIcons.sourceIconRes(dstRoot.scheme), null,
-        ).apply { applyAll = CopyEngine.Decision.OVERWRITE }
-        val started = runCatching { Transfers.start(app, session) }
-            .getOrElse { toastOn(ctx, it.message ?: ctx.getString(R.string.err_failed)); return@launch }
-        if (!started) return@launch toastOn(ctx, ctx.getString(R.string.transfer_busy))
-        onStarted((copies + deletes).map { it.key })
     }
+    if (deletes.isEmpty()) continueSync(true)
+    else DeleteUi.confirm(ctx, scope, deletes.map { it.file }) { continueSync(it) }
 }
 
 private fun toastOn(ctx: Context, msg: String) =

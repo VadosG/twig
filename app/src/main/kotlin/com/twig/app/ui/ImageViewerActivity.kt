@@ -392,37 +392,20 @@ class ImageViewerActivity : AppCompatActivity() {
     }
 
     private fun confirmDelete(file: XFile) {
-        AlertDialog.Builder(this)
-            .setMessage(getString(R.string.confirm_delete, 1))
-            .setNegativeButton(R.string.dialog_cancel, null)
-            .setPositiveButton(R.string.dialog_ok) { _, _ -> delete(file) }
-            .setOnDismissListener { scheduleHide() }
-            .show()
-    }
-
-    /**
-     * Delete the current image and remove it from the list. [images] is the "original discovery order"; [order] holds its
-     * indices, so deleting one shifts every later index — [order] must be rebuilt entirely (anything with an index
-     * greater than the deleted one decrements by 1), you can't just remove one element.
-     * After deletion, [pos] stays put and points to the next image in the playback order.
-     */
-    private fun delete(file: XFile) {
-        val idx = images.indexOfFirst { it.path == file.path && it.scheme == file.scheme }
-        if (idx < 0) return
-        lifecycleScope.launch {
-            val err = withContext(Dispatchers.IO) {
-                runCatching { FsRegistry.of(file).delete(file) }.exceptionOrNull()
+        DeleteUi.confirm(this, this, listOf(file), onDismiss = { scheduleHide() }) { success ->
+            if (success) {
+                val idx = images.indexOfFirst { it.path == file.path && it.scheme == file.scheme }
+                if (idx >= 0) {
+                    cache.remove(file.path)
+                    picked.remove(file.path)
+                    images.removeAt(idx)
+                    order = order.filter { it != idx }.map { if (it > idx) it - 1 else it }.toMutableList()
+                    changed = true
+                    publishResult()
+                    if (order.isEmpty()) finish()
+                    else { pos = pos.coerceAtMost(order.lastIndex); loadCurrent() }
+                }
             }
-            if (err != null) { toast(err.message ?: getString(R.string.info_failed)); return@launch }
-            cache.remove(file.path)
-            picked.remove(file.path)
-            images.removeAt(idx)
-            order = order.filter { it != idx }.map { if (it > idx) it - 1 else it }.toMutableList()
-            changed = true
-            publishResult()
-            if (order.isEmpty()) { finish(); return@launch }
-            pos = pos.coerceAtMost(order.lastIndex)
-            loadCurrent()
         }
     }
 

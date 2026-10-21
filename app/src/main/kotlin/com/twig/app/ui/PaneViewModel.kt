@@ -477,7 +477,21 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
         resortAll()
     }
 
-    /** After settings (thumbnails / grid mode) change, re-sort cached children under the new rules. */
+    fun refreshTrash() {
+        state.value.rows.filterIsInstance<FileNode>().firstOrNull {
+            it.file.scheme == "trash" && it.file.path == "/"
+        }?.let { root ->
+            children.keys.filter { it.startsWith("f:trash:") }.forEach { children.remove(it) }
+            synchronized(expanded) { expanded.removeAll { it.startsWith("f:trash:") && it != root.key } }
+            if (currentDir?.scheme == "trash") {
+                currentDir = root.file
+                currentKey = root.key
+            }
+            refreshNode(root)
+        }
+    }
+
+    /** Re-sort cached children after display settings change. */
     fun resortAll() {
         // children may be modified concurrently from IO threads; pull, null-check, then write back — no !!
         for (k in children.keys.toList()) children[k]?.let { children[k] = sortList(k, it) }
@@ -536,7 +550,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
      */
     private fun visible(list: List<XFile>?): List<XFile> {
         val l = list ?: return emptyList()
-        return if (showHidden) l else l.filter { !it.name.startsWith(".") }
+        return if (showHidden) l else l.filter { it.scheme == "trash" || !it.name.startsWith(".") }
     }
 
     /**
@@ -545,7 +559,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
      * manually picked "Open as archive".
      */
     private fun expandableArchive(f: XFile, key: String = fileKey(f)): Boolean =
-        !f.isDir && Archives.isArchive(f) &&
+        !f.isDir && f.scheme != "trash" && Archives.isArchive(f) &&
             (!OpenFiles.isInstallable(f) || forcedArchive.contains(key))
 
     private val _state = MutableStateFlow(State())
@@ -1574,6 +1588,9 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     /** onResume also checks the current directory on any backend, including server/favorite roots. */
     fun refreshOnResume() {
         val targets = localRefreshTargets().toMap(LinkedHashMap())
+        expandedSnapshot().forEach { key ->
+            keyFile[key]?.takeIf { it.scheme == "trash" && it.isDir }?.let { targets[key] = it }
+        }
         currentDir?.let { dir ->
             keyFile.forEach { (key, file) ->
                 if (file.scheme == dir.scheme && file.path == dir.path && file.isDir) targets[key] = file
@@ -2775,6 +2792,15 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     // ---- Building the tree ----
 
     private fun rebuild() {
+        val trashEnabled = Prefs.trashEnabled(getApplication())
+        if (!trashEnabled) {
+            synchronized(expanded) { expanded.removeAll { it.startsWith("f:trash:") } }
+            children.keys.filter { it.startsWith("f:trash:") }.forEach { children.remove(it) }
+            if (currentDir?.scheme == "trash" || currentKey?.startsWith("f:trash:") == true) {
+                currentDir = null
+                currentKey = null
+            }
+        }
         val rows = ArrayList<Node>()
         attachedKeys.clear()
         storageShortcutKeys.clear()
@@ -2797,6 +2823,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
                 addFile(rows, XFile("file", v.path, isDir = true), 0, v.label, capacity(v.path))
             }
             addFile(rows, XFile("file", "/", isDir = true), 0, str(R.string.group_root), capacity("/"))
+            if (trashEnabled) addFile(rows, XFile("trash", "/", isDir = true, canWrite = false), 0, str(R.string.trash_title))
             addGroup(rows, "lan", str(R.string.group_lan))
             addGroup(rows, "ftp", "FTP")
             addGroup(rows, "sftp", "SSH (SFTP)")

@@ -1014,4 +1014,22 @@
     <string name="shortcut_pick_command">Pilih folder lokal atau lokasi SSH (SFTP)</string>
     <string name="cmd_use_privileged">Gunakan sesi berhak istimewa (%1$s)</string>
     <string name="android_data_hide_system">Sembunyikan folder aplikasi sistem</string>
+
+    <!-- Local shared-storage trash -->
+    <string name="trash_title">Sampah</string>
+    <string name="trash_restore">Pulihkan</string>
+    <string name="trash_delete_permanently">Hapus permanen</string>
+    <string name="trash_empty">Kosongkan sampah</string>
+    <string name="trash_no_items">Sampah kosong</string>
+    <string name="trash_restore_parent">Folder asal tidak ada: %1$s. Buat dan pulihkan?</string>
+    <string name="trash_restore_name">Pulihkan sebagai</string>
+    <string name="trash_busy">Memproses…</string>
+    <string name="trash_invalid">Entri rusak. Berkas disimpan di: %1$s</string>
+    <string name="trash_failed">Tidak dapat menyelesaikan operasi: %1$s</string>
+    <string name="settings_trash_enabled">Aktifkan sampah</string>
+    <string name="settings_trash_enabled_desc">Hanya penyimpanan bersama lokal yang dapat ditulis langsung (internal, kartu SD, dan USB). Jaringan dan jalur terlindungi tidak didukung. Jika nonaktif, penghapusan permanen; aktifkan kembali untuk memulihkan isi yang ada.</string>
+    <string name="trash_use">Gunakan sampah</string>
+    <string name="trash_original_path">Lokasi asli</string>
+    <string name="trash_deleted_at">Waktu dihapus</string>
+    <string name="trash_storage">Volume penyimpanan</string>
 </resources>

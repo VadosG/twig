@@ -238,7 +238,8 @@ class PaneFragment : Fragment() {
                 if (host?.onPickNode(node) == true) return@click
                 when (node) {
                     is PaneViewModel.FileNode ->
-                        if (node.expandable) viewModel.toggle(node) else open(node.file)
+                        if (node.expandable) viewModel.toggle(node)
+                        else if (node.file.scheme != "trash" || node.file.canRead) open(node.file)
                     is PaneViewModel.WebsiteNode -> startActivity(WebsiteActivity.intent(requireContext(), node.site.id))
                     is PaneViewModel.ActionNode ->
                         if (node.id == "add_website") WebsiteDialogs.edit(requireContext())
@@ -923,23 +924,16 @@ class PaneFragment : Fragment() {
     }
 
     private fun confirmDeleteEntry(e: TreemapEntry) {
-        AlertDialog.Builder(requireContext())
-            .setMessage(getString(R.string.treemap_confirm_delete, e.name, Format.size(e.size)))
-            .setNegativeButton(R.string.dialog_cancel, null)
-            .setPositiveButton(R.string.dialog_ok) { _, _ ->
-                runIo({ FsRegistry.of(e.file).delete(e.file) }) {
-                    // Pull it out of the map and decrement size upward; refresh in place; the tree side re-lists as usual.
-                    e.parent?.children?.remove(e)
-                    var p = e.parent
-                    while (p != null) { p.size -= e.size; p = p.parent }
-                    while (mapStack.size > 1 && mapStack.last() === e) {
-                        mapStack.removeAt(mapStack.size - 1)
-                    }
-                    if (mapMode && mapStack.isNotEmpty()) renderMap()
-                    viewModel.refresh()
-                }
+        DeleteUi.confirm(requireContext(), viewLifecycleOwner, listOf(e.file)) { success ->
+            if (success) {
+                e.parent?.children?.remove(e)
+                var p = e.parent
+                while (p != null) { p.size -= e.size; p = p.parent }
+                while (mapStack.size > 1 && mapStack.last() === e) mapStack.removeAt(mapStack.size - 1)
+                if (mapMode && mapStack.isNotEmpty()) renderMap()
             }
-            .show()
+            viewModel.refresh()
+        }
     }
 
     // ---- File search (recursive glob, results attached as a virtual directory on the tree) ----
@@ -1213,15 +1207,9 @@ class PaneFragment : Fragment() {
         if (apps.isNotEmpty()) uninstallApps(apps)
         val rest = sel.filterNot { it.scheme == AppsFileSystem.SCHEME }
         if (rest.isEmpty()) return
-        AlertDialog.Builder(requireContext())
-            .setMessage(getString(R.string.confirm_delete, rest.size))
-            .setNegativeButton(R.string.dialog_cancel, null)
-            .setPositiveButton(R.string.dialog_ok) { _, _ ->
-                runIo({ rest.forEach { FsRegistry.of(it).delete(it) } }) {
-                    adapter.clearSelection(); clearMapSelection(); viewModel.refresh()
-                }
-            }
-            .show()
+        DeleteUi.confirm(requireContext(), viewLifecycleOwner, rest) {
+            adapter.clearSelection(); clearMapSelection(); viewModel.refresh()
+        }
     }
 
     // ---- App management (scheme=apps) ----
@@ -1781,6 +1769,12 @@ class PaneFragment : Fragment() {
     }
 
     private fun longClickFile(node: PaneViewModel.FileNode) {
+        if (node.file.scheme == "trash") {
+            val selected = adapter.selectedItems()
+            if (adapter.isSelected(node) && selected.size > 1) { showBatchMenu(selected); return }
+            TrashDialogs(requireContext(), viewLifecycleOwner) { viewModel.refreshTrash() }.show(node.file, trashFileActions(node))
+            return
+        }
         if (node.file.isDir && node.file.scheme.startsWith("git")) {
             val actions = ArrayList<MenuAct>()
             actions.item(getString(R.string.action_refresh), R.drawable.ic_refresh) { viewModel.refreshNode(node) }
@@ -1828,6 +1822,29 @@ class PaneFragment : Fragment() {
         showActionMenu(requireContext(), node.file.name, actions) {
             noteSourceDirs(listOf(node.file))
         }
+    }
+
+    /** Deleted entries remain read-only; inspection and export use their virtual source. */
+    private fun trashFileActions(node: PaneViewModel.FileNode): List<MenuAct> {
+        val file = node.file
+        if (file.path == "/" || file.path.startsWith("/@status/")) return emptyList()
+        val actions = ArrayList<MenuAct>()
+        actions.item(getString(R.string.file_info), R.drawable.ic_info) { viewModel.toggleInfo(node) }
+        if (!file.canRead) return actions // A deleted symlink can be inspected/restored, never followed.
+        actions.item(getString(R.string.action_select), R.drawable.ic_sel_check) { adapter.toggleSelection(node) }
+        if (file.isDir) {
+            actions.item(getString(R.string.action_refresh), R.drawable.ic_refresh) { viewModel.refreshNode(node) }
+            actions.item(getString(R.string.strip_search), R.drawable.ic_search) { promptSearch(file) }
+            actions.item(getString(R.string.strip_map), R.drawable.ic_treemap) { enterTreemap(file) }
+        } else {
+            actions.item(getString(R.string.open_with_external), R.drawable.ic_open_with) { openExternal(file) }
+            actions.item(getString(R.string.open_how), R.drawable.ic_tune) { chooseOpen(file) }
+            actions.item(getString(R.string.action_share), R.drawable.ic_share) { shareFile(file) }
+        }
+        actions.item(getString(R.string.action_clip_add), R.drawable.ic_clipboard) { addToClipboard(listOf(file)) }
+        actions.item(getString(R.string.strip_copy), R.drawable.ic_copy) { performCopy(listOf(file), move = false) }
+        actions.item(getString(R.string.strip_compress), R.drawable.ic_compress) { performCompress(listOf(file)) }
+        return actions
     }
 
     /**

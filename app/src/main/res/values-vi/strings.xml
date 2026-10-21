@@ -1013,4 +1013,22 @@
     <string name="shortcut_pick_command">Chọn thư mục cục bộ hoặc vị trí SSH (SFTP)</string>
     <string name="cmd_use_privileged">Sử dụng phiên đặc quyền (%1$s)</string>
     <string name="android_data_hide_system">Ẩn thư mục ứng dụng hệ thống</string>
+
+    <!-- Local shared-storage trash -->
+    <string name="trash_title">Thùng rác</string>
+    <string name="trash_restore">Khôi phục</string>
+    <string name="trash_delete_permanently">Xóa vĩnh viễn</string>
+    <string name="trash_empty">Dọn sạch thùng rác</string>
+    <string name="trash_no_items">Thùng rác trống</string>
+    <string name="trash_restore_parent">Thư mục gốc không còn: %1$s. Tạo và khôi phục?</string>
+    <string name="trash_restore_name">Khôi phục với tên</string>
+    <string name="trash_busy">Đang xử lý…</string>
+    <string name="trash_invalid">Bản ghi bị hỏng. Tệp được giữ tại: %1$s</string>
+    <string name="trash_failed">Không thể hoàn tất thao tác: %1$s</string>
+    <string name="settings_trash_enabled">Bật thùng rác</string>
+    <string name="settings_trash_enabled_desc">Chỉ hỗ trợ bộ nhớ dùng chung cục bộ có thể ghi trực tiếp (bộ nhớ trong, thẻ SD và USB). Không hỗ trợ mạng hoặc đường dẫn được bảo vệ. Khi tắt, xóa là vĩnh viễn; bật lại để khôi phục nội dung hiện có.</string>
+    <string name="trash_use">Dùng thùng rác</string>
+    <string name="trash_original_path">Vị trí ban đầu</string>
+    <string name="trash_deleted_at">Thời gian xóa</string>
+    <string name="trash_storage">Ổ lưu trữ</string>
 </resources>

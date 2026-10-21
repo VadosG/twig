@@ -1018,4 +1018,22 @@
     <string name="shortcut_pick_command">اختر مجلدًا محليًا أو موقع SSH (SFTP)</string>
     <string name="cmd_use_privileged">استخدام جلسة مميزة (%1$s)</string>
     <string name="android_data_hide_system">إخفاء مجلدات تطبيقات النظام</string>
+
+    <!-- Local shared-storage trash -->
+    <string name="trash_title">سلة المهملات</string>
+    <string name="trash_restore">استعادة</string>
+    <string name="trash_delete_permanently">حذف نهائي</string>
+    <string name="trash_empty">إفراغ سلة المهملات</string>
+    <string name="trash_no_items">سلة المهملات فارغة</string>
+    <string name="trash_restore_parent">المجلد الأصلي غير موجود: %1$s. إنشاؤه والاستعادة؟</string>
+    <string name="trash_restore_name">استعادة باسم</string>
+    <string name="trash_busy">جارٍ التنفيذ…</string>
+    <string name="trash_invalid">سجل تالف. الملفات محفوظة في: %1$s</string>
+    <string name="trash_failed">تعذر إكمال العملية: %1$s</string>
+    <string name="settings_trash_enabled">تفعيل سلة المهملات</string>
+    <string name="settings_trash_enabled_desc">يدعم فقط التخزين المحلي المشترك القابل للكتابة مباشرة (التخزين الداخلي وبطاقات SD ووحدات USB)، دون الشبكة أو المسارات المحمية. عند إيقافه يكون الحذف نهائيًا، ويمكن استعادة المحتويات الموجودة عند تفعيله مجددًا.</string>
+    <string name="trash_use">استخدام سلة المهملات</string>
+    <string name="trash_original_path">الموقع الأصلي</string>
+    <string name="trash_deleted_at">وقت الحذف</string>
+    <string name="trash_storage">وحدة التخزين</string>
 </resources>

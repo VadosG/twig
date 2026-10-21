@@ -1014,4 +1014,22 @@
     <string name="shortcut_pick_command">Elige una carpeta local o una ubicación SSH (SFTP)</string>
     <string name="cmd_use_privileged">Usar sesión privilegiada (%1$s)</string>
     <string name="android_data_hide_system">Ocultar carpetas de aplicaciones del sistema</string>
+
+    <!-- Local shared-storage trash -->
+    <string name="trash_title">Papelera</string>
+    <string name="trash_restore">Restaurar</string>
+    <string name="trash_delete_permanently">Eliminar permanentemente</string>
+    <string name="trash_empty">Vaciar papelera</string>
+    <string name="trash_no_items">La papelera está vacía</string>
+    <string name="trash_restore_parent">Falta la carpeta original: %1$s. ¿Crearla y restaurar?</string>
+    <string name="trash_restore_name">Restaurar como</string>
+    <string name="trash_busy">Procesando…</string>
+    <string name="trash_invalid">Registro dañado. Los archivos se conservan en: %1$s</string>
+    <string name="trash_failed">No se pudo completar la operación: %1$s</string>
+    <string name="settings_trash_enabled">Activar papelera</string>
+    <string name="settings_trash_enabled_desc">Solo almacenamiento local compartido con escritura directa (almacenamiento interno, tarjetas SD y unidades USB). No admite red ni rutas protegidas. Al desactivarla, el borrado es permanente; vuelve a activarla para restaurar el contenido existente.</string>
+    <string name="trash_use">Usar papelera</string>
+    <string name="trash_original_path">Ubicación original</string>
+    <string name="trash_deleted_at">Fecha de eliminación</string>
+    <string name="trash_storage">Unidad de almacenamiento</string>
 </resources>

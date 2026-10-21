@@ -127,6 +127,7 @@ object FileIcons {
         // identical; manufacturing shape differences would only be fake information.
         "jellyfin" -> R.drawable.ic_media_jellyfin
         "emby" -> R.drawable.ic_media_emby
+        "trash" -> R.drawable.ic_trash
         "git" -> R.drawable.ic_git
         "restic" -> R.drawable.ic_restic
         com.twig.app.AppsFileSystem.SCHEME -> R.drawable.ic_file_apk

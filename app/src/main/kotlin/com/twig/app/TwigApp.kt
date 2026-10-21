@@ -58,6 +58,7 @@ class TwigApp : Application() {
             FsRegistry.register(SafFileSystem(app))
             AndroidDataAccess.install(app)
             FsRegistry.register(AppsFileSystem(app))
+            FsRegistry.register(TrashFileSystem(app))
             FsRegistry.register(ShareSourceFileSystem(app))
         }
     }

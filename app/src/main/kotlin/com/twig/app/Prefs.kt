@@ -448,11 +448,14 @@ object Prefs {
         sp(ctx).edit().putInt("privileged_mode", mode).apply()
     }
 
+    fun trashEnabled(ctx: Context): Boolean = sp(ctx).getBoolean("trash_enabled", true)
+    fun setTrashEnabled(ctx: Context, enabled: Boolean) { sp(ctx).edit().putBoolean("trash_enabled", enabled).apply() }
+
     /** Signature of preferences that affect main UI layout; when it changes after
      * returning from settings, MainActivity recreates. */
     fun uiSignature(ctx: Context): String = listOf(
         density(ctx), textSize(ctx), thumbs(ctx), thumbsGrid(ctx), thumbsGridNames(ctx), gridCell(ctx),
-        showHidden(ctx), rowDivider(ctx), sniffTypes(ctx), dateFormat(ctx), folderCounts(ctx),
+        showHidden(ctx), rowDivider(ctx), sniffTypes(ctx), dateFormat(ctx), folderCounts(ctx), trashEnabled(ctx),
     ).joinToString(",")
 
     /** Last active queue id (NOW or a named playlist), used by cold-start resume to locate the right list. */

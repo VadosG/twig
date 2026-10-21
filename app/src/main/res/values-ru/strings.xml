@@ -1050,4 +1050,22 @@
     <string name="android_data_existing">Показывать только обнаруженные папки с данными</string>
     <string name="android_data_existing_note">Android может скрывать папки. Отключите, чтобы увидеть все возможные приложения.</string>
     <string name="android_data_no_matches">Нет подходящих приложений</string>
+
+    <!-- Local shared-storage trash -->
+    <string name="trash_title">Корзина</string>
+    <string name="trash_restore">Восстановить</string>
+    <string name="trash_delete_permanently">Удалить навсегда</string>
+    <string name="trash_empty">Очистить корзину</string>
+    <string name="trash_no_items">Корзина пуста</string>
+    <string name="trash_restore_parent">Исходная папка отсутствует: %1$s. Создать и восстановить?</string>
+    <string name="trash_restore_name">Восстановить как</string>
+    <string name="trash_busy">Обработка…</string>
+    <string name="trash_invalid">Повреждённая запись. Файлы сохранены в: %1$s</string>
+    <string name="trash_failed">Не удалось завершить операцию: %1$s</string>
+    <string name="settings_trash_enabled">Включить корзину</string>
+    <string name="settings_trash_enabled_desc">Только локальное общее хранилище с прямой записью (внутренняя память, SD-карты и USB-накопители). Сеть и защищённые пути не поддерживаются. При отключении удаление окончательное; для восстановления содержимого включите корзину снова.</string>
+    <string name="trash_use">Использовать корзину</string>
+    <string name="trash_original_path">Исходное расположение</string>
+    <string name="trash_deleted_at">Время удаления</string>
+    <string name="trash_storage">Накопитель</string>
 </resources>

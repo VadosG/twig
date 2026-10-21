@@ -1014,4 +1014,22 @@
     <string name="shortcut_pick_command">ローカルフォルダまたは SSH（SFTP）の場所を選択</string>
     <string name="cmd_use_privileged">特権セッションを使用（%1$s）</string>
     <string name="android_data_hide_system">システムアプリのフォルダを非表示</string>
+
+    <!-- Local shared-storage trash -->
+    <string name="trash_title">ゴミ箱</string>
+    <string name="trash_restore">復元</string>
+    <string name="trash_delete_permanently">完全に削除</string>
+    <string name="trash_empty">ゴミ箱を空にする</string>
+    <string name="trash_no_items">ゴミ箱は空です</string>
+    <string name="trash_restore_parent">元のフォルダがありません：%1$s。作成して復元しますか？</string>
+    <string name="trash_restore_name">名前を指定して復元</string>
+    <string name="trash_busy">処理中…</string>
+    <string name="trash_invalid">記録が破損しています。ファイルの保存先：%1$s</string>
+    <string name="trash_failed">操作を完了できません：%1$s</string>
+    <string name="settings_trash_enabled">ごみ箱を有効にする</string>
+    <string name="settings_trash_enabled_desc">直接書き込めるローカル共有ストレージ（内部ストレージ、SD カード、USB ドライブ）のみ対応。ネットワークや保護されたパスには非対応です。無効時は完全に削除しますが、再度有効にすると既存の内容を復元できます。</string>
+    <string name="trash_use">ごみ箱を使用</string>
+    <string name="trash_original_path">元の場所</string>
+    <string name="trash_deleted_at">削除日時</string>
+    <string name="trash_storage">ストレージ</string>
 </resources>
