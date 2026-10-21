@@ -953,8 +953,8 @@ class FileAdapter(
                     // Directories on media servers are all virtual (albums / artists / libraries…), give them a distinguishable icon
                     val mediaIcon = FileIcons.mediaDirIcon(file)
                     b.icon.setImageResource(mediaIcon ?: R.drawable.ic_folder)
-                    // Android/data package folders reuse the installed-app icon cache; missing apps keep the folder icon.
-                    val appPackage = com.twig.app.AndroidDataAccess.appPackage(file)
+                    // Known package directories reuse the installed-app icon cache; missing apps keep the folder icon.
+                    val appPackage = com.twig.app.AppPackageFolders.packageOf(file)
                     if (appPackage != null) {
                         FileIcons.bindApp(b.icon, appPackage)
                     } else if (com.twig.app.SafFileSystem.isTreeRoot(file)) {

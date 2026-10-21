@@ -4,6 +4,20 @@
 > shared conventions are in [AGENTS.md](../../AGENTS.md); the other sections live
 > beside this file in [docs/lessons/](.).
 
+- **Package-folder icons must cover the other app storage locations too** (2026-10-21,
+  issue #19): icon detection lived inside `AndroidDataAccess` and only recognized
+  Android/data, so Android/media, Android/obb and private package directories still
+  showed generic folders. `AppPackageFolders` now owns the icon hint independently of
+  permission routing. It recognizes direct package directories in external storage
+  (including aliases, removable volumes and external-storage SAF document IDs),
+  /data/data, per-user credential/device-encrypted storage, adopted storage and mirrors.
+  Only local files and the external-storage document provider qualify; nested directories
+  and remote paths must not inherit the installed app's icon. Reuse `FileIcons.bindApp`
+  and its `pkg:` cache with the folder placeholder for missing apps, regardless of the
+  thumbnail preference. Do not stat or canonicalize private paths on the row-binding
+  thread to identify an icon. Path coverage and actual recycled-row icon binding are
+  covered by `AppPackageFoldersTest` and `AppPackageIconTest`.
+
 - **Network video thumbnails (★ 2026-07-22, the whole `Thumbs.genVideoNetworkFrame`
   saga)**: the core insight is **never let the system `MediaMetadataRetriever` (MMR) seek
   by itself over a slow network** — it ignores the container's Cues index and scans

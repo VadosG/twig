@@ -256,6 +256,9 @@ each write `= null`.
   cache, unaffected by the thumbnail preference. Routing them through the thumbnail
   pipeline would only render the same image twice and burn a second copy of disk cache
   and a queue slot.
+  Package directories in Android/data, Android/media, Android/obb and private app storage
+  use the same installed-app icon cache (`AppPackageFolders` identifies direct children,
+  including local aliases and external-storage SAF documents). Missing apps retain the folder icon.
 - **Network video thumbnails** (★ see [docs/lessons/thumbnails.md](docs/lessons/thumbnails.md) for the full saga): instead of
   downloading the whole file, Twig parses the container itself to locate the keyframe at
   1/10 of the duration and downloads only ~2 MB. MP4 parses the moov sample tables

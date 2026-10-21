@@ -259,15 +259,15 @@ class AndroidDataAccessTest {
 
     @Test fun `app icons match only direct data directories for both local and SAF listings`() {
         val document = XFile("saf", DocumentsContract.buildDocumentUriUsingTree(tree, packageId).toString(), true)
-        assertEquals("com.example", AndroidDataAccess.appPackage(root))
-        assertEquals("com.example", AndroidDataAccess.appPackage(document))
-        assertEquals("com.example", AndroidDataAccess.appPackage(root.copy(path = "/storage/ABCD-1234/Android/data/com.example")))
-        assertNull(AndroidDataAccess.appPackage(root.copy(path = root.parentPath)))
-        assertNull(AndroidDataAccess.appPackage(root.copy(path = root.path + "/files")))
-        assertNull(AndroidDataAccess.appPackage(document.copy(path =
+        assertEquals("com.example", AppPackageFolders.packageOf(root))
+        assertEquals("com.example", AppPackageFolders.packageOf(document))
+        assertEquals("com.example", AppPackageFolders.packageOf(root.copy(path = "/storage/ABCD-1234/Android/data/com.example")))
+        assertNull(AppPackageFolders.packageOf(root.copy(path = root.parentPath)))
+        assertNull(AppPackageFolders.packageOf(root.copy(path = root.path + "/files")))
+        assertNull(AppPackageFolders.packageOf(document.copy(path =
             DocumentsContract.buildDocumentUriUsingTree(tree, "$packageId/files").toString())))
-        assertNull(AndroidDataAccess.appPackage(document.copy(path = document.path.replace(AndroidDataAccess.AUTHORITY, "other.provider"))))
-        assertNull(AndroidDataAccess.appPackage(root.copy(isDir = false)))
+        assertNull(AppPackageFolders.packageOf(document.copy(path = document.path.replace(AndroidDataAccess.AUTHORITY, "other.provider"))))
+        assertNull(AppPackageFolders.packageOf(root.copy(isDir = false)))
     }
 
     @Test fun `directory scans traverse SAF descendants and existing grants survive a new access instance`() {
