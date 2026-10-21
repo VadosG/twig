@@ -1039,4 +1039,5 @@
     <string name="compare_content_unlimited">サイズ制限なし</string>
     <string name="batch_template_hint">{name}：元の名前（拡張子なし）、{ext}：ドットを含む拡張子、{number}：連番、{date}：更新日（yyyyMMdd）</string>
     <string name="batch_template_error">テンプレートが無効か、更新日がありません</string>
+    <string name="batch_titlecase">タイトルケース（英語）</string>
 </resources>

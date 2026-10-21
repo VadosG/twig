@@ -1039,4 +1039,5 @@
     <string name="compare_content_unlimited">Tanpa batas ukuran</string>
     <string name="batch_template_hint">{name}: nama asli tanpa ekstensi; {ext}: ekstensi termasuk titik; {number}: nomor urut; {date}: tanggal perubahan (yyyyMMdd)</string>
     <string name="batch_template_error">Templat tidak valid atau tanggal perubahan tidak tersedia</string>
+    <string name="batch_titlecase">Huruf Judul (Inggris)</string>
 </resources>

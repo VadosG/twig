@@ -28,7 +28,30 @@ import java.util.Date
 /** Name generation has no filesystem side effects; preview and execution use the same plan. */
 internal object BatchRenameNames {
     enum class Part { NAME, EXTENSION, FULL }
-    enum class LetterCase { KEEP, LOWER, UPPER }
+    enum class LetterCase { KEEP, LOWER, UPPER, TITLE }
+
+    private val titleWords = Regex("[\\p{L}\\p{N}][\\p{L}\\p{M}\\p{N}]*(?:[’'][\\p{L}\\p{M}\\p{N}]+)*")
+    private val titleMinorWords = setOf(
+        "a", "an", "the", "and", "but", "or", "nor", "for", "as", "at", "by", "down", "from",
+        "in", "into", "like", "near", "of", "off", "on", "onto", "out", "over", "past", "per",
+        "till", "to", "up", "upon", "via", "vs", "with",
+    )
+
+    /** English title casing with a fixed minor-word list, not grammatical analysis. */
+    private fun titleCase(text: String): String {
+        val words = titleWords.findAll(text).toList()
+        fun subtitleBoundary(gap: String) = gap.contains(" - ") ||
+            gap.any { it == ':' || it == '—' || it == '–' || it == '\n' || it == '\r' }
+        var index = 0
+        return titleWords.replace(text) { match ->
+            val i = index++
+            val word = match.value.lowercase(Locale.ROOT)
+            val first = i == 0 || subtitleBoundary(text.substring(words[i - 1].range.last + 1, match.range.first))
+            val last = i == words.lastIndex || subtitleBoundary(text.substring(match.range.last + 1, words[i + 1].range.first))
+            if (first || last || word !in titleMinorWords) word.replaceFirstChar { it.titlecase(Locale.ROOT) }
+            else word
+        }
+    }
 
     fun generate(
         files: List<XFile>, part: Part, numbering: Boolean, find: String, replacement: String,
@@ -71,6 +94,7 @@ internal object BatchRenameNames {
             val changed = prefix + when (letterCase) {
                 LetterCase.LOWER -> old.lowercase(Locale.ROOT)
                 LetterCase.UPPER -> old.uppercase(Locale.ROOT)
+                LetterCase.TITLE -> titleCase(old)
                 LetterCase.KEEP -> when {
                     numbering -> {
                         val number = number()
@@ -138,7 +162,7 @@ internal object BatchRenameDialog {
         val prefix = EditText(context).apply { setHint(R.string.batch_prefix); setSingleLine() }
         val suffix = EditText(context).apply { setHint(R.string.batch_suffix); setSingleLine() }
         affixBox.addView(prefix); affixBox.addView(suffix); content.addView(affixBox)
-        val letterCase = spinner(listOf(R.string.batch_lowercase, R.string.batch_uppercase))
+        val letterCase = spinner(listOf(R.string.batch_lowercase, R.string.batch_uppercase, R.string.batch_titlecase))
         content.addView(letterCase)
         val templateBox = column()
         val template = EditText(context).apply { setSingleLine(); setText("{name}{ext}") }

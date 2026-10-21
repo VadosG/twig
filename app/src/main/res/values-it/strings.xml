@@ -1039,4 +1039,5 @@
     <string name="compare_content_unlimited">Nessun limite di dimensione</string>
     <string name="batch_template_hint">{name}: nome originale senza estensione; {ext}: estensione con punto; {number}: numero; {date}: data di modifica (yyyyMMdd)</string>
     <string name="batch_template_error">Modello non valido o data di modifica assente</string>
+    <string name="batch_titlecase">Maiuscole del titolo (inglese)</string>
 </resources>

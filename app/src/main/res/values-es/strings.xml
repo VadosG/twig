@@ -1039,4 +1039,5 @@
     <string name="compare_content_unlimited">Sin límite de tamaño</string>
     <string name="batch_template_hint">{name}: nombre original sin extensión; {ext}: extensión con punto; {number}: número; {date}: fecha de modificación (yyyyMMdd)</string>
     <string name="batch_template_error">Plantilla no válida o falta la fecha de modificación</string>
+    <string name="batch_titlecase">Mayúsculas de título (inglés)</string>
 </resources>

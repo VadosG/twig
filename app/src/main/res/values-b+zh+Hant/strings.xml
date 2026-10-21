@@ -1038,4 +1038,5 @@
     <string name="compare_content_unlimited">不限大小</string>
     <string name="batch_template_hint">{name}：原始檔名（不含副檔名）；{ext}：副檔名（含點）；{number}：序號；{date}：修改日期（yyyyMMdd）</string>
     <string name="batch_template_error">範本無效或缺少修改日期</string>
+    <string name="batch_titlecase">標題大小寫（英語）</string>
 </resources>

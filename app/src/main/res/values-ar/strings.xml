@@ -1043,4 +1043,5 @@
     <string name="compare_content_unlimited">بلا حد للحجم</string>
     <string name="batch_template_hint">{name}: الاسم الأصلي دون الامتداد؛ {ext}: الامتداد مع النقطة؛ {number}: الرقم التسلسلي؛ {date}: تاريخ التعديل (yyyyMMdd)</string>
     <string name="batch_template_error">القالب غير صالح أو تاريخ التعديل غير متوفر</string>
+    <string name="batch_titlecase">حالة أحرف العنوان (الإنجليزية)</string>
 </resources>

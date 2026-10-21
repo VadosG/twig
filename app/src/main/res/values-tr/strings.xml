@@ -1039,4 +1039,5 @@
     <string name="compare_content_unlimited">Boyut sınırı yok</string>
     <string name="batch_template_hint">{name}: uzantısız özgün ad; {ext}: nokta dahil uzantı; {number}: sıra numarası; {date}: değiştirilme tarihi (yyyyMMdd)</string>
     <string name="batch_template_error">Geçersiz şablon veya değiştirilme tarihi eksik</string>
+    <string name="batch_titlecase">Başlık Düzeni (İngilizce)</string>
 </resources>

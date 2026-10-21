@@ -1109,4 +1109,5 @@
     <string name="compare_content_unlimited">No size limit</string>
     <string name="batch_template_hint">{name}: original name without extension; {ext}: extension including dot; {number}: sequence; {date}: modified date (yyyyMMdd)</string>
     <string name="batch_template_error">Invalid template or missing modification date</string>
+    <string name="batch_titlecase">Title Case (English)</string>
 </resources>

@@ -1069,4 +1069,5 @@
     <string name="compare_content_unlimited">不限大小</string>
     <string name="batch_template_hint">{name}：原文件名（不含扩展名）；{ext}：扩展名（含点）；{number}：序号；{date}：修改日期（yyyyMMdd）</string>
     <string name="batch_template_error">模板无效或缺少修改日期</string>
+    <string name="batch_titlecase">标题大小写（英语）</string>
 </resources>

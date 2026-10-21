@@ -103,6 +103,11 @@ class BatchRenameTest {
             assertFalse(apply.isEnabled)
             mode(3)
             assertTrue("Hidden invalid regex must not block case conversion", apply.isEnabled)
+            val letterCase = spinners.single { it.adapter.getItem(0) == activity.getString(com.twig.app.R.string.batch_lowercase) }
+            assertEquals(activity.getString(com.twig.app.R.string.batch_titlecase), letterCase.adapter.getItem(2))
+            letterCase.setSelection(2)
+            org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
+            assertFalse("Old.JPG is already title case with the extension excluded", apply.isEnabled)
             mode(2)
             byHint(com.twig.app.R.string.batch_prefix).setText("pre_")
             assertTrue(apply.isEnabled)
@@ -141,6 +146,44 @@ class BatchRenameTest {
             assertEquals(listOf("IMAGE.JPG", "IMAGE.jpg"), generate(files, letterCase = BatchRenameNames.LetterCase.UPPER))
             assertEquals(listOf("IMAGE.jpg", "image.jpg"), generate(files, BatchRenameNames.Part.EXTENSION,
                 letterCase = BatchRenameNames.LetterCase.LOWER))
+        } finally { java.util.Locale.setDefault(previous) }
+    }
+
+    @Test fun `title case keeps minor words lowercase except at title and subtitle boundaries`() {
+        val cases = linkedMapOf(
+            "THE LORD OF THE RINGS" to "The Lord of the Rings",
+            "a walk in the woods" to "A Walk in the Woods",
+            "what is it good for" to "What Is It Good For",
+            "what is it for: an introduction to the subject" to "What Is It For: An Introduction to the Subject",
+            "a journey through the woods" to "A Journey Through the Woods",
+            "the art of war — a guide to strategy" to "The Art of War — A Guide to Strategy",
+            "to be or not to be" to "To Be or Not to Be",
+            "the" to "The",
+        )
+        assertEquals(cases.values.map { "$it.MKV" }, generate(cases.keys.map { file("$it.MKV") },
+            letterCase = BatchRenameNames.LetterCase.TITLE))
+    }
+
+    @Test fun `title case preserves filename separators contractions and selected scope`() {
+        val cases = linkedMapOf(
+            "state-of-the-art" to "State-of-the-Art",
+            "the_lord_of_the_rings" to "The_Lord_of_the_Rings",
+            "  (THE ROAD TO SUCCESS!)  " to "  (The Road to Success!)  ",
+            "DON’T PANIC" to "Don’t Panic",
+            "IT'S A WONDERFUL LIFE" to "It's a Wonderful Life",
+            "中文 and ENGLISH" to "中文 and English",
+            "..." to "...",
+            "123 - the road to nowhere" to "123 - The Road to Nowhere",
+        )
+        assertEquals(cases.values.toList(), generate(cases.keys.map { file(it, true) },
+            letterCase = BatchRenameNames.LetterCase.TITLE))
+        assertEquals(listOf("report.Txt"), generate(listOf(file("report.TXT")), BatchRenameNames.Part.EXTENSION,
+            letterCase = BatchRenameNames.LetterCase.TITLE))
+        val previous = java.util.Locale.getDefault()
+        java.util.Locale.setDefault(java.util.Locale.forLanguageTag("tr-TR"))
+        try {
+            assertEquals(listOf("Image in the City.JPG"), generate(listOf(file("IMAGE IN THE CITY.JPG")),
+                letterCase = BatchRenameNames.LetterCase.TITLE))
         } finally { java.util.Locale.setDefault(previous) }
     }
 

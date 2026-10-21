@@ -1039,4 +1039,5 @@
     <string name="compare_content_unlimited">आकार की कोई सीमा नहीं</string>
     <string name="batch_template_hint">{name}: एक्सटेंशन के बिना मूल नाम; {ext}: बिंदु सहित एक्सटेंशन; {number}: क्रम संख्या; {date}: संशोधन तिथि (yyyyMMdd)</string>
     <string name="batch_template_error">अमान्य टेम्पलेट या संशोधन तिथि उपलब्ध नहीं है</string>
+    <string name="batch_titlecase">शीर्षक अक्षर शैली (अंग्रेज़ी)</string>
 </resources>

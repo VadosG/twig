@@ -1038,4 +1038,5 @@
     <string name="compare_content_unlimited">Không giới hạn kích thước</string>
     <string name="batch_template_hint">{name}: tên gốc không có phần mở rộng; {ext}: phần mở rộng gồm dấu chấm; {number}: số thứ tự; {date}: ngày sửa đổi (yyyyMMdd)</string>
     <string name="batch_template_error">Mẫu không hợp lệ hoặc thiếu ngày sửa đổi</string>
+    <string name="batch_titlecase">Viết hoa tiêu đề (tiếng Anh)</string>
 </resources>

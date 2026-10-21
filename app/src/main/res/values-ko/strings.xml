@@ -1039,4 +1039,5 @@
     <string name="compare_content_unlimited">크기 제한 없음</string>
     <string name="batch_template_hint">{name}: 확장자를 제외한 원래 이름; {ext}: 점을 포함한 확장자; {number}: 순번; {date}: 수정 날짜 (yyyyMMdd)</string>
     <string name="batch_template_error">템플릿이 잘못되었거나 수정 날짜가 없습니다</string>
+    <string name="batch_titlecase">제목 대소문자 (영어)</string>
 </resources>

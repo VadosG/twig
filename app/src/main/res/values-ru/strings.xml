@@ -1075,4 +1075,5 @@
     <string name="compare_content_unlimited">Без ограничения размера</string>
     <string name="batch_template_hint">{name}: исходное имя без расширения; {ext}: расширение с точкой; {number}: номер; {date}: дата изменения (yyyyMMdd)</string>
     <string name="batch_template_error">Недопустимый шаблон или отсутствует дата изменения</string>
+    <string name="batch_titlecase">Регистр заголовка (английский)</string>
 </resources>
