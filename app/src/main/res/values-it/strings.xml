@@ -147,7 +147,7 @@
     <string name="webdav_url">URL del server (http(s)://…)</string>
     <string name="smb_host">Host (IP/nome)</string>
     <string name="smb_share">Condivisione / percorso (facoltativo; vuoto = tutte)</string>
-    <string name="smb_domain">Dominio (predefinito: WORKGROUP)</string>
+    <string name="smb_domain">Dominio (facoltativo; lasciare vuoto per i gruppi di lavoro)</string>
     <string name="action_saved">Connessione salvata</string>
     <string name="action_theme">Tema</string>
     <string name="action_language">Lingua</string>

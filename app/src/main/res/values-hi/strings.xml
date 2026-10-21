@@ -147,7 +147,7 @@
     <string name="webdav_url">सर्वर URL (http(s)://…)</string>
     <string name="smb_host">होस्ट (IP/नाम)</string>
     <string name="smb_share">शेयर / पथ (वैकल्पिक; खाली = सभी शेयर)</string>
-    <string name="smb_domain">डोमेन (डिफ़ॉल्ट WORKGROUP)</string>
+    <string name="smb_domain">डोमेन (वैकल्पिक; कार्यसमूहों के लिए खाली छोड़ें)</string>
     <string name="action_saved">कनेक्शन सहेजा गया</string>
     <string name="action_theme">थीम</string>
     <string name="action_language">भाषा</string>

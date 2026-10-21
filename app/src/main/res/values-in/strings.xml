@@ -147,7 +147,7 @@
     <string name="webdav_url">URL server (http(s)://…)</string>
     <string name="smb_host">Host (IP/nama)</string>
     <string name="smb_share">Berbagi / jalur (opsional; kosong = semua)</string>
-    <string name="smb_domain">Domain (bawaan WORKGROUP)</string>
+    <string name="smb_domain">Domain (opsional; kosongkan untuk grup kerja)</string>
     <string name="action_saved">Koneksi disimpan</string>
     <string name="action_theme">Tema</string>
     <string name="action_language">Bahasa</string>

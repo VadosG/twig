@@ -147,7 +147,7 @@
     <string name="webdav_url">Server-URL (http(s)://…)</string>
     <string name="smb_host">Host (IP/Name)</string>
     <string name="smb_share">Freigabe / Pfad (optional; leer = alle)</string>
-    <string name="smb_domain">Domäne (Standard: WORKGROUP)</string>
+    <string name="smb_domain">Domäne (optional; bei Arbeitsgruppen leer lassen)</string>
     <string name="action_saved">Verbindung gespeichert</string>
     <string name="action_theme">Design</string>
     <string name="action_language">Sprache</string>

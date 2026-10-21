@@ -149,7 +149,7 @@
     <string name="webdav_url">服务器 URL(http(s)://…)</string>
     <string name="smb_host">主机(IP/名称)</string>
     <string name="smb_share">共享名/路径(可选,留空列出全部共享)</string>
-    <string name="smb_domain">域(默认 WORKGROUP)</string>
+    <string name="smb_domain">域（可选，普通工作组留空）</string>
     <string name="action_saved">已保存连接</string>
     <string name="action_theme">主题</string>
     <string name="action_language">语言</string>

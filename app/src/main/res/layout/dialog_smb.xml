@@ -52,7 +52,6 @@
         android:layout_height="wrap_content"
         android:hint="@string/smb_domain"
         android:inputType="text"
-        android:text="WORKGROUP"
         android:importantForAutofill="no" />
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/smb1"

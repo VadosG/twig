@@ -147,7 +147,7 @@
     <string name="webdav_url">عنوان الخادم (http(s)://…)</string>
     <string name="smb_host">المضيف (IP/اسم)</string>
     <string name="smb_share">مشاركة / مسار (اختياري؛ فارغ = كل المشاركات)</string>
-    <string name="smb_domain">النطاق (الافتراضي WORKGROUP)</string>
+    <string name="smb_domain">النطاق (اختياري؛ اتركه فارغًا لمجموعات العمل)</string>
     <string name="action_saved">تم حفظ الاتصال</string>
     <string name="action_theme">المظهر</string>
     <string name="action_language">اللغة</string>

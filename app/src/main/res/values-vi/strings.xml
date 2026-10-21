@@ -147,7 +147,7 @@
     <string name="webdav_url">URL máy chủ (http(s)://…)</string>
     <string name="smb_host">Máy chủ (IP/tên)</string>
     <string name="smb_share">Chia sẻ / đường dẫn (tùy chọn; trống = mọi chia sẻ)</string>
-    <string name="smb_domain">Miền (mặc định WORKGROUP)</string>
+    <string name="smb_domain">Miền (tùy chọn; để trống cho nhóm làm việc)</string>
     <string name="action_saved">Đã lưu kết nối</string>
     <string name="action_theme">Giao diện</string>
     <string name="action_language">Ngôn ngữ</string>

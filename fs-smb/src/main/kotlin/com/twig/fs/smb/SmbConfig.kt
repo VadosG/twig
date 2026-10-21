@@ -18,5 +18,6 @@ data class SmbConfig(
     val share: String = "",
     val user: String = "guest",
     val password: String = "",
-    val domain: String = "WORKGROUP",
+    /** Optional authentication domain; an ordinary workgroup does not need one. */
+    val domain: String = "",
 )

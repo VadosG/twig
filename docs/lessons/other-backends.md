@@ -130,6 +130,23 @@
   The three-argument NtlmPasswordAuthenticator constructor always chooses USER, including
   for `guest`: explicit passwordless guest access needs AuthenticationType.GUEST. Keep
   `allowGuestFallback=false` so a named login cannot silently connect as somebody else.
+- **SMB1 cold connections can wait on the authentication domain, even with an IP host**
+  (2026-10-21, issue #18). The report was slow first access and fast subsequent access
+  on two servers. Server warm-up was the initial hypothesis, but a standalone NT1-only
+  `dperson/samba` fixture reproduced the wait with the current backend: jcifs-ng's DFS
+  discovery tried to resolve the supplied `WORKGROUP` authentication domain. With DNS
+  unavailable for that name, NetBIOS retries took about 6 seconds; the negative DFS
+  cache made subsequent listings fast. Server and client both using `WORKGROUP` did
+  not prevent it. Mounting a share directly only moved the wait from listing into
+  `connect()`. An ordinary workgroup is not an authentication domain: new SMB
+  connections now leave the domain blank, and saving a blank field must not put
+  `WORKGROUP` back. The shared dialog, saved-connection default and backend config
+  agree on this. Keep explicit saved domains (including `WORKGROUP`) and the old JSON
+  fallback for records without a domain field; do not silently migrate credentials or
+  globally disable DFS. Clearing the domain or disabling DFS reduced cold access from
+  about 6.13 s to 0.12 s in the fixture; all six existing SMB1 unit/live tests passed.
+  This establishes the mechanism, not the reporter's exact network cause: Android
+  confirmation is still needed. `ConnectionStoreOrderTest` covers domain preservation.
 - **Server XML goes through `SafeXml`** (WebDAV multistatus, S3 listings): DOCTYPE and external
   entities off, each feature set on its own because Android's factory throws on unknown ones.
   On the JVM the old code really did expand `<!ENTITY x SYSTEM "file:…">` into a file name

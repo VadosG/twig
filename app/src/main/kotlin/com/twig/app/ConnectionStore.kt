@@ -26,7 +26,7 @@ data class SavedConnection(
     val share: String = "",
     val user: String = "",
     val password: String = "",
-    val domain: String = "WORKGROUP",
+    val domain: String = "",
     /** User-defined display name (nullable); when set, shown in the tree. */
     val name: String = "",
     /** SFTP private key file path (nullable); non-empty means key auth, password acts as passphrase. */
@@ -124,6 +124,7 @@ data class SavedConnection(
             share = o.optString("share", ""),
             user = o.optString("user", ""),
             password = o.optString("password", ""),
+            // Preserve the historical default for older records without a domain field.
             domain = o.optString("domain", "WORKGROUP"),
             name = o.optString("name", ""),
             keyPath = o.optString("keyPath", ""),

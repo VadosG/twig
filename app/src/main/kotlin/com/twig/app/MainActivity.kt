@@ -861,7 +861,7 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
                         "smb", host, share = share,
                         user = d.etUser.text.toString().trim().ifEmpty { "guest" },
                         password = d.etPass.text.toString(),
-                        domain = d.etDomain.text.toString().trim().ifEmpty { "WORKGROUP" },
+                        domain = d.etDomain.text.toString().trim(),
                         name = d.etName.text.toString().trim(),
                         smb1 = d.smb1.isChecked,
                     ),

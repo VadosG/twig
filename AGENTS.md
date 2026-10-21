@@ -587,4 +587,5 @@ add its symptom here.
   and nothing warns you below it.
   *Explains*: a white, invisible shortcut icon, an empty long-press menu, an SMB crash
   while thumbnails load, a server that jumps to the bottom of its group the first time you
-  expand it after importing a backup, "track info closes the music page" on Android 9.
+  expand it after importing a backup, "track info closes the music page" on Android 9,
+  an SMB1 cold connection that waits on WORKGROUP but is fast on subsequent access.

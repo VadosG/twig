@@ -48,6 +48,17 @@ class ConnectionStoreOrderTest {
     }
 
     @Test
+    fun `SMB domain stays optional while saved authentication domains are preserved`() {
+        val smb = SavedConnection(type = "smb", host = "nas", smb1 = true)
+        assertEquals("", smb.domain)
+        for (domain in listOf("WORKGROUP", "EXAMPLE", "")) {
+            ConnectionStore.save(ctx, smb.copy(domain = domain))
+            assertEquals(domain, ConnectionStore.all(ctx).last().domain)
+        }
+        assertEquals("WORKGROUP", SavedConnection.fromJson(smb.toJson().apply { remove("domain") }).domain)
+    }
+
+    @Test
     fun `writing a token back keeps the server where it was`() {
         // What the first expansion of the second server does
         ConnectionStore.save(ctx, ConnectionStore.all(ctx)[1].copy(token = "t", userId = "uid"))

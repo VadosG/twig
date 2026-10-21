@@ -147,7 +147,7 @@
     <string name="webdav_url">Sunucu URL’si (http(s)://…)</string>
     <string name="smb_host">Ana makine (IP/ad)</string>
     <string name="smb_share">Paylaşım / yol (isteğe bağlı; boş = tüm paylaşımlar)</string>
-    <string name="smb_domain">Etki alanı (varsayılan WORKGROUP)</string>
+    <string name="smb_domain">Etki alanı (isteğe bağlı; çalışma grupları için boş bırakın)</string>
     <string name="action_saved">Bağlantı kaydedildi</string>
     <string name="action_theme">Tema</string>
     <string name="action_language">Dil</string>

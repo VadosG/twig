@@ -147,7 +147,7 @@
     <string name="webdav_url">サーバーURL（http(s)://…）</string>
     <string name="smb_host">ホスト（IP／名前）</string>
     <string name="smb_share">共有／パス（任意、空欄ですべて表示）</string>
-    <string name="smb_domain">ドメイン（既定：WORKGROUP）</string>
+    <string name="smb_domain">ドメイン（任意。ワークグループでは空欄）</string>
     <string name="action_saved">接続を保存しました</string>
     <string name="action_theme">テーマ</string>
     <string name="action_language">言語</string>
