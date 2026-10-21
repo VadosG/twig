@@ -238,7 +238,9 @@ needs no special case.
 - **Batch rename** selected files and folders with live original/new-name previews.
   Replace text or use regular expressions, choose case sensitivity, and target names,
   extensions or both. Add numbering before or after names with a configurable start
-  and zero padding. Duplicate and existing destination names are checked before renaming.
+  and zero padding, add prefixes/suffixes, or change case. Templates accept `{name}`
+  (without extension), `{ext}` (including the dot), `{number}`, and `{date}` (modification
+  date as `yyyyMMdd`). Duplicate and existing destination names are checked before renaming.
 - **Favourites** and **recent locations** store *how to get there* (connection
   label + path), not a session-scoped scheme, so they survive restarts.
 - **Restores your last position** across restarts, level by level, releasing

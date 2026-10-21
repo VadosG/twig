@@ -1028,4 +1028,13 @@
     <string name="trash_original_path">Vị trí ban đầu</string>
     <string name="trash_deleted_at">Thời gian xóa</string>
     <string name="trash_storage">Ổ lưu trữ</string>
+    <string name="batch_affixes">Tiền tố và hậu tố</string>
+    <string name="batch_change_case">Đổi chữ hoa/thường</string>
+    <string name="batch_template">Mẫu</string>
+    <string name="batch_prefix">Tiền tố</string>
+    <string name="batch_suffix">Hậu tố</string>
+    <string name="batch_lowercase">chữ thường</string>
+    <string name="batch_uppercase">CHỮ HOA</string>
+    <string name="batch_template_hint">{name}: tên gốc không có phần mở rộng; {ext}: phần mở rộng gồm dấu chấm; {number}: số thứ tự; {date}: ngày sửa đổi (yyyyMMdd)</string>
+    <string name="batch_template_error">Mẫu không hợp lệ hoặc thiếu ngày sửa đổi</string>
 </resources>

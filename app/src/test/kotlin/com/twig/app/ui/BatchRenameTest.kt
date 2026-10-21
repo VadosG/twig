@@ -20,7 +20,9 @@ class BatchRenameTest {
         numbering: Boolean = false, find: String = "old", replacement: String = "new",
         regex: Boolean = false, matchCase: Boolean = false, width: Int = 1,
         start: String = "1", numberFirst: Boolean = false,
-    ) = BatchRenameNames.generate(files, part, numbering, find, replacement, regex, matchCase, width, start, numberFirst)
+        prefix: String = "", suffix: String = "", letterCase: BatchRenameNames.LetterCase = BatchRenameNames.LetterCase.KEEP,
+        template: String? = null,
+    ) = BatchRenameNames.generate(files, part, numbering, find, replacement, regex, matchCase, width, start, numberFirst, prefix, suffix, letterCase, template)
 
     @Test fun `preview columns stay aligned on first measurement and after rebinding long names`() {
         val row = BatchRenameDialog.NameColumns(context)
@@ -73,6 +75,88 @@ class BatchRenameTest {
         assertEquals(listOf(".new", "new.dir", "new"), generate(files))
         assertEquals(listOf(".old", "old.dir", "old"), generate(files, BatchRenameNames.Part.EXTENSION))
         listOf("", ".", "..", "a/b", "a\\b", "a\u0000b").forEach { assertFalse(BatchRenameNames.valid(it)) }
+    }
+
+    @Test fun `switching rename methods ignores hidden invalid rules and validates template numbers`() {
+        val activity = org.robolectric.Robolectric.buildActivity(SettingsActivity::class.java).setup().get()
+        try {
+            BatchRenameDialog.show(activity, activity, listOf(file("Old.JPG")), { null }) {}
+            val dialog = org.robolectric.shadows.ShadowDialog.getLatestDialog() as androidx.appcompat.app.AlertDialog
+            fun descendants(view: android.view.View): List<android.view.View> = listOf(view) +
+                if (view is android.view.ViewGroup) (0 until view.childCount).flatMap { descendants(view.getChildAt(it)) }
+                else emptyList()
+            val views = descendants(dialog.window!!.decorView)
+            val spinners = views.filterIsInstance<android.widget.Spinner>()
+            val method = spinners.single { it.adapter.getItem(0) == activity.getString(com.twig.app.R.string.batch_replace) }
+            val fields = views.filterIsInstance<android.widget.EditText>()
+            fun byHint(id: Int) = fields.single { it.hint?.toString() == activity.getString(id) }
+            val regex = views.filterIsInstance<android.widget.CheckBox>().single {
+                it.text.toString() == activity.getString(com.twig.app.R.string.batch_regex)
+            }
+            val apply = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+            fun mode(index: Int) {
+                method.setSelection(index)
+                org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
+            }
+            regex.isChecked = true
+            byHint(com.twig.app.R.string.batch_find).setText("[")
+            assertFalse(apply.isEnabled)
+            mode(3)
+            assertTrue("Hidden invalid regex must not block case conversion", apply.isEnabled)
+            mode(2)
+            byHint(com.twig.app.R.string.batch_prefix).setText("pre_")
+            assertTrue(apply.isEnabled)
+            mode(4)
+            val template = fields.single { it.text.toString() == "{name}{ext}" }
+            val start = fields.single { it.inputType == android.text.InputType.TYPE_CLASS_NUMBER }
+            start.setText("")
+            template.setText("{name}_copy{ext}")
+            assertTrue("A template without numbering needs no start value", apply.isEnabled)
+            template.setText("{number}_{name}{ext}")
+            assertFalse(apply.isEnabled)
+            start.setText("7")
+            assertTrue(apply.isEnabled)
+            template.setText("{unknown}")
+            assertFalse(apply.isEnabled)
+            dialog.dismiss()
+        } finally { activity.finish() }
+    }
+
+    @Test fun `affixes apply to the selected part and preserve extension and literal tokens`() {
+        val files = listOf(file("Photo.JPG"), file(".hidden"), file("Folder.v1", true))
+        assertEquals(listOf("pre_Photo_done.JPG", "pre_.hidden_done", "pre_Folder.v1_done"),
+            generate(files, find = "", prefix = "pre_", suffix = "_done"))
+        assertEquals(listOf("Photo.JPG.bak"), generate(files.take(1), BatchRenameNames.Part.FULL, find = "", suffix = ".bak"))
+        assertEquals(listOf("Photo.xJPG", ".hidden.x", "Folder.v1"),
+            generate(files, BatchRenameNames.Part.EXTENSION, find = "", prefix = "x"))
+        assertEquals(listOf("{name}Photo.JPG"), generate(files.take(1), find = "", prefix = "{name}"))
+    }
+
+    @Test fun `case conversion is independent of device locale and respects scope`() {
+        val previous = java.util.Locale.getDefault()
+        java.util.Locale.setDefault(java.util.Locale.forLanguageTag("tr-TR"))
+        try {
+            val files = listOf(file("IMAGE.JPG"), file("image.jpg"))
+            assertEquals(listOf("image.JPG", "image.jpg"), generate(files, letterCase = BatchRenameNames.LetterCase.LOWER))
+            assertEquals(listOf("IMAGE.JPG", "IMAGE.jpg"), generate(files, letterCase = BatchRenameNames.LetterCase.UPPER))
+            assertEquals(listOf("IMAGE.jpg", "image.jpg"), generate(files, BatchRenameNames.Part.EXTENSION,
+                letterCase = BatchRenameNames.LetterCase.LOWER))
+        } finally { java.util.Locale.setDefault(previous) }
+    }
+
+    @Test fun `templates preserve literal names and expand padded sequence and modification date`() {
+        val time = java.util.GregorianCalendar(2026, java.util.Calendar.OCTOBER, 21, 12, 0).timeInMillis
+        val files = listOf(file("Photo.JPG"), file("README"), file("Folder.v1", true), file("{number}.txt"))
+            .map { it.copy(lastModified = time) }
+        assertEquals(files.map { it.name }, generate(files, template = "{name}{ext}"))
+        assertEquals(listOf("20261021_09_Photo.JPG", "20261021_10_README", "20261021_11_Folder.v1", "20261021_12_{number}.txt"),
+            generate(files, width = 2, start = "9", template = "{date}_{number}_{name}{ext}"))
+        for (invalid in listOf("{unknown}", "{name", "name}", "{{name}}")) {
+            assertTrue(runCatching { generate(files, template = invalid) }.isFailure)
+        }
+        assertTrue(runCatching { generate(files, start = "-1", template = "{number}{ext}") }.isFailure)
+        assertTrue(runCatching { generate(listOf(file("no-date")), template = "{date}") }.isFailure)
+        assertEquals(listOf("no-date"), generate(listOf(file("no-date")), start = "", template = "{name}{ext}"))
     }
 
     /** Opaque handles ensure no path slicing can accidentally pass a parent or conflict check. */

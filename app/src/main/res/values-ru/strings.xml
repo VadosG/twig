@@ -1065,4 +1065,13 @@
     <string name="trash_original_path">Исходное расположение</string>
     <string name="trash_deleted_at">Время удаления</string>
     <string name="trash_storage">Накопитель</string>
+    <string name="batch_affixes">Префикс и суффикс</string>
+    <string name="batch_change_case">Изменить регистр</string>
+    <string name="batch_template">Шаблон</string>
+    <string name="batch_prefix">Префикс</string>
+    <string name="batch_suffix">Суффикс</string>
+    <string name="batch_lowercase">строчные</string>
+    <string name="batch_uppercase">ПРОПИСНЫЕ</string>
+    <string name="batch_template_hint">{name}: исходное имя без расширения; {ext}: расширение с точкой; {number}: номер; {date}: дата изменения (yyyyMMdd)</string>
+    <string name="batch_template_error">Недопустимый шаблон или отсутствует дата изменения</string>
 </resources>

@@ -1059,4 +1059,13 @@
     <string name="trash_original_path">原位置</string>
     <string name="trash_deleted_at">删除时间</string>
     <string name="trash_storage">所在存储</string>
+    <string name="batch_affixes">前缀和后缀</string>
+    <string name="batch_change_case">转换大小写</string>
+    <string name="batch_template">模板</string>
+    <string name="batch_prefix">前缀</string>
+    <string name="batch_suffix">后缀</string>
+    <string name="batch_lowercase">小写</string>
+    <string name="batch_uppercase">大写</string>
+    <string name="batch_template_hint">{name}：原文件名（不含扩展名）；{ext}：扩展名（含点）；{number}：序号；{date}：修改日期（yyyyMMdd）</string>
+    <string name="batch_template_error">模板无效或缺少修改日期</string>
 </resources>

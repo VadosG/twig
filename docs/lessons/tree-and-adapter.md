@@ -10,6 +10,10 @@
   headers and rows. `BatchRenameTest` covers first measurement and rebound long names.
   Rename preflight uses tree parents for opaque URIs and rejects failed listings,
   conflicting destinations and selected ancestors before changing any names.
+  Prefix/suffix, case conversion and template modes (#13, 2026-10-21) share that same
+  preview/execution path. Templates expand once so braces in an original filename stay
+  literal; dates use modification metadata and fail explicitly when unavailable. Case
+  conversion uses `Locale.ROOT`. Hidden controls must not affect another mode's rule.
 
 - **Website fullscreen plus a hidden toolbar took three Back gestures (2026-10-17)**:
   a separate application fullscreen-exit state consumed Back on top of system navigation

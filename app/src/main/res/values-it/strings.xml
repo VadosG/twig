@@ -1029,4 +1029,13 @@
     <string name="trash_original_path">Posizione originale</string>
     <string name="trash_deleted_at">Data di eliminazione</string>
     <string name="trash_storage">Volume di archiviazione</string>
+    <string name="batch_affixes">Prefisso e suffisso</string>
+    <string name="batch_change_case">Cambia maiuscole/minuscole</string>
+    <string name="batch_template">Modello</string>
+    <string name="batch_prefix">Prefisso</string>
+    <string name="batch_suffix">Suffisso</string>
+    <string name="batch_lowercase">minuscolo</string>
+    <string name="batch_uppercase">MAIUSCOLO</string>
+    <string name="batch_template_hint">{name}: nome originale senza estensione; {ext}: estensione con punto; {number}: numero; {date}: data di modifica (yyyyMMdd)</string>
+    <string name="batch_template_error">Modello non valido o data di modifica assente</string>
 </resources>

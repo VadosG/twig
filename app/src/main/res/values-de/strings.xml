@@ -1029,4 +1029,13 @@
     <string name="trash_original_path">Ursprünglicher Ort</string>
     <string name="trash_deleted_at">Gelöscht</string>
     <string name="trash_storage">Speichermedium</string>
+    <string name="batch_affixes">Präfix und Suffix</string>
+    <string name="batch_change_case">Groß-/Kleinschreibung</string>
+    <string name="batch_template">Vorlage</string>
+    <string name="batch_prefix">Präfix</string>
+    <string name="batch_suffix">Suffix</string>
+    <string name="batch_lowercase">kleinbuchstaben</string>
+    <string name="batch_uppercase">GROSSBUCHSTABEN</string>
+    <string name="batch_template_hint">{name}: ursprünglicher Name ohne Endung; {ext}: Endung mit Punkt; {number}: Nummer; {date}: Änderungsdatum (yyyyMMdd)</string>
+    <string name="batch_template_error">Ungültige Vorlage oder fehlendes Änderungsdatum</string>
 </resources>

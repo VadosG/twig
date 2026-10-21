@@ -1033,4 +1033,13 @@
     <string name="trash_original_path">الموقع الأصلي</string>
     <string name="trash_deleted_at">وقت الحذف</string>
     <string name="trash_storage">وحدة التخزين</string>
+    <string name="batch_affixes">بادئة ولاحقة</string>
+    <string name="batch_change_case">تغيير حالة الأحرف</string>
+    <string name="batch_template">قالب</string>
+    <string name="batch_prefix">بادئة</string>
+    <string name="batch_suffix">لاحقة</string>
+    <string name="batch_lowercase">أحرف صغيرة</string>
+    <string name="batch_uppercase">أحرف كبيرة</string>
+    <string name="batch_template_hint">{name}: الاسم الأصلي دون الامتداد؛ {ext}: الامتداد مع النقطة؛ {number}: الرقم التسلسلي؛ {date}: تاريخ التعديل (yyyyMMdd)</string>
+    <string name="batch_template_error">القالب غير صالح أو تاريخ التعديل غير متوفر</string>
 </resources>

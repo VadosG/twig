@@ -1029,4 +1029,13 @@
     <string name="trash_original_path">Ubicación original</string>
     <string name="trash_deleted_at">Fecha de eliminación</string>
     <string name="trash_storage">Unidad de almacenamiento</string>
+    <string name="batch_affixes">Prefijo y sufijo</string>
+    <string name="batch_change_case">Cambiar mayúsculas</string>
+    <string name="batch_template">Plantilla</string>
+    <string name="batch_prefix">Prefijo</string>
+    <string name="batch_suffix">Sufijo</string>
+    <string name="batch_lowercase">minúsculas</string>
+    <string name="batch_uppercase">MAYÚSCULAS</string>
+    <string name="batch_template_hint">{name}: nombre original sin extensión; {ext}: extensión con punto; {number}: número; {date}: fecha de modificación (yyyyMMdd)</string>
+    <string name="batch_template_error">Plantilla no válida o falta la fecha de modificación</string>
 </resources>

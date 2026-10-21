@@ -1029,4 +1029,13 @@
     <string name="trash_original_path">Lokasi asli</string>
     <string name="trash_deleted_at">Waktu dihapus</string>
     <string name="trash_storage">Volume penyimpanan</string>
+    <string name="batch_affixes">Awalan dan akhiran</string>
+    <string name="batch_change_case">Ubah huruf besar/kecil</string>
+    <string name="batch_template">Templat</string>
+    <string name="batch_prefix">Awalan</string>
+    <string name="batch_suffix">Akhiran</string>
+    <string name="batch_lowercase">huruf kecil</string>
+    <string name="batch_uppercase">HURUF BESAR</string>
+    <string name="batch_template_hint">{name}: nama asli tanpa ekstensi; {ext}: ekstensi termasuk titik; {number}: nomor urut; {date}: tanggal perubahan (yyyyMMdd)</string>
+    <string name="batch_template_error">Templat tidak valid atau tanggal perubahan tidak tersedia</string>
 </resources>
