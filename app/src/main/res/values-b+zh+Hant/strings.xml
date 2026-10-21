@@ -1044,4 +1044,8 @@
     <string name="batch_insert_invalid_offset">請輸入有效的非負整數偏移量</string>
     <string name="batch_insert_overwrite">插入／覆寫</string>
     <string name="batch_overwrite">覆寫</string>
+    <string name="batch_method">改名方式</string>
+    <string name="batch_rules">規則設定</string>
+    <string name="batch_preview">結果預覽</string>
+    <string name="batch_preview_count">%2$d 個名稱中，%1$d 個將變更</string>
 </resources>

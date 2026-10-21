@@ -1045,4 +1045,8 @@
     <string name="batch_insert_invalid_offset">Inserisci uno scostamento intero non negativo valido</string>
     <string name="batch_insert_overwrite">Inserisci / sovrascrivi</string>
     <string name="batch_overwrite">Sovrascrivi</string>
+    <string name="batch_method">Metodo di rinomina</string>
+    <string name="batch_rules">Impostazioni della regola</string>
+    <string name="batch_preview">Anteprima</string>
+    <string name="batch_preview_count">Verranno modificati %1$d nomi su %2$d</string>
 </resources>

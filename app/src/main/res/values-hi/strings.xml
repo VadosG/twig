@@ -1045,4 +1045,8 @@
     <string name="batch_insert_invalid_offset">मान्य गैर-ऋणात्मक पूर्णांक ऑफ़सेट दर्ज करें</string>
     <string name="batch_insert_overwrite">सम्मिलित करें / अधिलेखित करें</string>
     <string name="batch_overwrite">अधिलेखित करें</string>
+    <string name="batch_method">नाम बदलने की विधि</string>
+    <string name="batch_rules">नियम सेटिंग</string>
+    <string name="batch_preview">पूर्वावलोकन</string>
+    <string name="batch_preview_count">%2$d में से %1$d नाम बदलेंगे</string>
 </resources>

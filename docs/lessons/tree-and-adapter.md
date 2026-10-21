@@ -29,6 +29,13 @@
   Overwrite shares the insertion position and replaces as many Unicode code points to its
   right as the entered text contains, appending any overflow. From-end changes only how
   that position is found: offset 0 still appends. Empty text never deletes characters.
+  The dialog fixes method/scope and rule controls above a single scrolling preview
+  RecyclerView. Pair related fields horizontally to preserve preview space; do not wrap
+  the settings in a ScrollView or include them as a scrolling list header. Preview rows
+  inherit the dialog background; original and unchanged names use primary text so dark
+  mode stays readable. Regex and case-sensitivity checkboxes share one row.
+  `BatchRenameLayoutTest` uses native font measurement to check fixed settings in every
+  mode, reaching the last of 80 preview rows, dark colors and larger-font radio choices.
 
 - **Website fullscreen plus a hidden toolbar took three Back gestures (2026-10-17)**:
   a separate application fullscreen-exit state consumed Back on top of system navigation

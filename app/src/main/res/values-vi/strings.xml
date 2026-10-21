@@ -1044,4 +1044,8 @@
     <string name="batch_insert_invalid_offset">Nhập độ lệch là số nguyên không âm hợp lệ</string>
     <string name="batch_insert_overwrite">Chèn / ghi đè</string>
     <string name="batch_overwrite">Ghi đè</string>
+    <string name="batch_method">Cách đổi tên</string>
+    <string name="batch_rules">Thiết lập quy tắc</string>
+    <string name="batch_preview">Xem trước</string>
+    <string name="batch_preview_count">%1$d trong %2$d tên sẽ thay đổi</string>
 </resources>

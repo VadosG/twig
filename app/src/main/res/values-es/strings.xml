@@ -1045,4 +1045,8 @@
     <string name="batch_insert_invalid_offset">Introduce un desplazamiento entero no negativo válido</string>
     <string name="batch_insert_overwrite">Insertar / sobrescribir</string>
     <string name="batch_overwrite">Sobrescribir</string>
+    <string name="batch_method">Método de cambio de nombre</string>
+    <string name="batch_rules">Configuración de la regla</string>
+    <string name="batch_preview">Vista previa</string>
+    <string name="batch_preview_count">Cambiarán %1$d de %2$d nombres</string>
 </resources>

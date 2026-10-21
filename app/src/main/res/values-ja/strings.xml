@@ -1045,4 +1045,8 @@
     <string name="batch_insert_invalid_offset">有効な 0 以上の整数のオフセットを入力してください</string>
     <string name="batch_insert_overwrite">挿入／上書き</string>
     <string name="batch_overwrite">上書き</string>
+    <string name="batch_method">名前の変更方法</string>
+    <string name="batch_rules">ルール設定</string>
+    <string name="batch_preview">プレビュー</string>
+    <string name="batch_preview_count">%2$d 個中 %1$d 個の名前を変更</string>
 </resources>

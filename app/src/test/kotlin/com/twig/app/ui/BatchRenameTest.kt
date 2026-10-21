@@ -85,6 +85,11 @@ class BatchRenameTest {
             fun descendants(view: android.view.View): List<android.view.View> = listOf(view) +
                 if (view is android.view.ViewGroup) (0 until view.childCount).flatMap { descendants(view.getChildAt(it)) }
                 else emptyList()
+            val content = descendants(dialog.window!!.decorView).filterIsInstance<BatchRenameDialog.DialogContent>().single()
+            val dp = activity.resources.displayMetrics.density
+            content.measure(android.view.View.MeasureSpec.makeMeasureSpec((320 * dp).toInt(), android.view.View.MeasureSpec.EXACTLY),
+                android.view.View.MeasureSpec.makeMeasureSpec((480 * dp).toInt(), android.view.View.MeasureSpec.AT_MOST))
+            content.layout(0, 0, content.measuredWidth, content.measuredHeight)
             val views = descendants(dialog.window!!.decorView)
             val spinners = views.filterIsInstance<android.widget.Spinner>()
             val method = spinners.single { it.adapter.getItem(0) == activity.getString(com.twig.app.R.string.batch_replace) }
@@ -111,21 +116,26 @@ class BatchRenameTest {
             mode(2)
             val offset = byHint(com.twig.app.R.string.batch_insert_offset)
             assertEquals("0", offset.text.toString())
-            val direction = spinners.single { it.adapter.getItem(0) == activity.getString(com.twig.app.R.string.batch_insert_begin) }
-            assertEquals(0, direction.selectedItemPosition)
+            val choices = views.filterIsInstance<BatchRenameDialog.Choices>()
+            fun choice(id: Int) = choices.single {
+                (it.getChildAt(0) as android.widget.RadioButton).text.toString() == activity.getString(id)
+            }
+            fun select(choices: BatchRenameDialog.Choices, index: Int) = choices.check(choices.getChildAt(index).id)
+            val direction = choice(com.twig.app.R.string.batch_insert_begin)
+            assertEquals(0, direction.selectedIndex)
             val text = byHint(com.twig.app.R.string.batch_insert_text)
-            val operation = spinners.single { it.adapter.getItem(0) == activity.getString(com.twig.app.R.string.batch_insert) }
-            assertEquals(0, operation.selectedItemPosition)
+            val operation = choice(com.twig.app.R.string.batch_insert)
+            assertEquals(0, operation.selectedIndex)
             text.setText("Old")
             assertTrue(apply.isEnabled)
-            operation.setSelection(1)
+            select(operation, 1)
             org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
             assertFalse("Overwriting Old with Old must leave the preview unchanged", apply.isEnabled)
             text.setText("New")
             assertTrue(apply.isEnabled)
-            operation.setSelection(0)
+            select(operation, 0)
             org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
-            direction.setSelection(1)
+            select(direction, 1)
             org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
             assertTrue(apply.isEnabled)
             offset.setText("")

@@ -1045,4 +1045,8 @@
     <string name="batch_insert_invalid_offset">유효한 0 이상의 정수 오프셋을 입력하세요</string>
     <string name="batch_insert_overwrite">삽입 / 덮어쓰기</string>
     <string name="batch_overwrite">덮어쓰기</string>
+    <string name="batch_method">이름 변경 방식</string>
+    <string name="batch_rules">규칙 설정</string>
+    <string name="batch_preview">미리 보기</string>
+    <string name="batch_preview_count">%2$d개 중 %1$d개의 이름 변경 예정</string>
 </resources>

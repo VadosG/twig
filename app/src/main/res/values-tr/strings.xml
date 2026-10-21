@@ -1045,4 +1045,8 @@
     <string name="batch_insert_invalid_offset">Geçerli, negatif olmayan bir tam sayı ofseti girin</string>
     <string name="batch_insert_overwrite">Ekle / üzerine yaz</string>
     <string name="batch_overwrite">Üzerine yaz</string>
+    <string name="batch_method">Yeniden adlandırma yöntemi</string>
+    <string name="batch_rules">Kural ayarları</string>
+    <string name="batch_preview">Önizleme</string>
+    <string name="batch_preview_count">%2$d addan %1$d tanesi değişecek</string>
 </resources>

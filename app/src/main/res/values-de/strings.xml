@@ -1045,4 +1045,8 @@
     <string name="batch_insert_invalid_offset">Einen gültigen nichtnegativen ganzzahligen Versatz eingeben</string>
     <string name="batch_insert_overwrite">Einfügen / Überschreiben</string>
     <string name="batch_overwrite">Überschreiben</string>
+    <string name="batch_method">Umbenennungsmethode</string>
+    <string name="batch_rules">Regeleinstellungen</string>
+    <string name="batch_preview">Vorschau</string>
+    <string name="batch_preview_count">%1$d von %2$d Namen werden geändert</string>
 </resources>

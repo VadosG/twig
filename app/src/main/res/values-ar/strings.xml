@@ -1049,4 +1049,8 @@
     <string name="batch_insert_invalid_offset">أدخل إزاحة صحيحة بعدد صحيح غير سالب</string>
     <string name="batch_insert_overwrite">إدراج / استبدال</string>
     <string name="batch_overwrite">استبدال</string>
+    <string name="batch_method">طريقة إعادة التسمية</string>
+    <string name="batch_rules">إعدادات القاعدة</string>
+    <string name="batch_preview">معاينة</string>
+    <string name="batch_preview_count">سيتم تغيير %1$d من أصل %2$d اسم</string>
 </resources>

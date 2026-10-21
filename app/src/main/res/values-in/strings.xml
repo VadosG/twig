@@ -1045,4 +1045,8 @@
     <string name="batch_insert_invalid_offset">Masukkan offset bilangan bulat nonnegatif yang valid</string>
     <string name="batch_insert_overwrite">Sisipkan / timpa</string>
     <string name="batch_overwrite">Timpa</string>
+    <string name="batch_method">Metode penggantian nama</string>
+    <string name="batch_rules">Pengaturan aturan</string>
+    <string name="batch_preview">Pratinjau</string>
+    <string name="batch_preview_count">%1$d dari %2$d nama akan berubah</string>
 </resources>

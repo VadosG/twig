@@ -1081,4 +1081,8 @@
     <string name="batch_insert_invalid_offset">Введите допустимое целое неотрицательное смещение</string>
     <string name="batch_insert_overwrite">Вставка / перезапись</string>
     <string name="batch_overwrite">Перезапись</string>
+    <string name="batch_method">Способ переименования</string>
+    <string name="batch_rules">Настройки правила</string>
+    <string name="batch_preview">Предпросмотр</string>
+    <string name="batch_preview_count">Будет изменено имён: %1$d из %2$d</string>
 </resources>

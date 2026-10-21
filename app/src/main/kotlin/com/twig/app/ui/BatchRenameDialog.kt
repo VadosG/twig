@@ -1,6 +1,8 @@
 package com.twig.app.ui
 
 import android.content.Context
+import android.graphics.Typeface
+import androidx.core.content.ContextCompat
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
@@ -138,69 +140,118 @@ internal object BatchRenameDialog {
     ) {
         val dp = context.resources.displayMetrics.density
         fun px(n: Int) = (n * dp).toInt()
-        fun label(id: Int) = TextView(context).apply { setText(id); setPadding(0, px(8), 0, px(4)) }
+        fun color(id: Int) = ContextCompat.getColor(context, id)
+        fun label(id: Int) = TextView(context).apply {
+            setText(id); textSize = 12f; setTextColor(color(R.color.text_secondary))
+            setPadding(0, px(8), 0, px(2))
+        }
+        fun heading(id: Int) = TextView(context).apply {
+            setText(id); textSize = 14f; setTypeface(null, Typeface.BOLD)
+            setTextColor(color(R.color.action_text)); setPadding(0, 0, 0, px(4))
+        }
         fun column() = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
         fun spinner(ids: List<Int>) = Spinner(context).apply {
+            minimumHeight = px(48)
             adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, ids.map(context::getString))
         }
-        val content = column().apply { setPadding(px(16), 0, px(16), px(8)) }
-        val part = spinner(listOf(R.string.batch_name_only, R.string.batch_ext_only, R.string.batch_name_ext))
+        fun divider(parent: LinearLayout) {
+            parent.addView(View(context).apply { setBackgroundColor(color(R.color.divider)) },
+                LinearLayout.LayoutParams(-1, px(1)).apply { topMargin = px(8); bottomMargin = px(8) })
+        }
+        val form = column().apply { setPadding(px(20), px(12), px(20), 0) }
         val method = spinner(listOf(R.string.batch_replace, R.string.batch_numbering,
             R.string.batch_insert_overwrite, R.string.batch_change_case, R.string.batch_template))
-        val partLabel = label(R.string.batch_apply_to)
-        content.addView(partLabel); content.addView(part)
-        content.addView(method)
+        val methodColumn = column()
+        methodColumn.addView(heading(R.string.batch_method)); methodColumn.addView(method)
+        val part = spinner(listOf(R.string.batch_name_only, R.string.batch_ext_only, R.string.batch_name_ext))
+        val partLabel = heading(R.string.batch_apply_to)
+        val scopeColumn = column()
+        scopeColumn.addView(partLabel); scopeColumn.addView(part)
+        val topFields = NameColumns(context)
+        methodColumn.setPadding(0, 0, px(8), 0)
+        topFields.addView(methodColumn, LinearLayout.LayoutParams(0, -2))
+        topFields.addView(scopeColumn, LinearLayout.LayoutParams(0, -2))
+        form.addView(topFields)
+        divider(form)
+        form.addView(heading(R.string.batch_rules))
         val replaceBox = column()
         val find = EditText(context).apply { setHint(R.string.batch_find); setSingleLine() }
         val replacement = EditText(context).apply { setHint(R.string.batch_replacement); setSingleLine() }
-        val regex = CheckBox(context).apply { setText(R.string.batch_regex) }
-        val matchCase = CheckBox(context).apply { setText(R.string.batch_match_case) }
-        replaceBox.addView(find); replaceBox.addView(replacement)
-        val checks = LinearLayout(context)
+        val regex = CheckBox(context).apply { setText(R.string.batch_regex); minHeight = px(48) }
+        val matchCase = CheckBox(context).apply { setText(R.string.batch_match_case); minHeight = px(48) }
+        val replaceFields = NameColumns(context)
+        val findColumn = column().apply { setPadding(0, 0, px(8), 0) }
+        findColumn.addView(label(R.string.batch_find)); findColumn.addView(find)
+        val replacementColumn = column()
+        replacementColumn.addView(label(R.string.batch_replacement)); replacementColumn.addView(replacement)
+        replaceFields.addView(findColumn, LinearLayout.LayoutParams(0, -2))
+        replaceFields.addView(replacementColumn, LinearLayout.LayoutParams(0, -2))
+        replaceBox.addView(replaceFields)
+        val checks = LinearLayout(context).apply { isBaselineAligned = false }
         checks.addView(regex, LinearLayout.LayoutParams(0, -2, 1f))
         checks.addView(matchCase, LinearLayout.LayoutParams(0, -2, 1f))
-        replaceBox.addView(checks); content.addView(replaceBox)
+        replaceBox.addView(checks); form.addView(replaceBox)
         val numberBox = column()
         val width = Spinner(context).apply {
+            minimumHeight = px(48)
             adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, listOf("1", "01", "001", "0001"))
         }
         val start = EditText(context).apply {
             inputType = InputType.TYPE_CLASS_NUMBER; setSingleLine(); setText("1")
         }
-        val order = spinner(listOf(R.string.batch_old_number, R.string.batch_number_old))
-        numberBox.addView(label(R.string.batch_number_format)); numberBox.addView(width)
-        numberBox.addView(label(R.string.batch_start)); numberBox.addView(start); numberBox.addView(order)
-        content.addView(numberBox)
+        val order = Choices(context, listOf(R.string.batch_old_number, R.string.batch_number_old))
+        val numberFields = NameColumns(context)
+        val formatColumn = column().apply { setPadding(0, 0, px(8), 0) }
+        formatColumn.addView(label(R.string.batch_number_format)); formatColumn.addView(width)
+        val startColumn = column()
+        startColumn.addView(label(R.string.batch_start)); startColumn.addView(start)
+        numberFields.addView(formatColumn, LinearLayout.LayoutParams(0, -2))
+        numberFields.addView(startColumn, LinearLayout.LayoutParams(0, -2))
+        numberBox.addView(numberFields); numberBox.addView(order); form.addView(numberBox)
         val insertBox = column()
-        val operation = spinner(listOf(R.string.batch_insert, R.string.batch_overwrite))
+        val operation = Choices(context, listOf(R.string.batch_insert, R.string.batch_overwrite))
         val insertion = EditText(context).apply { setHint(R.string.batch_insert_text); setSingleLine() }
         val offset = EditText(context).apply {
             setHint(R.string.batch_insert_offset)
             inputType = InputType.TYPE_CLASS_NUMBER; setSingleLine(); setText("0")
         }
-        val direction = spinner(listOf(R.string.batch_insert_begin, R.string.batch_insert_end))
-        insertBox.addView(operation); insertBox.addView(insertion)
-        insertBox.addView(label(R.string.batch_insert_offset)); insertBox.addView(offset)
-        insertBox.addView(direction); content.addView(insertBox)
+        val direction = Choices(context, listOf(R.string.batch_insert_begin, R.string.batch_insert_end))
+        insertBox.addView(operation)
+        val insertFields = NameColumns(context)
+        val textColumn = column().apply { setPadding(0, 0, px(8), 0) }
+        textColumn.addView(label(R.string.batch_insert_text)); textColumn.addView(insertion)
+        val offsetColumn = column()
+        offsetColumn.addView(label(R.string.batch_insert_offset)); offsetColumn.addView(offset)
+        insertFields.addView(textColumn, LinearLayout.LayoutParams(0, -2))
+        insertFields.addView(offsetColumn, LinearLayout.LayoutParams(0, -2))
+        insertBox.addView(insertFields)
+        insertBox.addView(direction); form.addView(insertBox)
         val letterCase = spinner(listOf(R.string.batch_lowercase, R.string.batch_uppercase, R.string.batch_titlecase))
-        content.addView(letterCase)
+        form.addView(letterCase)
         val templateBox = column()
         val template = EditText(context).apply { setSingleLine(); setText("{name}{ext}") }
-        templateBox.addView(template); templateBox.addView(label(R.string.batch_template_hint))
-        content.addView(templateBox)
+        templateBox.addView(template)
+        templateBox.addView(label(R.string.batch_template_hint).apply { textSize = 12f })
+        form.addView(templateBox)
+
+        val previewBox = column().apply {
+            setPadding(0, 0, 0, px(8))
+        }
+        previewBox.addView(heading(R.string.batch_preview))
+        val summary = TextView(context).apply { textSize = 12f; setTextColor(color(R.color.text_secondary)) }
+        previewBox.addView(summary)
+        val status = TextView(context).apply {
+            textSize = 12f; setTextColor(color(R.color.menu_icon_danger)); visibility = View.GONE
+        }
+        previewBox.addView(status)
         val header = NameColumns(context)
         header.addView(label(R.string.batch_before), LinearLayout.LayoutParams(0, -2))
         header.addView(label(R.string.batch_after), LinearLayout.LayoutParams(0, -2))
-        content.addView(header)
+        previewBox.addView(header)
         val preview = PreviewAdapter(files, ::px)
-        val list = RecyclerView(context).apply {
-            layoutManager = LinearLayoutManager(context); adapter = preview
-        }
-        content.addView(list, LinearLayout.LayoutParams(-1, px(180)))
-        val status = TextView(context)
-        content.addView(status)
-        val scroll = ScrollView(context).apply { addView(content) }
-        val dialog = AlertDialog.Builder(context).setTitle(R.string.batch_rename).setView(scroll)
+        divider(form); form.addView(previewBox)
+        val content = DialogContent(context, form, preview)
+        val dialog = AlertDialog.Builder(context).setTitle(R.string.batch_rename).setView(content)
             .setNegativeButton(R.string.dialog_cancel, null).setPositiveButton(R.string.action_rename, null).create()
         var names = emptyList<String>()
         var busy = false
@@ -216,19 +267,22 @@ internal object BatchRenameDialog {
             templateBox.visibility = if (mode == 4) View.VISIBLE else View.GONE
             part.visibility = if (mode == 4) View.GONE else View.VISIBLE
             partLabel.visibility = part.visibility
+            scopeColumn.visibility = part.visibility
             val result = runCatching {
                 BatchRenameNames.generate(files, BatchRenameNames.Part.entries[part.selectedItemPosition], numbering,
                     if (mode == 0) find.text.toString() else "", replacement.text.toString(), regex.isChecked, matchCase.isChecked,
-                    width.selectedItemPosition + 1, start.text.toString(), order.selectedItemPosition == 1,
+                    width.selectedItemPosition + 1, start.text.toString(), order.selectedIndex == 1,
                     insertion = if (mode == 2) insertion.text.toString() else null,
-                    offset = offset.text.toString(), fromEnd = direction.selectedItemPosition == 1,
+                    offset = offset.text.toString(), fromEnd = direction.selectedIndex == 1,
                     letterCase = if (mode == 3) BatchRenameNames.LetterCase.entries[letterCase.selectedItemPosition + 1]
                         else BatchRenameNames.LetterCase.KEEP,
                     template = if (mode == 4) template.text.toString() else null,
-                    overwrite = operation.selectedItemPosition == 1)
+                    overwrite = operation.selectedIndex == 1)
             }
             names = result.getOrDefault(emptyList())
             preview.names = names; preview.notifyDataSetChanged()
+            summary.text = context.getString(R.string.batch_preview_count,
+                names.indices.count { names[it] != files[it].name }, files.size)
             val invalid = names.firstOrNull { !BatchRenameNames.valid(it) }
             status.text = when {
                 result.isFailure -> context.getString(when (mode) {
@@ -239,6 +293,7 @@ internal object BatchRenameDialog {
                 invalid != null -> context.getString(R.string.batch_invalid_name, invalid)
                 else -> ""
             }
+            status.visibility = if (status.text.isEmpty()) View.GONE else View.VISIBLE
             dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.isEnabled = result.isSuccess && invalid == null &&
                 names.indices.any { names[it] != files[it].name }
         }
@@ -248,12 +303,13 @@ internal object BatchRenameDialog {
             override fun afterTextChanged(s: Editable?) {}
         }
         listOf(find, replacement, start, insertion, offset, template).forEach { it.addTextChangedListener(watcher) }
-        listOf(part, method, width, order, letterCase, direction, operation).forEach {
+        listOf(part, method, width, letterCase).forEach {
             it.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) = update()
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
         }
+        listOf(order, direction, operation).forEach { it.setOnCheckedChangeListener { _, _ -> update() } }
         regex.setOnCheckedChangeListener { _, _ -> update() }
         matchCase.setOnCheckedChangeListener { _, _ -> update() }
         dialog.setOnShowListener {
@@ -281,7 +337,8 @@ internal object BatchRenameDialog {
                 dialog.setCancelable(false)
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
                 dialog.getButton(AlertDialog.BUTTON_NEGATIVE).isEnabled = false
-                enableInputs(content, false)
+                enableInputs(form, false)
+                status.visibility = View.VISIBLE
                 status.setText(R.string.batch_working)
                 owner.lifecycleScope.launch {
                     var completed = 0
@@ -297,11 +354,12 @@ internal object BatchRenameDialog {
                     )
                     if (result.isFailure && completed == 0) {
                         busy = false
-                        enableInputs(content, true)
+                        enableInputs(form, true)
                         dialog.setCancelable(true)
                         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).isEnabled = true
                         update()
                         status.text = message
+                        status.visibility = View.VISIBLE
                     } else {
                         dialog.dismiss()
                         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
@@ -369,7 +427,7 @@ internal object BatchRenameDialog {
         override fun onCreateViewHolder(parent: ViewGroup, type: Int): Holder {
             val row = NameColumns(parent.context).apply {
                 layoutParams = RecyclerView.LayoutParams(-1, -2)
-                setPadding(0, px(6), 0, px(6))
+                setPadding(px(20), px(6), px(20), px(6))
             }
             fun cell() = TextView(parent.context).apply {
                 gravity = Gravity.TOP or Gravity.START
@@ -384,8 +442,59 @@ internal object BatchRenameDialog {
         override fun getItemCount() = files.size
         override fun onBindViewHolder(holder: Holder, position: Int) {
             holder.before.text = files[position].name
-            holder.after.text = names.getOrNull(position) ?: ""
-            holder.after.alpha = if (names.getOrNull(position) == files[position].name) 0.5f else 1f
+            holder.before.setTextColor(ContextCompat.getColor(holder.row.context, R.color.text_primary))
+            val name = names.getOrNull(position)
+            val changed = name != null && name != files[position].name
+            holder.after.text = name ?: ""
+            holder.after.typeface = if (changed) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+            holder.after.setTextColor(ContextCompat.getColor(holder.row.context, when {
+                name != null && !BatchRenameNames.valid(name) -> R.color.menu_icon_danger
+                changed -> R.color.action_text
+                else -> R.color.text_primary
+            }))
+        }
+    }
+
+    /** Settings stay in place; only the preview rows consume the remaining scrollable area. */
+    internal class DialogContent(context: Context, form: View, preview: RecyclerView.Adapter<*>) : LinearLayout(context) {
+        val list = RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = preview
+            itemAnimator = null
+            isVerticalScrollBarEnabled = true
+        }
+
+        init {
+            orientation = VERTICAL
+            addView(form, LayoutParams(-1, -2))
+            addView(list, LayoutParams(-1, 0, 1f))
+        }
+
+        override fun onMeasure(widthSpec: Int, heightSpec: Int) {
+            val available = if (View.MeasureSpec.getMode(heightSpec) == View.MeasureSpec.UNSPECIFIED)
+                resources.displayMetrics.heightPixels else View.MeasureSpec.getSize(heightSpec)
+            val height = minOf((600 * resources.displayMetrics.density).toInt(), available)
+            super.onMeasure(widthSpec, View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY))
+        }
+    }
+
+    /** Standard radio choices with equal touch targets and room for wrapping labels. */
+    internal class Choices(context: Context, labels: List<Int>) : RadioGroup(context) {
+        val selectedIndex: Int get() = (0 until childCount).firstOrNull { getChildAt(it).id == checkedRadioButtonId } ?: 0
+
+        init {
+            orientation = HORIZONTAL
+            isBaselineAligned = false
+            val dp = resources.displayMetrics.density
+            fun px(n: Int) = (n * dp).toInt()
+            for ((index, label) in labels.withIndex()) {
+                addView(RadioButton(context).apply {
+                    id = View.generateViewId(); setText(label)
+                    gravity = Gravity.CENTER_VERTICAL or Gravity.START; textSize = 14f
+                    minHeight = px(48); setPadding(0, px(8), px(4), px(8))
+                }, LayoutParams(0, -1, 1f).apply { if (index > 0) marginStart = px(8); topMargin = px(8) })
+            }
+            check(getChildAt(0).id)
         }
     }
 
