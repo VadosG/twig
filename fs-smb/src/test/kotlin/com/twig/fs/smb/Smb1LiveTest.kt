@@ -1,7 +1,9 @@
 package com.twig.fs.smb
 
 import com.twig.core.FsException
+import com.twig.core.FsRegistry
 import com.twig.core.XFile
+import com.twig.core.isWritableDir
 import org.junit.Assert.*
 import org.junit.Assume.assumeTrue
 import org.junit.Test
@@ -65,10 +67,45 @@ class Smb1LiveTest {
                 parent.openOutput(file).use { it.write(42) }
                 val nested = client("Public" + dir.path)
                 try {
+                    assertTrue(nested.stat("/")!!.canWrite)
                     assertEquals(listOf("/inside.txt"), nested.list(nested.root()).map { it.path })
                     assertEquals(1L, nested.stat("/inside.txt")?.size)
                 } finally { nested.disconnect() }
             } finally { parent.delete(dir) }
         } finally { parent.disconnect() }
+    }
+
+    @Test fun `enumerated share roots allow creation while the share itself stays protected`() {
+        checkShareRoot("")
+    }
+
+    @Test fun `directly mounted share roots stay writable after stat`() {
+        checkShareRoot("Public")
+    }
+
+    private fun checkShareRoot(mount: String) {
+        val fs = client(mount)
+        FsRegistry.register(fs)
+        try {
+            val root = if (mount.isEmpty()) fs.list(fs.root()).single { it.name == "Public" } else fs.root()
+            assertTrue("The UI must allow creation in a writable share root", root.isWritableDir())
+            assertTrue("Refreshing metadata must not disable creation", fs.stat(root.path)!!.isWritableDir())
+            assertThrows(FsException::class.java) { fs.delete(root) }
+            assertThrows(FsException::class.java) { fs.rename(root, "renamed-share") }
+
+            val name = "twig-root-${System.nanoTime()}"
+            val file = fs.createFile(root, "$name.txt")
+            try {
+                fs.openOutput(file).use { it.write("root write".toByteArray()) }
+                assertEquals("root write", fs.openInput(file).bufferedReader().use { it.readText() })
+                val dir = fs.mkdir(root, name)
+                try {
+                    assertTrue(fs.list(root).single { it.path == dir.path }.isWritableDir())
+                } finally { fs.delete(dir) }
+            } finally { if (fs.exists(file)) fs.delete(file) }
+        } finally {
+            FsRegistry.unregister(fs.scheme)
+            fs.disconnect()
+        }
     }
 }

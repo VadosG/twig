@@ -157,8 +157,12 @@ class Smb1FileSystem(private val config: SmbConfig, override val scheme: String 
     private fun resource(file: XFile) = SmbFile(urlFor(file.path, file.isDir), context)
     private fun metadata(file: SmbFile, path: String): XFile {
         val dir = file.isDirectory
+        // jCIFS gives share roots a synthetic READONLY attribute, not their create permissions.
+        // Allow writes inside a share and let the server enforce access; requireEntry still
+        // prevents modifying the share itself. Ordinary entries retain their reported flags.
+        val canWrite = file.type == SmbConstants.TYPE_SHARE || file.canWrite()
         return XFile(scheme, path, isDir = dir, size = if (dir) 0 else file.length(),
-            lastModified = file.lastModified(), canWrite = file.canWrite())
+            lastModified = file.lastModified(), canWrite = canWrite)
     }
 
     internal fun urlFor(path: String, directory: Boolean): String {

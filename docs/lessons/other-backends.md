@@ -147,6 +147,21 @@
   about 6.13 s to 0.12 s in the fixture; all six existing SMB1 unit/live tests passed.
   This establishes the mechanism, not the reporter's exact network cause: Android
   confirmation is still needed. `ConnectionStoreOrderTest` covers domain preservation.
+- **SMB1 share-root attributes do not describe permission to create children**
+  (2026-10-22, issue #18). Connecting to a server with no share configured made its
+  enumerated shares appear read-only in Twig, while their subdirectories were writable.
+  The same `twig-smb1-test` Samba container reproduced it: actual mkdir and file writes
+  at the share root succeeded. jcifs-ng's `ShareEnumIterator` supplies synthetic
+  `ATTR_READONLY | ATTR_DIRECTORY` attributes, and `SmbFile.exists()` also leaves those
+  defaults for `TYPE_SHARE` rather than querying ordinary directory attributes.
+  Passing `SmbFile.canWrite()` directly into `XFile` therefore disabled the UI's
+  `isWritableDir()` gate. Direct-share tests missed this because `root()` defaults to
+  writable; `stat("/")` exposed the same bad flag even on a direct mount. Treat
+  `TYPE_SHARE` as a possible write destination and let the server enforce actual
+  permissions, while retaining ordinary entry flags and `requireEntry` protection
+  against deleting or renaming the share itself. Live regressions cover both mount
+  modes, the UI gate before and after stat, actual root writes, subdirectory metadata
+  and share deletion/rename rejection. Share enumeration alone is not a write test.
 - **Server XML goes through `SafeXml`** (WebDAV multistatus, S3 listings): DOCTYPE and external
   entities off, each feature set on its own because Android's factory throws on unknown ones.
   On the JVM the old code really did expand `<!ENTITY x SYSTEM "file:…">` into a file name
