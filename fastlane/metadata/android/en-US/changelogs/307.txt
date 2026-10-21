@@ -1,0 +1,1 @@
+Fixes SMB1 share roots incorrectly appearing read-only, preventing file creation and pasting. Fixes the missing /etc shortcut when browsing readable system directories without elevated access.
