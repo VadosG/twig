@@ -1029,15 +1029,18 @@
     <string name="trash_original_path">Emplacement initial</string>
     <string name="trash_deleted_at">Date de suppression</string>
     <string name="trash_storage">Volume de stockage</string>
-    <string name="batch_affixes">Préfixe et suffixe</string>
     <string name="batch_change_case">Changer la casse</string>
     <string name="batch_template">Modèle</string>
-    <string name="batch_prefix">Préfixe</string>
-    <string name="batch_suffix">Suffixe</string>
     <string name="batch_lowercase">minuscules</string>
     <string name="batch_uppercase">MAJUSCULES</string>
     <string name="compare_content_unlimited">Sans limite de taille</string>
     <string name="batch_template_hint">{name} : nom original sans extension ; {ext} : extension avec point ; {number} : numéro ; {date} : date de modification (yyyyMMdd)</string>
     <string name="batch_template_error">Modèle non valide ou date de modification absente</string>
     <string name="batch_titlecase">Casse de titre (anglais)</string>
+    <string name="batch_insert">Insérer</string>
+    <string name="batch_insert_text">Texte à insérer</string>
+    <string name="batch_insert_offset">Décalage</string>
+    <string name="batch_insert_begin">Depuis le début (gauche)</string>
+    <string name="batch_insert_end">Depuis la fin (droite)</string>
+    <string name="batch_insert_invalid_offset">Saisissez un décalage entier positif ou nul valide</string>
 </resources>

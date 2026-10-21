@@ -1029,15 +1029,18 @@
     <string name="trash_original_path">원래 위치</string>
     <string name="trash_deleted_at">삭제 시간</string>
     <string name="trash_storage">저장소</string>
-    <string name="batch_affixes">접두사 및 접미사</string>
     <string name="batch_change_case">대소문자 변경</string>
     <string name="batch_template">템플릿</string>
-    <string name="batch_prefix">접두사</string>
-    <string name="batch_suffix">접미사</string>
     <string name="batch_lowercase">소문자</string>
     <string name="batch_uppercase">대문자</string>
     <string name="compare_content_unlimited">크기 제한 없음</string>
     <string name="batch_template_hint">{name}: 확장자를 제외한 원래 이름; {ext}: 점을 포함한 확장자; {number}: 순번; {date}: 수정 날짜 (yyyyMMdd)</string>
     <string name="batch_template_error">템플릿이 잘못되었거나 수정 날짜가 없습니다</string>
     <string name="batch_titlecase">제목 대소문자 (영어)</string>
+    <string name="batch_insert">삽입</string>
+    <string name="batch_insert_text">삽입할 텍스트</string>
+    <string name="batch_insert_offset">오프셋</string>
+    <string name="batch_insert_begin">시작부터 (왼쪽)</string>
+    <string name="batch_insert_end">끝부터 (오른쪽)</string>
+    <string name="batch_insert_invalid_offset">유효한 0 이상의 정수 오프셋을 입력하세요</string>
 </resources>

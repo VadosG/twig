@@ -56,7 +56,7 @@ internal object BatchRenameNames {
     fun generate(
         files: List<XFile>, part: Part, numbering: Boolean, find: String, replacement: String,
         regex: Boolean, matchCase: Boolean, width: Int, start: String, numberFirst: Boolean,
-        prefix: String = "", suffix: String = "", letterCase: LetterCase = LetterCase.KEEP,
+        insertion: String? = null, offset: String = "0", fromEnd: Boolean = false, letterCase: LetterCase = LetterCase.KEEP,
         template: String? = null,
     ): List<String> {
         val pattern = if (!numbering && regex && find.isNotEmpty()) {
@@ -64,6 +64,10 @@ internal object BatchRenameNames {
         } else null
         val tokens = Regex("\\{([^{}]*)\\}")
         if (template != null) require(tokens.replace(template, "").none { it == '{' || it == '}' })
+        val insertOffset = if (insertion != null) {
+            require(offset.isNotEmpty() && offset.all { it in '0'..'9' })
+            requireNotNull(offset.toIntOrNull())
+        } else 0
         val usesNumber = numbering || template?.contains("{number}") == true
         val first = if (usesNumber) {
             require(start.isNotEmpty() && start.all { it in '0'..'9' })
@@ -91,7 +95,13 @@ internal object BatchRenameNames {
                     }
                 }
             }
-            val changed = prefix + when (letterCase) {
+            val changed = if (insertion != null) {
+                // Count Unicode code points so an insertion never splits a surrogate pair.
+                val length = old.codePointCount(0, old.length)
+                val distance = insertOffset.coerceAtMost(length)
+                val position = old.offsetByCodePoints(0, if (fromEnd) length - distance else distance)
+                old.substring(0, position) + insertion + old.substring(position)
+            } else when (letterCase) {
                 LetterCase.LOWER -> old.lowercase(Locale.ROOT)
                 LetterCase.UPPER -> old.uppercase(Locale.ROOT)
                 LetterCase.TITLE -> titleCase(old)
@@ -104,7 +114,7 @@ internal object BatchRenameNames {
                     pattern != null -> pattern.replace(old, replacement)
                     else -> old.replace(find, replacement, ignoreCase = !matchCase)
                 }
-            } + suffix
+            }
             // Directories have no extension; extension-only leaves them unchanged.
             when (part) {
                 Part.FULL -> changed
@@ -133,7 +143,7 @@ internal object BatchRenameDialog {
         val content = column().apply { setPadding(px(16), 0, px(16), px(8)) }
         val part = spinner(listOf(R.string.batch_name_only, R.string.batch_ext_only, R.string.batch_name_ext))
         val method = spinner(listOf(R.string.batch_replace, R.string.batch_numbering,
-            R.string.batch_affixes, R.string.batch_change_case, R.string.batch_template))
+            R.string.batch_insert, R.string.batch_change_case, R.string.batch_template))
         val partLabel = label(R.string.batch_apply_to)
         content.addView(partLabel); content.addView(part)
         content.addView(method)
@@ -158,10 +168,16 @@ internal object BatchRenameDialog {
         numberBox.addView(label(R.string.batch_number_format)); numberBox.addView(width)
         numberBox.addView(label(R.string.batch_start)); numberBox.addView(start); numberBox.addView(order)
         content.addView(numberBox)
-        val affixBox = column()
-        val prefix = EditText(context).apply { setHint(R.string.batch_prefix); setSingleLine() }
-        val suffix = EditText(context).apply { setHint(R.string.batch_suffix); setSingleLine() }
-        affixBox.addView(prefix); affixBox.addView(suffix); content.addView(affixBox)
+        val insertBox = column()
+        val insertion = EditText(context).apply { setHint(R.string.batch_insert_text); setSingleLine() }
+        val offset = EditText(context).apply {
+            setHint(R.string.batch_insert_offset)
+            inputType = InputType.TYPE_CLASS_NUMBER; setSingleLine(); setText("0")
+        }
+        val direction = spinner(listOf(R.string.batch_insert_begin, R.string.batch_insert_end))
+        insertBox.addView(insertion)
+        insertBox.addView(label(R.string.batch_insert_offset)); insertBox.addView(offset)
+        insertBox.addView(direction); content.addView(insertBox)
         val letterCase = spinner(listOf(R.string.batch_lowercase, R.string.batch_uppercase, R.string.batch_titlecase))
         content.addView(letterCase)
         val templateBox = column()
@@ -191,7 +207,7 @@ internal object BatchRenameDialog {
             replaceBox.visibility = if (mode == 0) View.VISIBLE else View.GONE
             numberBox.visibility = if (numbering || mode == 4) View.VISIBLE else View.GONE
             order.visibility = if (numbering) View.VISIBLE else View.GONE
-            affixBox.visibility = if (mode == 2) View.VISIBLE else View.GONE
+            insertBox.visibility = if (mode == 2) View.VISIBLE else View.GONE
             letterCase.visibility = if (mode == 3) View.VISIBLE else View.GONE
             templateBox.visibility = if (mode == 4) View.VISIBLE else View.GONE
             part.visibility = if (mode == 4) View.GONE else View.VISIBLE
@@ -200,8 +216,8 @@ internal object BatchRenameDialog {
                 BatchRenameNames.generate(files, BatchRenameNames.Part.entries[part.selectedItemPosition], numbering,
                     if (mode == 0) find.text.toString() else "", replacement.text.toString(), regex.isChecked, matchCase.isChecked,
                     width.selectedItemPosition + 1, start.text.toString(), order.selectedItemPosition == 1,
-                    prefix = if (mode == 2) prefix.text.toString() else "",
-                    suffix = if (mode == 2) suffix.text.toString() else "",
+                    insertion = if (mode == 2) insertion.text.toString() else null,
+                    offset = offset.text.toString(), fromEnd = direction.selectedItemPosition == 1,
                     letterCase = if (mode == 3) BatchRenameNames.LetterCase.entries[letterCase.selectedItemPosition + 1]
                         else BatchRenameNames.LetterCase.KEEP,
                     template = if (mode == 4) template.text.toString() else null)
@@ -210,7 +226,11 @@ internal object BatchRenameDialog {
             preview.names = names; preview.notifyDataSetChanged()
             val invalid = names.firstOrNull { !BatchRenameNames.valid(it) }
             status.text = when {
-                result.isFailure -> context.getString(if (mode == 4) R.string.batch_template_error else R.string.batch_invalid_rule)
+                result.isFailure -> context.getString(when (mode) {
+                    2 -> R.string.batch_insert_invalid_offset
+                    4 -> R.string.batch_template_error
+                    else -> R.string.batch_invalid_rule
+                })
                 invalid != null -> context.getString(R.string.batch_invalid_name, invalid)
                 else -> ""
             }
@@ -222,8 +242,8 @@ internal object BatchRenameDialog {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = update()
             override fun afterTextChanged(s: Editable?) {}
         }
-        listOf(find, replacement, start, prefix, suffix, template).forEach { it.addTextChangedListener(watcher) }
-        listOf(part, method, width, order, letterCase).forEach {
+        listOf(find, replacement, start, insertion, offset, template).forEach { it.addTextChangedListener(watcher) }
+        listOf(part, method, width, order, letterCase, direction).forEach {
             it.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) = update()
                 override fun onNothingSelected(parent: AdapterView<*>?) {}

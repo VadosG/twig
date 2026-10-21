@@ -20,9 +20,9 @@ class BatchRenameTest {
         numbering: Boolean = false, find: String = "old", replacement: String = "new",
         regex: Boolean = false, matchCase: Boolean = false, width: Int = 1,
         start: String = "1", numberFirst: Boolean = false,
-        prefix: String = "", suffix: String = "", letterCase: BatchRenameNames.LetterCase = BatchRenameNames.LetterCase.KEEP,
+        insertion: String? = null, offset: String = "0", fromEnd: Boolean = false, letterCase: BatchRenameNames.LetterCase = BatchRenameNames.LetterCase.KEEP,
         template: String? = null,
-    ) = BatchRenameNames.generate(files, part, numbering, find, replacement, regex, matchCase, width, start, numberFirst, prefix, suffix, letterCase, template)
+    ) = BatchRenameNames.generate(files, part, numbering, find, replacement, regex, matchCase, width, start, numberFirst, insertion, offset, fromEnd, letterCase, template)
 
     @Test fun `preview columns stay aligned on first measurement and after rebinding long names`() {
         val row = BatchRenameDialog.NameColumns(context)
@@ -109,11 +109,20 @@ class BatchRenameTest {
             org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
             assertFalse("Old.JPG is already title case with the extension excluded", apply.isEnabled)
             mode(2)
-            byHint(com.twig.app.R.string.batch_prefix).setText("pre_")
+            val offset = byHint(com.twig.app.R.string.batch_insert_offset)
+            assertEquals("0", offset.text.toString())
+            val direction = spinners.single { it.adapter.getItem(0) == activity.getString(com.twig.app.R.string.batch_insert_begin) }
+            assertEquals(0, direction.selectedItemPosition)
+            byHint(com.twig.app.R.string.batch_insert_text).setText("pre_")
             assertTrue(apply.isEnabled)
+            direction.setSelection(1)
+            org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
+            assertTrue(apply.isEnabled)
+            offset.setText("")
+            assertFalse("Invalid offsets must block insertion", apply.isEnabled)
             mode(4)
             val template = fields.single { it.text.toString() == "{name}{ext}" }
-            val start = fields.single { it.inputType == android.text.InputType.TYPE_CLASS_NUMBER }
+            val start = fields.single { it.inputType == android.text.InputType.TYPE_CLASS_NUMBER && it != offset }
             start.setText("")
             template.setText("{name}_copy{ext}")
             assertTrue("A template without numbering needs no start value", apply.isEnabled)
@@ -127,14 +136,36 @@ class BatchRenameTest {
         } finally { activity.finish() }
     }
 
-    @Test fun `affixes apply to the selected part and preserve extension and literal tokens`() {
+    @Test fun `insertion uses zero-based offset from either end of the selected part`() {
         val files = listOf(file("Photo.JPG"), file(".hidden"), file("Folder.v1", true))
-        assertEquals(listOf("pre_Photo_done.JPG", "pre_.hidden_done", "pre_Folder.v1_done"),
-            generate(files, find = "", prefix = "pre_", suffix = "_done"))
-        assertEquals(listOf("Photo.JPG.bak"), generate(files.take(1), BatchRenameNames.Part.FULL, find = "", suffix = ".bak"))
-        assertEquals(listOf("Photo.xJPG", ".hidden.x", "Folder.v1"),
-            generate(files, BatchRenameNames.Part.EXTENSION, find = "", prefix = "x"))
-        assertEquals(listOf("{name}Photo.JPG"), generate(files.take(1), find = "", prefix = "{name}"))
+        assertEquals(listOf("pre_Photo.JPG", "pre_.hidden", "pre_Folder.v1"), generate(files, insertion = "pre_"))
+        assertEquals(listOf("Photo_done.JPG", ".hidden_done", "Folder.v1_done"),
+            generate(files, insertion = "_done", fromEnd = true))
+        assertEquals(listOf("PhXoto.JPG"), generate(files.take(1), insertion = "X", offset = "2"))
+        assertEquals(listOf("PhoXto.JPG"), generate(files.take(1), insertion = "X", offset = "2", fromEnd = true))
+        assertEquals(listOf("Photo.JPG.bak"), generate(files.take(1), BatchRenameNames.Part.FULL,
+            insertion = ".bak", fromEnd = true))
+        assertEquals(listOf("Photo.JxPG", ".hidden.x", "Folder.v1"),
+            generate(files, BatchRenameNames.Part.EXTENSION, insertion = "x", offset = "1"))
+        assertEquals(listOf("{name}Photo.JPG"), generate(files.take(1), insertion = "{name}"))
+    }
+
+    @Test fun `insertion clamps offsets to each name length and rejects invalid offsets`() {
+        val files = listOf(file("a.txt"), file("abcd.txt"))
+        assertEquals(listOf("a_.txt", "abcd_.txt"), generate(files, insertion = "_", offset = "99"))
+        assertEquals(listOf("_a.txt", "_abcd.txt"), generate(files, insertion = "_", offset = "99", fromEnd = true))
+        assertEquals(files.map { it.name }, generate(files, insertion = ""))
+        for (invalid in listOf("", "-1", "+1", "1.5", "text", "2147483648")) {
+            assertTrue(runCatching { generate(files, insertion = "x", offset = invalid) }.isFailure)
+        }
+        assertEquals(listOf("new.txt"), generate(listOf(file("old.txt")), offset = "invalid"))
+    }
+
+    @Test fun `insertion counts supplementary Unicode characters without splitting surrogate pairs`() {
+        val files = listOf(file("a😀b.txt"))
+        assertEquals(listOf("a😀_b.txt"), generate(files, insertion = "_", offset = "2"))
+        assertEquals(listOf("a😀_b.txt"), generate(files, insertion = "_", offset = "1", fromEnd = true))
+        assertEquals(listOf("a_😀b.txt"), generate(files, insertion = "_", offset = "2", fromEnd = true))
     }
 
     @Test fun `case conversion is independent of device locale and respects scope`() {

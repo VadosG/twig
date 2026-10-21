@@ -1099,15 +1099,18 @@
     <string name="trash_original_path">Original location</string>
     <string name="trash_deleted_at">Deleted</string>
     <string name="trash_storage">Storage volume</string>
-    <string name="batch_affixes">Prefix and suffix</string>
     <string name="batch_change_case">Change case</string>
     <string name="batch_template">Template</string>
-    <string name="batch_prefix">Prefix</string>
-    <string name="batch_suffix">Suffix</string>
     <string name="batch_lowercase">lowercase</string>
     <string name="batch_uppercase">UPPERCASE</string>
     <string name="compare_content_unlimited">No size limit</string>
     <string name="batch_template_hint">{name}: original name without extension; {ext}: extension including dot; {number}: sequence; {date}: modified date (yyyyMMdd)</string>
     <string name="batch_template_error">Invalid template or missing modification date</string>
     <string name="batch_titlecase">Title Case (English)</string>
+    <string name="batch_insert">Insert</string>
+    <string name="batch_insert_text">Text to insert</string>
+    <string name="batch_insert_offset">Offset</string>
+    <string name="batch_insert_begin">From beginning (left)</string>
+    <string name="batch_insert_end">From end (right)</string>
+    <string name="batch_insert_invalid_offset">Enter a valid nonnegative whole-number offset</string>
 </resources>

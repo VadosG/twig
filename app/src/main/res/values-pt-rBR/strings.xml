@@ -1029,15 +1029,18 @@
     <string name="trash_original_path">Local original</string>
     <string name="trash_deleted_at">Data de exclusão</string>
     <string name="trash_storage">Volume de armazenamento</string>
-    <string name="batch_affixes">Prefixo e sufixo</string>
     <string name="batch_change_case">Alterar maiúsculas</string>
     <string name="batch_template">Modelo</string>
-    <string name="batch_prefix">Prefixo</string>
-    <string name="batch_suffix">Sufixo</string>
     <string name="batch_lowercase">minúsculas</string>
     <string name="batch_uppercase">MAIÚSCULAS</string>
     <string name="compare_content_unlimited">Sem limite de tamanho</string>
     <string name="batch_template_hint">{name}: nome original sem extensão; {ext}: extensão com ponto; {number}: número; {date}: data de modificação (yyyyMMdd)</string>
     <string name="batch_template_error">Modelo inválido ou data de modificação ausente</string>
     <string name="batch_titlecase">Maiúsculas de título (inglês)</string>
+    <string name="batch_insert">Inserir</string>
+    <string name="batch_insert_text">Texto a inserir</string>
+    <string name="batch_insert_offset">Deslocamento</string>
+    <string name="batch_insert_begin">Do início (esquerda)</string>
+    <string name="batch_insert_end">Do fim (direita)</string>
+    <string name="batch_insert_invalid_offset">Insira um deslocamento inteiro não negativo válido</string>
 </resources>

@@ -1028,15 +1028,18 @@
     <string name="trash_original_path">原始位置</string>
     <string name="trash_deleted_at">刪除時間</string>
     <string name="trash_storage">所在儲存空間</string>
-    <string name="batch_affixes">前綴和後綴</string>
     <string name="batch_change_case">轉換大小寫</string>
     <string name="batch_template">範本</string>
-    <string name="batch_prefix">前綴</string>
-    <string name="batch_suffix">後綴</string>
     <string name="batch_lowercase">小寫</string>
     <string name="batch_uppercase">大寫</string>
     <string name="compare_content_unlimited">不限大小</string>
     <string name="batch_template_hint">{name}：原始檔名（不含副檔名）；{ext}：副檔名（含點）；{number}：序號；{date}：修改日期（yyyyMMdd）</string>
     <string name="batch_template_error">範本無效或缺少修改日期</string>
     <string name="batch_titlecase">標題大小寫（英語）</string>
+    <string name="batch_insert">插入</string>
+    <string name="batch_insert_text">插入文字</string>
+    <string name="batch_insert_offset">偏移量</string>
+    <string name="batch_insert_begin">從開頭（左端）</string>
+    <string name="batch_insert_end">從末尾（右端）</string>
+    <string name="batch_insert_invalid_offset">請輸入有效的非負整數偏移量</string>
 </resources>

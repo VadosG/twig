@@ -1029,15 +1029,18 @@
     <string name="trash_original_path">मूल स्थान</string>
     <string name="trash_deleted_at">हटाने का समय</string>
     <string name="trash_storage">स्टोरेज वॉल्यूम</string>
-    <string name="batch_affixes">उपसर्ग और प्रत्यय</string>
     <string name="batch_change_case">अक्षरों का आकार बदलें</string>
     <string name="batch_template">टेम्पलेट</string>
-    <string name="batch_prefix">उपसर्ग</string>
-    <string name="batch_suffix">प्रत्यय</string>
     <string name="batch_lowercase">छोटे अक्षर</string>
     <string name="batch_uppercase">बड़े अक्षर</string>
     <string name="compare_content_unlimited">आकार की कोई सीमा नहीं</string>
     <string name="batch_template_hint">{name}: एक्सटेंशन के बिना मूल नाम; {ext}: बिंदु सहित एक्सटेंशन; {number}: क्रम संख्या; {date}: संशोधन तिथि (yyyyMMdd)</string>
     <string name="batch_template_error">अमान्य टेम्पलेट या संशोधन तिथि उपलब्ध नहीं है</string>
     <string name="batch_titlecase">शीर्षक अक्षर शैली (अंग्रेज़ी)</string>
+    <string name="batch_insert">सम्मिलित करें</string>
+    <string name="batch_insert_text">सम्मिलित करने का पाठ</string>
+    <string name="batch_insert_offset">ऑफ़सेट</string>
+    <string name="batch_insert_begin">आरंभ से (बाएँ)</string>
+    <string name="batch_insert_end">अंत से (दाएँ)</string>
+    <string name="batch_insert_invalid_offset">मान्य गैर-ऋणात्मक पूर्णांक ऑफ़सेट दर्ज करें</string>
 </resources>

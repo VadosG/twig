@@ -1029,15 +1029,18 @@
     <string name="trash_original_path">元の場所</string>
     <string name="trash_deleted_at">削除日時</string>
     <string name="trash_storage">ストレージ</string>
-    <string name="batch_affixes">接頭辞と接尾辞</string>
     <string name="batch_change_case">大文字・小文字を変換</string>
     <string name="batch_template">テンプレート</string>
-    <string name="batch_prefix">接頭辞</string>
-    <string name="batch_suffix">接尾辞</string>
     <string name="batch_lowercase">小文字</string>
     <string name="batch_uppercase">大文字</string>
     <string name="compare_content_unlimited">サイズ制限なし</string>
     <string name="batch_template_hint">{name}：元の名前（拡張子なし）、{ext}：ドットを含む拡張子、{number}：連番、{date}：更新日（yyyyMMdd）</string>
     <string name="batch_template_error">テンプレートが無効か、更新日がありません</string>
     <string name="batch_titlecase">タイトルケース（英語）</string>
+    <string name="batch_insert">挿入</string>
+    <string name="batch_insert_text">挿入するテキスト</string>
+    <string name="batch_insert_offset">オフセット</string>
+    <string name="batch_insert_begin">先頭から（左端）</string>
+    <string name="batch_insert_end">末尾から（右端）</string>
+    <string name="batch_insert_invalid_offset">有効な 0 以上の整数のオフセットを入力してください</string>
 </resources>

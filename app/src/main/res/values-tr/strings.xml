@@ -1029,15 +1029,18 @@
     <string name="trash_original_path">Özgün konum</string>
     <string name="trash_deleted_at">Silinme zamanı</string>
     <string name="trash_storage">Depolama birimi</string>
-    <string name="batch_affixes">Önek ve sonek</string>
     <string name="batch_change_case">Büyük/küçük harf değiştir</string>
     <string name="batch_template">Şablon</string>
-    <string name="batch_prefix">Önek</string>
-    <string name="batch_suffix">Sonek</string>
     <string name="batch_lowercase">küçük harf</string>
     <string name="batch_uppercase">BÜYÜK HARF</string>
     <string name="compare_content_unlimited">Boyut sınırı yok</string>
     <string name="batch_template_hint">{name}: uzantısız özgün ad; {ext}: nokta dahil uzantı; {number}: sıra numarası; {date}: değiştirilme tarihi (yyyyMMdd)</string>
     <string name="batch_template_error">Geçersiz şablon veya değiştirilme tarihi eksik</string>
     <string name="batch_titlecase">Başlık Düzeni (İngilizce)</string>
+    <string name="batch_insert">Ekle</string>
+    <string name="batch_insert_text">Eklenecek metin</string>
+    <string name="batch_insert_offset">Ofset</string>
+    <string name="batch_insert_begin">Baştan (sol)</string>
+    <string name="batch_insert_end">Sondan (sağ)</string>
+    <string name="batch_insert_invalid_offset">Geçerli, negatif olmayan bir tam sayı ofseti girin</string>
 </resources>

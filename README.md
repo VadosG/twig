@@ -238,11 +238,14 @@ needs no special case.
 - **Batch rename** selected files and folders with live original/new-name previews.
   Replace text or use regular expressions, choose case sensitivity, and target names,
   extensions or both. Add numbering before or after names with a configurable start
-  and zero padding, add prefixes/suffixes, or change case (including English title case,
+  and zero padding, insert text at a zero-based character offset from the beginning (left)
+  or end (right), or change case (including English title case,
   with common short prepositions, articles and conjunctions lowercase except at the start
   or end of a title/subtitle). Templates accept `{name}`
   (without extension), `{ext}` (including the dot), `{number}`, and `{date}` (modification
-  date as `yyyyMMdd`). Duplicate and existing destination names are checked before renaming.
+  date as `yyyyMMdd`). Insertion offsets beyond a name’s length stop at the opposite edge;
+  offset 0 adds a prefix or suffix. Duplicate and existing destination names are checked
+  before renaming.
 - **Favourites** and **recent locations** store *how to get there* (connection
   label + path), not a session-scoped scheme, so they survive restarts.
 - **Restores your last position** across restarts, level by level, releasing
