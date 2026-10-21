@@ -2586,7 +2586,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
             // These are navigation shortcuts only: filesystem listings must still fail for
             // copy, comparison and recursive scans rather than pretending this is a complete root.
             val rootShortcuts = if (file.scheme == "file" && file.path == "/" && listed.getOrNull().isNullOrEmpty()) {
-                listOf("/system", "/vendor", "/product", "/system_ext", "/apex", "/odm", "/oem", "/proc", "/mnt", "/storage")
+                listOf("/system", "/vendor", "/product", "/system_ext", "/apex", "/odm", "/oem", "/proc", "/mnt", "/storage", "/etc")
                     .mapNotNull { path -> runCatching { fs.stat(path) }.getOrNull()?.takeIf { it.isDir && it.canRead } }
             } else emptyList()
             val granted = if (AndroidDataAccess.isRoot(file)) AndroidDataAccess.instance?.let { access ->
