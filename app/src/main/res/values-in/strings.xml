@@ -330,8 +330,8 @@
     <string name="compare_sync_overwrite_newer">Timpa %2$d item lebih baru di %1$s</string>
     <string name="compare_sync_scanning">Memindai… %1$d dibandingkan · %2$d berbeda</string>
     <string name="compare_sync_delete_failed">Tidak dapat menghapus %1$d item</string>
-    <string name="compare_sync_unreadable">%1$d folder tidak terbaca dan dibiarkan utuh (mis. %2$s). Pindai ulang.</string>
-    <string name="compare_sync_unreadable_only">Beberapa folder tidak terbaca; tidak ada yang aman disinkronkan. Pindai ulang.</string>
+    <string name="compare_sync_unreadable">%1$d item tidak terbaca dan dibiarkan utuh (mis. %2$s). Pindai ulang.</string>
+    <string name="compare_sync_unreadable_only">Beberapa item tidak terbaca; tidak ada yang aman disinkronkan. Pindai ulang.</string>
     <string name="compare_sync_wait_scan">Masih memindai — tunggu sebelum sinkronisasi</string>
     <string name="compare_exclude_this">Kecualikan item ini</string>
     <string name="compare_excludes">Aturan pengecualian</string>
@@ -1036,6 +1036,7 @@
     <string name="batch_suffix">Akhiran</string>
     <string name="batch_lowercase">huruf kecil</string>
     <string name="batch_uppercase">HURUF BESAR</string>
+    <string name="compare_content_unlimited">Tanpa batas ukuran</string>
     <string name="batch_template_hint">{name}: nama asli tanpa ekstensi; {ext}: ekstensi termasuk titik; {number}: nomor urut; {date}: tanggal perubahan (yyyyMMdd)</string>
     <string name="batch_template_error">Templat tidak valid atau tanggal perubahan tidak tersedia</string>
 </resources>

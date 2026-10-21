@@ -330,8 +330,8 @@
     <string name="compare_sync_overwrite_newer">%1$s पक्ष के %2$d नए आइटम ओवरराइट करें</string>
     <string name="compare_sync_scanning">स्कैन जारी… %1$d तुलना की · %2$d अलग</string>
     <string name="compare_sync_delete_failed">%1$d आइटम नहीं हटाए जा सके</string>
-    <string name="compare_sync_unreadable">%1$d फ़ोल्डर पढ़े नहीं जा सके, इन्हें नहीं छुएँगे (जैसे %2$s)। दोबारा स्कैन करें।</string>
-    <string name="compare_sync_unreadable_only">कुछ फ़ोल्डर नहीं पढ़े जा सके; सुरक्षित सिंक संभव नहीं। दोबारा स्कैन करें।</string>
+    <string name="compare_sync_unreadable">%1$d आइटम पढ़े नहीं जा सके, इन्हें नहीं छुएँगे (जैसे %2$s)। दोबारा स्कैन करें।</string>
+    <string name="compare_sync_unreadable_only">कुछ आइटम नहीं पढ़े जा सके; सुरक्षित सिंक संभव नहीं। दोबारा स्कैन करें।</string>
     <string name="compare_sync_wait_scan">स्कैन जारी है; सिंक करने से पहले पूरा होने दें</string>
     <string name="compare_exclude_this">यह आइटम बाहर रखें</string>
     <string name="compare_excludes">बहिष्करण नियम</string>
@@ -1036,6 +1036,7 @@
     <string name="batch_suffix">प्रत्यय</string>
     <string name="batch_lowercase">छोटे अक्षर</string>
     <string name="batch_uppercase">बड़े अक्षर</string>
+    <string name="compare_content_unlimited">आकार की कोई सीमा नहीं</string>
     <string name="batch_template_hint">{name}: एक्सटेंशन के बिना मूल नाम; {ext}: बिंदु सहित एक्सटेंशन; {number}: क्रम संख्या; {date}: संशोधन तिथि (yyyyMMdd)</string>
     <string name="batch_template_error">अमान्य टेम्पलेट या संशोधन तिथि उपलब्ध नहीं है</string>
 </resources>

@@ -330,8 +330,8 @@
     <string name="compare_sync_overwrite_newer">Sovrascrivi %2$d elementi più recenti su %1$s</string>
     <string name="compare_sync_scanning">Scansione… %1$d confrontati · %2$d diversi</string>
     <string name="compare_sync_delete_failed">Impossibile eliminare %1$d elementi</string>
-    <string name="compare_sync_unreadable">%1$d cartelle illeggibili resteranno intatte (es. %2$s). Ripeti la scansione.</string>
-    <string name="compare_sync_unreadable_only">Cartelle illeggibili; nessuna sincronizzazione sicura possibile. Ripeti la scansione.</string>
+    <string name="compare_sync_unreadable">%1$d elementi illeggibili resteranno intatte (es. %2$s). Ripeti la scansione.</string>
+    <string name="compare_sync_unreadable_only">Elementi illeggibili; nessuna sincronizzazione sicura possibile. Ripeti la scansione.</string>
     <string name="compare_sync_wait_scan">Scansione in corso — attendi prima di sincronizzare</string>
     <string name="compare_exclude_this">Escludi questo elemento</string>
     <string name="compare_excludes">Regole di esclusione</string>
@@ -1036,6 +1036,7 @@
     <string name="batch_suffix">Suffisso</string>
     <string name="batch_lowercase">minuscolo</string>
     <string name="batch_uppercase">MAIUSCOLO</string>
+    <string name="compare_content_unlimited">Nessun limite di dimensione</string>
     <string name="batch_template_hint">{name}: nome originale senza estensione; {ext}: estensione con punto; {number}: numero; {date}: data di modifica (yyyyMMdd)</string>
     <string name="batch_template_error">Modello non valido o data di modifica assente</string>
 </resources>

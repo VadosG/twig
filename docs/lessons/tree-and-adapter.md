@@ -4,6 +4,15 @@
 > shared conventions are in [AGENTS.md](../../AGENTS.md); the other sections live
 > beside this file in [docs/lessons/](.).
 
+- **Content comparison reported read failures as differences** (2026-10-21, #17):
+  `contentEquals` swallowed stream failures and returned false, making sync offer to
+  overwrite an unreadable pair. Propagate read errors to `compareFiles`, which records
+  `PairState.ERROR`; cancellation still propagates. Both sync entry points skip these
+  entries and include them in their unreadable summary. `ContentComparisonTest` covers
+  open/read failures on either side, both sync directions, stream cleanup, cancellation,
+  and bounded streaming beyond the old 16 MB option cap. The new unlimited cap is opt-in
+  for each tier; network comparison stays off by default.
+
 - **Batch-rename preview columns shifted until scrolling** (2026-10-19): top alignment
   alone did not fix weighted columns during the dialog's initial `AT_MOST` measure.
   `BatchRenameDialog.NameColumns` divides the available width explicitly for both

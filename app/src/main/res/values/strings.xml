@@ -352,8 +352,8 @@
     <string name="compare_sync_overwrite_newer">Overwrite %2$d newer item(s) on the %1$s side</string>
     <string name="compare_sync_scanning">Scanning… %1$d compared · %2$d differing</string>
     <string name="compare_sync_delete_failed">%1$d item(s) could not be deleted</string>
-    <string name="compare_sync_unreadable">%1$d folder(s) could not be read and will be left untouched (e.g. %2$s). Rescan to try again.</string>
-    <string name="compare_sync_unreadable_only">Some folders could not be read, so there is nothing safe to sync. Rescan to try again.</string>
+    <string name="compare_sync_unreadable">%1$d item(s) could not be read and will be left untouched (e.g. %2$s). Rescan to try again.</string>
+    <string name="compare_sync_unreadable_only">Some items could not be read, so there is nothing safe to sync. Rescan to try again.</string>
     <string name="compare_sync_wait_scan">Still scanning — wait for it to finish before syncing</string>
     <string name="compare_exclude_this">Exclude this item</string>
     <string name="compare_excludes">Exclude rules</string>
@@ -1106,6 +1106,7 @@
     <string name="batch_suffix">Suffix</string>
     <string name="batch_lowercase">lowercase</string>
     <string name="batch_uppercase">UPPERCASE</string>
+    <string name="compare_content_unlimited">No size limit</string>
     <string name="batch_template_hint">{name}: original name without extension; {ext}: extension including dot; {number}: sequence; {date}: modified date (yyyyMMdd)</string>
     <string name="batch_template_error">Invalid template or missing modification date</string>
 </resources>

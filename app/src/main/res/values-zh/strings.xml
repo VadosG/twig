@@ -333,8 +333,8 @@
     <string name="compare_sync_overwrite_newer">覆盖%1$s侧较新的 %2$d 项</string>
     <string name="compare_sync_scanning">正在扫描…已比对 %1$d · 差异 %2$d</string>
     <string name="compare_sync_delete_failed">%1$d 项删除失败</string>
-    <string name="compare_sync_unreadable">%1$d 个文件夹读取失败,将原样保留(例如 %2$s)。重新扫描可再试一次。</string>
-    <string name="compare_sync_unreadable_only">有文件夹读取失败,没有可以安全同步的内容。重新扫描可再试一次。</string>
+    <string name="compare_sync_unreadable">%1$d 个项目读取失败,将原样保留(例如 %2$s)。重新扫描可再试一次。</string>
+    <string name="compare_sync_unreadable_only">有项目读取失败,没有可以安全同步的内容。重新扫描可再试一次。</string>
     <string name="compare_sync_wait_scan">还在扫描,等扫完再同步</string>
     <string name="compare_exclude_this">排除此项</string>
     <string name="compare_excludes">排除规则</string>
@@ -1066,6 +1066,7 @@
     <string name="batch_suffix">后缀</string>
     <string name="batch_lowercase">小写</string>
     <string name="batch_uppercase">大写</string>
+    <string name="compare_content_unlimited">不限大小</string>
     <string name="batch_template_hint">{name}：原文件名（不含扩展名）；{ext}：扩展名（含点）；{number}：序号；{date}：修改日期（yyyyMMdd）</string>
     <string name="batch_template_error">模板无效或缺少修改日期</string>
 </resources>

@@ -2,6 +2,7 @@ package com.twig.app.ui
 
 import com.twig.core.FsRegistry
 import com.twig.core.XFile
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -32,11 +33,11 @@ enum class PairState {
     SCANNING,
 
     /**
-     * Directory present on both sides whose listing failed on at least one of them
-     * (timeout, permission, dropped connection). Its contents are **unknown**, not empty:
-     * no children are recorded under it, and sync neither copies into it nor deletes from
-     * it — before this state existed, a failed listing read as an empty directory, and
-     * mirror sync deleted everything on the other side.
+     * Entry present on both sides whose listing or content read failed on at least one
+     * side (timeout, permission, dropped connection). Its contents are **unknown**:
+     * sync skips the entry, and a failed directory listing records no children. Before
+     * this state existed, a failed listing read as an empty directory, and mirror sync
+     * deleted everything on the other side.
      */
     ERROR,
 }
@@ -207,16 +208,13 @@ internal fun contentComparable(l: XFile, r: XFile, o: CompareOptions): Boolean {
  * Block-by-block streaming comparison of two files, **returning on the first difference**.
  * Saves more than half versus "hash both sides" — different files usually diverge early,
  * while hashing requires reading both sides fully.
- * A read failure (permission / connection lost) is treated as "different" — better to let
- * the user see a difference and investigate than to falsely report "same".
+ * Read failures propagate so callers can distinguish an unreadable pair from a mismatch.
  */
 internal suspend fun contentEquals(l: XFile, r: XFile): Boolean {
     if (l.size != r.size) return false
-    return runCatching {
-        FsRegistry.of(l).openInput(l).use { a ->
-            FsRegistry.of(r).openInput(r).use { b -> streamsEqual(a, b) }
-        }
-    }.getOrDefault(false)
+    return FsRegistry.of(l).openInput(l).use { a ->
+        FsRegistry.of(r).openInput(r).use { b -> streamsEqual(a, b) }
+    }
 }
 
 private suspend fun streamsEqual(a: InputStream, b: InputStream): Boolean {
@@ -258,7 +256,14 @@ internal suspend fun compareFiles(l: XFile, r: XFile, o: CompareOptions): PairSt
     // where the biggest chunk of reads would have come from.
     val skipByTime = o.contentOnlyIfTimeDiffers && timeSame
     if (!skipByTime && contentComparable(l, r, o)) {
-        return if (contentEquals(l, r)) PairState.SAME else PairState.DIFF
+        return try {
+            if (contentEquals(l, r)) PairState.SAME else PairState.DIFF
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            coroutineContext.ensureActive()
+            PairState.ERROR
+        }
     }
     return if (timeSame) PairState.SAME else PairState.DIFF
 }

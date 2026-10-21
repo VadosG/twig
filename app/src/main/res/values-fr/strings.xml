@@ -330,8 +330,8 @@
     <string name="compare_sync_overwrite_newer">Écraser %2$d éléments plus récents sur %1$s</string>
     <string name="compare_sync_scanning">Analyse… %1$d comparés · %2$d différents</string>
     <string name="compare_sync_delete_failed">Impossible de supprimer %1$d éléments</string>
-    <string name="compare_sync_unreadable">%1$d dossiers illisibles resteront intacts (ex. %2$s). Relancez l’analyse.</string>
-    <string name="compare_sync_unreadable_only">Des dossiers sont illisibles ; aucune synchronisation sûre possible. Relancez l’analyse.</string>
+    <string name="compare_sync_unreadable">%1$d éléments illisibles resteront intacts (ex. %2$s). Relancez l’analyse.</string>
+    <string name="compare_sync_unreadable_only">Des éléments sont illisibles ; aucune synchronisation sûre possible. Relancez l’analyse.</string>
     <string name="compare_sync_wait_scan">Analyse en cours — attendez avant de synchroniser</string>
     <string name="compare_exclude_this">Exclure cet élément</string>
     <string name="compare_excludes">Règles d’exclusion</string>
@@ -1036,6 +1036,7 @@
     <string name="batch_suffix">Suffixe</string>
     <string name="batch_lowercase">minuscules</string>
     <string name="batch_uppercase">MAJUSCULES</string>
+    <string name="compare_content_unlimited">Sans limite de taille</string>
     <string name="batch_template_hint">{name} : nom original sans extension ; {ext} : extension avec point ; {number} : numéro ; {date} : date de modification (yyyyMMdd)</string>
     <string name="batch_template_error">Modèle non valide ou date de modification absente</string>
 </resources>

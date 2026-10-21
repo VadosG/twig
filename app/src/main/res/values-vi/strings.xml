@@ -330,8 +330,8 @@
     <string name="compare_sync_overwrite_newer">Ghi đè %2$d mục mới hơn ở bên %1$s</string>
     <string name="compare_sync_scanning">Đang quét… đã so sánh %1$d · khác %2$d</string>
     <string name="compare_sync_delete_failed">Không xóa được %1$d mục</string>
-    <string name="compare_sync_unreadable">Không đọc được %1$d thư mục nên sẽ giữ nguyên (vd. %2$s). Quét lại để thử.</string>
-    <string name="compare_sync_unreadable_only">Một số thư mục không đọc được nên không thể đồng bộ an toàn. Hãy quét lại.</string>
+    <string name="compare_sync_unreadable">Không đọc được %1$d mục nên sẽ giữ nguyên (vd. %2$s). Quét lại để thử.</string>
+    <string name="compare_sync_unreadable_only">Một số mục không đọc được nên không thể đồng bộ an toàn. Hãy quét lại.</string>
     <string name="compare_sync_wait_scan">Vẫn đang quét; chờ xong trước khi đồng bộ</string>
     <string name="compare_exclude_this">Loại trừ mục này</string>
     <string name="compare_excludes">Quy tắc loại trừ</string>
@@ -1035,6 +1035,7 @@
     <string name="batch_suffix">Hậu tố</string>
     <string name="batch_lowercase">chữ thường</string>
     <string name="batch_uppercase">CHỮ HOA</string>
+    <string name="compare_content_unlimited">Không giới hạn kích thước</string>
     <string name="batch_template_hint">{name}: tên gốc không có phần mở rộng; {ext}: phần mở rộng gồm dấu chấm; {number}: số thứ tự; {date}: ngày sửa đổi (yyyyMMdd)</string>
     <string name="batch_template_error">Mẫu không hợp lệ hoặc thiếu ngày sửa đổi</string>
 </resources>

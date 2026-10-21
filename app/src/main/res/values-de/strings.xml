@@ -330,8 +330,8 @@
     <string name="compare_sync_overwrite_newer">%2$d neuere Einträge auf %1$s überschreiben</string>
     <string name="compare_sync_scanning">Analyse… %1$d verglichen · %2$d verschieden</string>
     <string name="compare_sync_delete_failed">%1$d Einträge konnten nicht gelöscht werden</string>
-    <string name="compare_sync_unreadable">%1$d Ordner nicht lesbar, bleiben unverändert (z. B. %2$s). Erneut scannen.</string>
-    <string name="compare_sync_unreadable_only">Ordner nicht lesbar; keine sichere Synchronisierung möglich. Erneut scannen.</string>
+    <string name="compare_sync_unreadable">%1$d Einträge nicht lesbar, bleiben unverändert (z. B. %2$s). Erneut scannen.</string>
+    <string name="compare_sync_unreadable_only">Einträge nicht lesbar; keine sichere Synchronisierung möglich. Erneut scannen.</string>
     <string name="compare_sync_wait_scan">Suche läuft noch — vor Synchronisierung warten</string>
     <string name="compare_exclude_this">Eintrag ausschließen</string>
     <string name="compare_excludes">Ausschlussregeln</string>
@@ -1036,6 +1036,7 @@
     <string name="batch_suffix">Suffix</string>
     <string name="batch_lowercase">kleinbuchstaben</string>
     <string name="batch_uppercase">GROSSBUCHSTABEN</string>
+    <string name="compare_content_unlimited">Keine Größenbegrenzung</string>
     <string name="batch_template_hint">{name}: ursprünglicher Name ohne Endung; {ext}: Endung mit Punkt; {number}: Nummer; {date}: Änderungsdatum (yyyyMMdd)</string>
     <string name="batch_template_error">Ungültige Vorlage oder fehlendes Änderungsdatum</string>
 </resources>

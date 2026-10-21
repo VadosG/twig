@@ -330,8 +330,8 @@
     <string name="compare_sync_overwrite_newer">Sobrescribir %2$d elementos más nuevos en %1$s</string>
     <string name="compare_sync_scanning">Explorando… %1$d comparados · %2$d diferentes</string>
     <string name="compare_sync_delete_failed">No se pudieron eliminar %1$d elementos</string>
-    <string name="compare_sync_unreadable">%1$d carpetas ilegibles quedarán intactas (p. ej. %2$s). Vuelve a explorar.</string>
-    <string name="compare_sync_unreadable_only">Hay carpetas ilegibles; no se puede sincronizar con seguridad. Vuelve a explorar.</string>
+    <string name="compare_sync_unreadable">%1$d elementos ilegibles quedarán intactas (p. ej. %2$s). Vuelve a explorar.</string>
+    <string name="compare_sync_unreadable_only">Hay elementos ilegibles; no se puede sincronizar con seguridad. Vuelve a explorar.</string>
     <string name="compare_sync_wait_scan">Exploración en curso; espera antes de sincronizar</string>
     <string name="compare_exclude_this">Excluir este elemento</string>
     <string name="compare_excludes">Reglas de exclusión</string>
@@ -1036,6 +1036,7 @@
     <string name="batch_suffix">Sufijo</string>
     <string name="batch_lowercase">minúsculas</string>
     <string name="batch_uppercase">MAYÚSCULAS</string>
+    <string name="compare_content_unlimited">Sin límite de tamaño</string>
     <string name="batch_template_hint">{name}: nombre original sin extensión; {ext}: extensión con punto; {number}: número; {date}: fecha de modificación (yyyyMMdd)</string>
     <string name="batch_template_error">Plantilla no válida o falta la fecha de modificación</string>
 </resources>

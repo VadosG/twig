@@ -330,8 +330,8 @@
     <string name="compare_sync_overwrite_newer">Sobrescrever %2$d itens mais recentes em %1$s</string>
     <string name="compare_sync_scanning">Analisando… %1$d comparados · %2$d diferentes</string>
     <string name="compare_sync_delete_failed">Não foi possível excluir %1$d itens</string>
-    <string name="compare_sync_unreadable">%1$d pastas ilegíveis ficarão intactas (ex.: %2$s). Analise novamente.</string>
-    <string name="compare_sync_unreadable_only">Há pastas ilegíveis; nada pode ser sincronizado com segurança. Analise novamente.</string>
+    <string name="compare_sync_unreadable">%1$d itens ilegíveis ficarão intactas (ex.: %2$s). Analise novamente.</string>
+    <string name="compare_sync_unreadable_only">Há itens ilegíveis; nada pode ser sincronizado com segurança. Analise novamente.</string>
     <string name="compare_sync_wait_scan">Análise em andamento — aguarde para sincronizar</string>
     <string name="compare_exclude_this">Excluir este item da comparação</string>
     <string name="compare_excludes">Regras de exclusão</string>
@@ -1036,6 +1036,7 @@
     <string name="batch_suffix">Sufixo</string>
     <string name="batch_lowercase">minúsculas</string>
     <string name="batch_uppercase">MAIÚSCULAS</string>
+    <string name="compare_content_unlimited">Sem limite de tamanho</string>
     <string name="batch_template_hint">{name}: nome original sem extensão; {ext}: extensão com ponto; {number}: número; {date}: data de modificação (yyyyMMdd)</string>
     <string name="batch_template_error">Modelo inválido ou data de modificação ausente</string>
 </resources>

@@ -330,8 +330,8 @@
     <string name="compare_sync_overwrite_newer">%1$s의 더 최신인 %2$d개 항목 덮어쓰기</string>
     <string name="compare_sync_scanning">스캔 중… %1$d개 비교 · %2$d개 다름</string>
     <string name="compare_sync_delete_failed">%1$d개 항목을 삭제하지 못했습니다</string>
-    <string name="compare_sync_unreadable">%1$d개 폴더를 읽을 수 없어 그대로 둡니다 (예: %2$s). 다시 검색하세요</string>
-    <string name="compare_sync_unreadable_only">읽을 수 없는 폴더가 있어 안전하게 동기화할 수 없습니다. 다시 검색하세요</string>
+    <string name="compare_sync_unreadable">%1$d개 항목를 읽을 수 없어 그대로 둡니다 (예: %2$s). 다시 검색하세요</string>
+    <string name="compare_sync_unreadable_only">읽을 수 없는 항목가 있어 안전하게 동기화할 수 없습니다. 다시 검색하세요</string>
     <string name="compare_sync_wait_scan">검색이 끝날 때까지 기다린 후 동기화하세요</string>
     <string name="compare_exclude_this">이 항목 제외</string>
     <string name="compare_excludes">제외 규칙</string>
@@ -1036,6 +1036,7 @@
     <string name="batch_suffix">접미사</string>
     <string name="batch_lowercase">소문자</string>
     <string name="batch_uppercase">대문자</string>
+    <string name="compare_content_unlimited">크기 제한 없음</string>
     <string name="batch_template_hint">{name}: 확장자를 제외한 원래 이름; {ext}: 점을 포함한 확장자; {number}: 순번; {date}: 수정 날짜 (yyyyMMdd)</string>
     <string name="batch_template_error">템플릿이 잘못되었거나 수정 날짜가 없습니다</string>
 </resources>

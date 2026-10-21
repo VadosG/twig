@@ -47,7 +47,7 @@ enum class SyncAct {
     /** Directory: descend to inspect children. */
     DESCEND,
 
-    /** Files identical on both sides, or a directory that could not be read ([PairState.ERROR]): do nothing. */
+    /** Files identical on both sides, or an entry that could not be read ([PairState.ERROR]): do nothing. */
     SKIP,
 }
 
@@ -91,7 +91,7 @@ class SyncItem(val key: String, val file: XFile, val targetNewer: Boolean = fals
 /**
  * What one sync needs to do. The incremental / overwrite toggles are only filtered **at
  * execution time**; the plan itself is complete — except under [unreadable], the keys of
- * directories whose listing failed, which the plan leaves alone and the confirmation
+ * entries whose listing or content read failed, which the plan leaves alone and the confirmation
  * dialog names.
  */
 class SyncPlan(
@@ -147,6 +147,7 @@ suspend fun buildSyncPlan(
                 if (closed.any { under(ev.dirKey, it) }) return@collect
                 for (e in ev.rows) {
                     val key = if (ev.dirKey.isEmpty()) e.name else "${ev.dirKey}/${e.name}"
+                    if (e.state == PairState.ERROR) unreadable += key
                     val src = if (from == 0) e.left else e.right
                     val dst = if (from == 0) e.right else e.left
                     when (syncActionFor(e.state, e.isDir, from)) {

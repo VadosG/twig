@@ -330,8 +330,8 @@
     <string name="compare_sync_overwrite_newer">覆蓋%1$s側較新的 %2$d 項</string>
     <string name="compare_sync_scanning">正在掃描…已比對 %1$d · 差異 %2$d</string>
     <string name="compare_sync_delete_failed">%1$d 項刪除失敗</string>
-    <string name="compare_sync_unreadable">%1$d 個資料夾讀取失敗,將原樣保留(例如 %2$s)。重新掃描可再試一次。</string>
-    <string name="compare_sync_unreadable_only">有資料夾讀取失敗,沒有可以安全同步的內容。重新掃描可再試一次。</string>
+    <string name="compare_sync_unreadable">%1$d 個項目讀取失敗,將原樣保留(例如 %2$s)。重新掃描可再試一次。</string>
+    <string name="compare_sync_unreadable_only">有項目讀取失敗,沒有可以安全同步的內容。重新掃描可再試一次。</string>
     <string name="compare_sync_wait_scan">還在掃描,等掃完再同步</string>
     <string name="compare_exclude_this">排除此項</string>
     <string name="compare_excludes">排除規則</string>
@@ -1035,6 +1035,7 @@
     <string name="batch_suffix">後綴</string>
     <string name="batch_lowercase">小寫</string>
     <string name="batch_uppercase">大寫</string>
+    <string name="compare_content_unlimited">不限大小</string>
     <string name="batch_template_hint">{name}：原始檔名（不含副檔名）；{ext}：副檔名（含點）；{number}：序號；{date}：修改日期（yyyyMMdd）</string>
     <string name="batch_template_error">範本無效或缺少修改日期</string>
 </resources>

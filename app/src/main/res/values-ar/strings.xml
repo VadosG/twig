@@ -330,8 +330,8 @@
     <string name="compare_sync_overwrite_newer">استبدال %2$d عنصر أحدث على الجانب %1$s</string>
     <string name="compare_sync_scanning">جارٍ الفحص… تمت مقارنة %1$d · المختلف %2$d</string>
     <string name="compare_sync_delete_failed">تعذر حذف %1$d عنصر</string>
-    <string name="compare_sync_unreadable">تعذرت قراءة %1$d مجلد ولن يتم تغييره (مثل %2$s). أعد الفحص للمحاولة.</string>
-    <string name="compare_sync_unreadable_only">تعذرت قراءة بعض المجلدات، فلا شيء آمن للمزامنة. أعد الفحص.</string>
+    <string name="compare_sync_unreadable">تعذرت قراءة %1$d عنصر ولن يتم تغييره (مثل %2$s). أعد الفحص للمحاولة.</string>
+    <string name="compare_sync_unreadable_only">تعذرت قراءة بعض العناصر، فلا شيء آمن للمزامنة. أعد الفحص.</string>
     <string name="compare_sync_wait_scan">الفحص مستمر؛ انتظر اكتماله قبل المزامنة</string>
     <string name="compare_exclude_this">استبعاد هذا العنصر</string>
     <string name="compare_excludes">قواعد الاستبعاد</string>
@@ -1040,6 +1040,7 @@
     <string name="batch_suffix">لاحقة</string>
     <string name="batch_lowercase">أحرف صغيرة</string>
     <string name="batch_uppercase">أحرف كبيرة</string>
+    <string name="compare_content_unlimited">بلا حد للحجم</string>
     <string name="batch_template_hint">{name}: الاسم الأصلي دون الامتداد؛ {ext}: الامتداد مع النقطة؛ {number}: الرقم التسلسلي؛ {date}: تاريخ التعديل (yyyyMMdd)</string>
     <string name="batch_template_error">القالب غير صالح أو تاريخ التعديل غير متوفر</string>
 </resources>

@@ -35,7 +35,7 @@ fun saveCompareOptions(ctx: Context, o: CompareOptions) {
 private val TOLERANCES = longArrayOf(0L, 1_000L, 2_000L, 60_000L, Long.MAX_VALUE / 4)
 
 /** Content-compare size cap tiers; 0 = off. */
-private val CONTENT_LIMITS = longArrayOf(0L, 256L * 1024, 1L shl 20, 16L shl 20)
+private val CONTENT_LIMITS = longArrayOf(0L, 256L * 1024, 1L shl 20, 16L shl 20, Long.MAX_VALUE)
 
 private fun dp(ctx: Context, v: Int) = (v * ctx.resources.displayMetrics.density).toInt()
 
@@ -61,7 +61,7 @@ fun showCompareOptions(ctx: Context, current: CompareOptions, onApply: (CompareO
     )
     val limitLabels = listOf(
         ctx.getString(R.string.compare_content_off),
-        "256 KB", "1 MB", "16 MB",
+        "256 KB", "1 MB", "16 MB", ctx.getString(R.string.compare_content_unlimited),
     )
     fun idxOf(arr: LongArray, v: Long) = arr.indexOfFirst { it == v }.let { if (it < 0) 0 else it }
 

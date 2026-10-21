@@ -330,8 +330,8 @@
     <string name="compare_sync_overwrite_newer">%1$s 側の新しい %2$d 件を上書き</string>
     <string name="compare_sync_scanning">スキャン中… %1$d 件比較 · %2$d 件差異</string>
     <string name="compare_sync_delete_failed">%1$d 件を削除できませんでした</string>
-    <string name="compare_sync_unreadable">%1$d 個のフォルダーを読み取れないため変更しません（例：%2$s）。再スキャンしてください</string>
-    <string name="compare_sync_unreadable_only">読み取れないフォルダーがあるため、安全に同期できる項目がありません。再スキャンしてください</string>
+    <string name="compare_sync_unreadable">%1$d 個の項目を読み取れないため変更しません（例：%2$s）。再スキャンしてください</string>
+    <string name="compare_sync_unreadable_only">読み取れない項目があるため、安全に同期できる項目がありません。再スキャンしてください</string>
     <string name="compare_sync_wait_scan">スキャン完了までお待ちください</string>
     <string name="compare_exclude_this">この項目を除外</string>
     <string name="compare_excludes">除外ルール</string>
@@ -1036,6 +1036,7 @@
     <string name="batch_suffix">接尾辞</string>
     <string name="batch_lowercase">小文字</string>
     <string name="batch_uppercase">大文字</string>
+    <string name="compare_content_unlimited">サイズ制限なし</string>
     <string name="batch_template_hint">{name}：元の名前（拡張子なし）、{ext}：ドットを含む拡張子、{number}：連番、{date}：更新日（yyyyMMdd）</string>
     <string name="batch_template_error">テンプレートが無効か、更新日がありません</string>
 </resources>
