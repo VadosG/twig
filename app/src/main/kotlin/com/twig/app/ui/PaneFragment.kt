@@ -1754,6 +1754,13 @@ class PaneFragment : Fragment() {
             is PaneViewModel.FileNode -> longClickFile(node)
             is PaneViewModel.ServerNode -> serverMenu(node)
             is PaneViewModel.FavoriteNode -> favoriteMenu(node)
+            is PaneViewModel.GroupNode -> if (node.id == "websites") {
+                val actions = ArrayList<MenuAct>()
+                actions.item(getString(R.string.website_defaults), R.drawable.ic_edit) {
+                    WebsiteDialogs.defaults(requireContext())
+                }
+                showActionMenu(requireContext(), node.label, actions)
+            }
             is PaneViewModel.WebsiteNode -> WebsiteDialogs.menu(requireContext(), node.site)
             is PaneViewModel.CompareNode -> compareFavMenu(node)
             is PaneViewModel.SearchNode -> searchNodeMenu(node)

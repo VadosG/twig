@@ -1032,7 +1032,9 @@ class FileAdapter(
             setIndicator(node.expanded)
             b.check.visibility = View.GONE
             b.root.setOnClickListener { onClick(node) }
-            b.root.setOnLongClickListener { false }
+            b.root.setOnLongClickListener {
+                if (node.id == "websites") { onLongClick(node); true } else false
+            }
         }
 
         private fun bindServer(node: PaneViewModel.ServerNode) {

@@ -30,6 +30,8 @@ object WebsiteDialogs {
 
     fun add(ctx: Context, initial: Website) = editForm(ctx, initial = initial)
 
+    fun defaults(ctx: Context) = editForm(ctx, defaults = true)
+
     private fun editForm(ctx: Context, site: Website? = null, defaults: Boolean = false,
         initial: Website = site ?: if (defaults) WebsiteStore.defaults(ctx) else WebsiteStore.newSite(ctx),
         onDefaultsSaved: (() -> Unit)? = null) {
