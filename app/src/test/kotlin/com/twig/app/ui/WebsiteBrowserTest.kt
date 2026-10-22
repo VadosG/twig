@@ -55,12 +55,15 @@ class WebsiteBrowserTest {
 
     @Test fun `temporary browser uses defaults keeps live page on relaunch and saves only on request`() {
         WebsiteStore.saveDefaults(app, Website(name = "", url = "", userAgent = "DefaultAgent",
-            script = "window.custom = true", style = "body { color: red; }"))
+            script = "window.custom = true", style = "body { color: red; }",
+            blockScreenshots = true, doubleTapToolbar = false))
         val intent = WebsiteActivity.browserIntent(app, "https://example.com/path")
         val controller = Robolectric.buildActivity(WebsiteActivity::class.java, intent).setup()
         val activity = controller.get()
         val web = activity.findViewById<WebView>(R.id.web)
         assertFalse(activity.isFinishing)
+        assertFalse((web as WebsiteWebView).doubleTapToolbar)
+        assertTrue(activity.window.attributes.flags and android.view.WindowManager.LayoutParams.FLAG_SECURE != 0)
         assertEquals("https://example.com/path", shadowOf(web).lastLoadedUrl)
         assertEquals("DefaultAgent", web.settings.userAgentString)
         assertTrue(WebsiteStore.all(app).isEmpty())
@@ -82,6 +85,8 @@ class WebsiteBrowserTest {
         assertEquals("", saved.script)
         assertEquals("window.custom = true", WebsiteStore.effective(app, saved).script)
         assertFalse(saved.id.startsWith("browser:"))
+        assertTrue(saved.blockScreenshots)
+        assertFalse(saved.doubleTapToolbar)
         controller.pause().stop().destroy()
     }
 }

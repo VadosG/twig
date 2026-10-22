@@ -30,7 +30,8 @@ class WebsiteDefaultsTest {
             hiddenElements = ".advert", blockedRequests = "ads.example.com",
             headers = "Secret: private", basicAuthPassword = "private",
             openFullscreen = true, fullscreen = true, hideStatusBar = true, hideNavigationBar = true,
-            pullToRefresh = true, disableTextSelection = true, lockScrollAxis = true))
+            pullToRefresh = true, disableTextSelection = true, lockScrollAxis = true,
+            blockScreenshots = true, doubleTapToolbar = false))
         val original = Website(name = "Saved", url = "https://example.com", userAgent = "SiteAgent")
         WebsiteStore.save(app, original)
         val controller = Robolectric.buildActivity(WebsiteActivity::class.java,
@@ -72,6 +73,8 @@ class WebsiteDefaultsTest {
         assertTrue(added.pullToRefresh)
         assertTrue(added.disableTextSelection)
         assertTrue(added.lockScrollAxis)
+        assertTrue(added.blockScreenshots)
+        assertFalse(added.doubleTapToolbar)
         assertEquals(original, WebsiteStore.all(app).first())
         WebsiteDialogs.edit(controller.get(), original)
         org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()

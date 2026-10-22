@@ -80,9 +80,9 @@ object WebsiteDialogs {
         }
         val openFullscreen = option(R.string.website_open_fullscreen, initial.openFullscreen)
         val fullscreen = option(R.string.website_fullscreen, initial.fullscreen)
-        val doubleTap = option(R.string.website_double_tap_toolbar, site?.doubleTapToolbar ?: true)
+        val doubleTap = option(R.string.website_double_tap_toolbar, initial.doubleTapToolbar)
         val blockScreenshots = option(R.string.website_block_screenshots,
-            site?.blockScreenshots ?: false)
+            initial.blockScreenshots)
         val backgroundRunning = option(R.string.website_allow_background_running, site?.allowBackgroundRunning ?: false).apply {
             text = ctx.getString(R.string.website_allow_background_running_hint,
                 ctx.getString(R.string.website_allow_background_running))
@@ -174,7 +174,7 @@ object WebsiteDialogs {
         if (defaults) {
             // Keep one editor and validation path for both per-site and default settings.
             val sharedOptions = setOf(openFullscreen, fullscreen, statusBar, navigationBar,
-                pullToRefresh, selection, scrollAxis)
+                pullToRefresh, selection, scrollAxis, blockScreenshots, doubleTap)
             for (index in 0 until form.indexOfChild(advancedHeader)) {
                 val view = form.getChildAt(index)
                 if (view !in sharedOptions) view.visibility = View.GONE
@@ -202,6 +202,8 @@ object WebsiteDialogs {
                     val values = WebsiteStore.defaults(ctx)
                     openFullscreen.isChecked = values.openFullscreen
                     fullscreen.isChecked = values.fullscreen
+                    doubleTap.isChecked = values.doubleTapToolbar
+                    blockScreenshots.isChecked = values.blockScreenshots
                     statusBar.isChecked = values.hideStatusBar
                     navigationBar.isChecked = values.hideNavigationBar
                     pullToRefresh.isChecked = values.pullToRefresh
@@ -235,6 +237,7 @@ object WebsiteDialogs {
                 }
                 if (defaults) {
                     WebsiteStore.saveDefaults(ctx, initial.copy(userAgent = agent,
+                        doubleTapToolbar = doubleTap.isChecked, blockScreenshots = blockScreenshots.isChecked,
                         openFullscreen = openFullscreen.isChecked, fullscreen = fullscreen.isChecked,
                         hideStatusBar = statusBar.isChecked, hideNavigationBar = navigationBar.isChecked,
                         pullToRefresh = pullToRefresh.isChecked, disableTextSelection = selection.isChecked,

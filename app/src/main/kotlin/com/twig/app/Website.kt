@@ -61,7 +61,9 @@ object WebsiteStore {
             openFullscreen = data.optBoolean("openFullscreen"), fullscreen = data.optBoolean("fullscreen"),
             hideStatusBar = data.optBoolean("hideStatusBar"), hideNavigationBar = data.optBoolean("hideNavigationBar"),
             pullToRefresh = data.optBoolean("pullToRefresh"), disableTextSelection = data.optBoolean("disableTextSelection"),
-            lockScrollAxis = data.optBoolean("lockScrollAxis"))
+            lockScrollAxis = data.optBoolean("lockScrollAxis"),
+            blockScreenshots = data.optBoolean("blockScreenshots"),
+            doubleTapToolbar = data.optBoolean("doubleTapToolbar", true))
     }
 
     /** Advanced fields are site additions/overrides, never copies of the global settings. */
@@ -93,6 +95,7 @@ object WebsiteStore {
             .put("hideStatusBar", site.hideStatusBar).put("hideNavigationBar", site.hideNavigationBar)
             .put("pullToRefresh", site.pullToRefresh).put("disableTextSelection", site.disableTextSelection)
             .put("lockScrollAxis", site.lockScrollAxis)
+            .put("blockScreenshots", site.blockScreenshots).put("doubleTapToolbar", site.doubleTapToolbar)
         preferences(ctx).edit().putString("defaults", data.toString()).apply()
     }
 

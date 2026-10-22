@@ -142,8 +142,7 @@ class WebsiteActivity : AppCompatActivity() {
 
     private fun syncScreenshotProtection() {
         val secure = if (Secrets.locked(this)) true else {
-            val id = intent.data?.lastPathSegment
-            WebsiteStore.all(this).firstOrNull { it.id == id }?.blockScreenshots ?: false
+            requestedWebsite()?.blockScreenshots ?: false
         }
         if (secure) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
