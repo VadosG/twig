@@ -91,8 +91,7 @@ class WebsiteActivity : AppCompatActivity() {
 
     /** Keep the live WebView running behind an opaque input shield while asking to unlock. */
     private fun protectWebsite() {
-        if (Secrets.hasMasterPassword(this)) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-        else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        syncScreenshotProtection()
         if (!Secrets.locked(this) || lockCover != null) return
         lockCover = View(this).apply {
             tag = "website_lock_cover"
@@ -111,6 +110,7 @@ class WebsiteActivity : AppCompatActivity() {
         protectWebsite()
         SecurityUi.gate(this) {
             if (isFinishing || isDestroyed) return@gate
+            syncScreenshotProtection()
             if (!::site.isInitialized) {
                 initializeWebsite(pendingSavedState)
                 pendingSavedState = null
@@ -131,6 +131,15 @@ class WebsiteActivity : AppCompatActivity() {
             }
             if (lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)) resumeWebsite()
         }
+    }
+
+    private fun syncScreenshotProtection() {
+        val secure = if (Secrets.locked(this)) true else {
+            val id = intent.data?.lastPathSegment
+            WebsiteStore.all(this).firstOrNull { it.id == id }?.blockScreenshots ?: false
+        }
+        if (secure) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
     }
 
     @SuppressLint("SetJavaScriptEnabled")

@@ -387,8 +387,14 @@ option.**
   the dialog is pending. Keep the latest incoming intent pending until unlock.
   Cover existing content and disable its accessibility descendants while prompting;
   do not destroy, hide or pause an opted-in background WebView to implement a UI lock.
-  `FLAG_SECURE` while a master password is enabled also prevents screenshots and
-  recent-task snapshots from exposing the authenticated page. Cookies remain intact.
+  `FLAG_SECURE` while locked prevents screenshots and new recent-task snapshots from
+  exposing the authenticated page. After unlocking, each website's "Prevent screenshots"
+  checkbox controls the flag (2026-10-22). The option defaults off regardless of
+  whether a master password is configured; saving the editor persists the choice. Explicit choices apply independently of the master password and survive backups.
+  Re-read the saved website on entry/resume so edits take effect on an existing page.
+  Reapply the flag at the entry gate and after successful asynchronous unlock.
+  Android may retain an older preview
+  captured while unlocked; this policy does not guarantee its removal. Cookies remain intact.
   Resume WebView work from the lifecycle observer (RESUMED is delivered after the
   Activity's `onResume` method), and also after an asynchronous unlock on a resumed
   screen. Tests exercise cold shortcut entry, reused intents, return from recents,

@@ -73,6 +73,8 @@ object WebsiteDialogs {
         val openFullscreen = option(R.string.website_open_fullscreen, site?.openFullscreen ?: false)
         val fullscreen = option(R.string.website_fullscreen, site?.fullscreen ?: false)
         val doubleTap = option(R.string.website_double_tap_toolbar, site?.doubleTapToolbar ?: true)
+        val blockScreenshots = option(R.string.website_block_screenshots,
+            site?.blockScreenshots ?: false)
         val backgroundRunning = option(R.string.website_allow_background_running, site?.allowBackgroundRunning ?: false).apply {
             text = ctx.getString(R.string.website_allow_background_running_hint,
                 ctx.getString(R.string.website_allow_background_running))
@@ -200,6 +202,7 @@ object WebsiteDialogs {
                 val saved = (site ?: Website(name = label, url = address)).copy(
                     name = label, url = address, fullscreen = fullscreen.isChecked, doubleTapToolbar = doubleTap.isChecked,
                     openFullscreen = openFullscreen.isChecked, allowBackgroundRunning = backgroundRunning.isChecked,
+                    blockScreenshots = blockScreenshots.isChecked,
                     hideStatusBar = statusBar.isChecked, hideNavigationBar = navigationBar.isChecked,
                     pullToRefresh = pullToRefresh.isChecked, disableTextSelection = selection.isChecked,
                     lockScrollAxis = scrollAxis.isChecked, desktopSite = desktop.isChecked,

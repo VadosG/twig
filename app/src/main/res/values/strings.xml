@@ -1119,4 +1119,5 @@
     <string name="batch_rules">Rule settings</string>
     <string name="batch_preview">Preview</string>
     <string name="batch_preview_count">%1$d of %2$d names will change</string>
+    <string name="website_block_screenshots">Prevent screenshots</string>
 </resources>

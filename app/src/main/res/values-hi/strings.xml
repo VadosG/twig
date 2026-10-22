@@ -1049,4 +1049,5 @@
     <string name="batch_rules">नियम सेटिंग</string>
     <string name="batch_preview">पूर्वावलोकन</string>
     <string name="batch_preview_count">%2$d में से %1$d नाम बदलेंगे</string>
+    <string name="website_block_screenshots">स्क्रीनशॉट रोकें</string>
 </resources>

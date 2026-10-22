@@ -66,7 +66,7 @@ class WebsiteOrientationTest {
                 assertEquals(1, (0 until group.childCount).count { (group.getChildAt(it) as RadioButton).isChecked })
             }
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
-            assertEquals(site.copy(orientation = WebsiteOrientation.PORTRAIT), WebsiteStore.all(app).single())
+            assertEquals(site.copy(orientation = WebsiteOrientation.PORTRAIT, blockScreenshots = false), WebsiteStore.all(app).single())
             WebsiteDialogs.edit(controller.get(), WebsiteStore.all(app).single())
             shadowOf(Looper.getMainLooper()).idle()
             val reopened = ShadowDialog.getLatestDialog() as AlertDialog

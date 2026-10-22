@@ -1079,4 +1079,5 @@
     <string name="batch_rules">规则设置</string>
     <string name="batch_preview">结果预览</string>
     <string name="batch_preview_count">%2$d 个名称中，%1$d 个将更改</string>
+    <string name="website_block_screenshots">禁止截屏</string>
 </resources>

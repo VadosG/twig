@@ -36,6 +36,7 @@ data class Website(
     val headers: String = "",
     val basicAuthUsername: String = "",
     val basicAuthPassword: String = "",
+    val blockScreenshots: Boolean = false,
 )
 
 enum class WebsiteOrientation(val key: String) {
@@ -65,6 +66,7 @@ object WebsiteStore {
                     fullscreen = fullscreen, pullToRefresh = o.optBoolean("pullToRefresh"),
                     doubleTapToolbar = o.optBoolean("doubleTapToolbar", true),
                     allowBackgroundRunning = o.optBoolean("allowBackgroundRunning"),
+                    blockScreenshots = o.optBoolean("blockScreenshots", false),
                     hideStatusBar = o.optBoolean("hideStatusBar", fullscreen),
                     hideNavigationBar = o.optBoolean("hideNavigationBar", fullscreen),
                     disableTextSelection = o.optBoolean("disableTextSelection"),
@@ -121,6 +123,7 @@ object WebsiteStore {
                 .put("openFullscreen", it.openFullscreen).put("orientation", it.orientation.key)
                 .put("script", it.script).put("style", it.style).put("hiddenElements", it.hiddenElements).put("userAgent", it.userAgent)
                 .put("blockedRequests", it.blockedRequests)
+                .put("blockScreenshots", it.blockScreenshots)
                 .put("headers", sealSecret(it.headers))
                 .put("basicAuthUsername", sealSecret(it.basicAuthUsername))
                 .put("basicAuthPassword", sealSecret(it.basicAuthPassword)))

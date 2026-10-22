@@ -280,7 +280,7 @@ class WebsiteFeatureTest {
         dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).performClick()
         assertEquals(site.copy(fullscreen = false, hideStatusBar = true, hideNavigationBar = false,
             pullToRefresh = true, disableTextSelection = false, lockScrollAxis = true, desktopSite = false,
-            openFullscreen = true, doubleTapToolbar = false, allowBackgroundRunning = true),
+            openFullscreen = true, doubleTapToolbar = false, allowBackgroundRunning = true, blockScreenshots = false),
             WebsiteStore.all(app).single())
         controller.pause().stop().destroy()
     }

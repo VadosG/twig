@@ -160,7 +160,9 @@ each write `= null`.
   Website tasks gate cold starts, reused shortcut intents and resumes with `SecurityUi`;
   defer reading credentials and loading/restoring pages until unlocked. An opaque cover
   blocks the live page while prompting without pausing opted-in background execution.
-  With a master password enabled, `FLAG_SECURE` prevents screenshots/task snapshots.
+  While locked, `FLAG_SECURE` prevents screenshots/task snapshots. After unlocking,
+  each website's "Prevent screenshots" option controls it and defaults off,
+  regardless of whether a master password is configured.
 - Viewers: `TextViewerActivity` / `HexViewerActivity` / `ImageViewerActivity` /
   `MediaPlayerActivity` (ExoPlayer + ffmpeg software audio decoding).
   Music inside mounted restic repositories and archives uses an in-memory queue

@@ -159,7 +159,7 @@ class WebsiteCustomizationTest {
             user.setText("alice")
             password.setText(" pass:word ")
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
-            val saved = site.copy(basicAuthUsername = "alice", basicAuthPassword = " pass:word ")
+            val saved = site.copy(basicAuthUsername = "alice", basicAuthPassword = " pass:word ", blockScreenshots = false)
             assertEquals(saved, WebsiteStore.all(app).single())
             WebsiteDialogs.edit(page.activity, saved)
             shadowOf(Looper.getMainLooper()).idle()
@@ -318,7 +318,7 @@ class WebsiteCustomizationTest {
             field(R.string.website_blocked_requests).setText("ads.test\nhttps://twig.test/ads/*")
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
             assertFalse(dialog.isShowing)
-            assertEquals(site.copy(userAgent = "Custom/2.0", script = "window.changed = true;",
+            assertEquals(site.copy(userAgent = "Custom/2.0", script = "window.changed = true;", blockScreenshots = false,
                 style = "#ad { display: none; }", headers = "X-Auth: secret", hiddenElements = "#ad\n.banner", blockedRequests = "ads.test\nhttps://twig.test/ads/*"), WebsiteStore.all(app).single())
             val saved = WebsiteStore.all(app).single()
             WebsiteDialogs.edit(page.activity, saved)

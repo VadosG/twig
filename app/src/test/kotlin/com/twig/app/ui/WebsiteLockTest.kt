@@ -8,6 +8,7 @@ import android.view.WindowManager
 import android.webkit.CookieManager
 import android.webkit.HttpAuthHandler
 import android.webkit.WebView
+import android.widget.CheckBox
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.test.core.app.ApplicationProvider
@@ -52,7 +53,7 @@ class WebsiteLockTest {
         Secrets.reset(app)
         WebsiteStore.preferences(app).edit().clear().commit()
         site = Website(name = "Private", url = "https://example.com", allowBackgroundRunning = true,
-            basicAuthUsername = "alice", basicAuthPassword = "private-password")
+            basicAuthUsername = "alice", basicAuthPassword = "private-password", blockScreenshots = false)
         WebsiteStore.save(app, site)
         Secrets.enableMasterPassword(app, "master-password".toCharArray())
         CookieManager.getInstance().setCookie(site.url, "session=existing-login")
@@ -70,7 +71,7 @@ class WebsiteLockTest {
         page = Robolectric.buildActivity(WebsiteActivity::class.java, WebsiteActivity.intent(app, site.id)).setup()
     }
 
-    private fun unlock() {
+    private fun unlock(screenshotsBlocked: Boolean = false) {
         val dialog = ShadowDialog.getLatestDialog() as AlertDialog
         fun input(view: View): EditText? {
             if (view is EditText) return view
@@ -86,6 +87,8 @@ class WebsiteLockTest {
         }
         assertFalse(Secrets.locked(app))
         assertNull(cover)
+        assertEquals(screenshotsBlocked,
+            activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE != 0)
     }
 
     @Test fun `locked shortcut loads nothing until unlock then authenticates with decrypted Basic credentials`() {
@@ -110,12 +113,14 @@ class WebsiteLockTest {
 
     @Test fun `recents unlock keeps the same authenticated page and background session without reloading`() {
         open()
+        assertEquals(0, activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE)
         val original = web
         web.loadUrl("https://example.com/player")
         page!!.pause().stop()
         Secrets.lock()
         page!!.start().resume().visible()
         assertNotNull(cover)
+        assertTrue(activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE != 0)
         assertFalse(shadowOf(web).wasOnPauseCalled())
         assertTrue(WebsiteBackground.entries().any { it.id == site.id })
         unlock()
@@ -139,6 +144,67 @@ class WebsiteLockTest {
         web.webViewClient.onReceivedHttpAuthRequest(web, handler, "example.com", "Private")
         assertEquals("alice" to "new-password",
             Shadow.extract<WebsiteCustomizationTest.AuthHandlerShadow>(handler).credentials)
+    }
+
+    @Test fun `screenshot protection option survives unlock and refreshes when returning to the website`() {
+        WebsiteStore.save(app, site.copy(blockScreenshots = true))
+        Secrets.lock()
+        open()
+        unlock(screenshotsBlocked = true)
+        assertTrue(activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE != 0)
+        page!!.pause().stop()
+        WebsiteStore.save(app, site.copy(blockScreenshots = false))
+        page!!.start().resume().visible()
+        assertEquals(0, activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE)
+        page!!.pause().stop()
+        WebsiteStore.save(app, site.copy(blockScreenshots = true))
+        page!!.start().resume().visible()
+        assertTrue(activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE != 0)
+    }
+
+    @Test fun `website screenshot protection also works without a master password`() {
+        WebsiteStore.save(app, site.copy(blockScreenshots = true))
+        assertTrue(Secrets.disableMasterPassword(app, "master-password".toCharArray()))
+        open()
+        assertTrue(activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE != 0)
+    }
+
+    @Test fun `screenshot choice defaults off with a master password and editor saves an override`() {
+        site = site.copy(blockScreenshots = false)
+        WebsiteStore.save(app, site)
+        open()
+        assertEquals(0, activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE)
+        WebsiteDialogs.edit(activity, site)
+        shadowOf(Looper.getMainLooper()).idle()
+        val dialog = ShadowDialog.getLatestDialog() as AlertDialog
+        val option = dialog.window!!.decorView.findViewWithTag<CheckBox>(R.string.website_block_screenshots)
+        assertFalse(option.isChecked)
+        option.performClick()
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+        assertEquals(true, WebsiteStore.all(app).single().blockScreenshots)
+        val exported = WebsiteStore.exportJson(app)
+        WebsiteStore.importJson(app, exported)
+        assertEquals(true, WebsiteStore.all(app).single().blockScreenshots)
+        page!!.pause().stop().start().resume().visible()
+        assertTrue(activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE != 0)
+    }
+
+    @Test fun `screenshot choice and editor default off without a master password`() {
+        assertTrue(Secrets.disableMasterPassword(app, "master-password".toCharArray()))
+        site = site.copy(blockScreenshots = false)
+        WebsiteStore.save(app, site)
+        open()
+        assertEquals(0, activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE)
+        WebsiteDialogs.edit(activity, site)
+        shadowOf(Looper.getMainLooper()).idle()
+        val dialog = ShadowDialog.getLatestDialog() as AlertDialog
+        assertFalse(dialog.window!!.decorView.findViewWithTag<CheckBox>(R.string.website_block_screenshots).isChecked)
+        dialog.dismiss()
+        WebsiteDialogs.edit(activity)
+        shadowOf(Looper.getMainLooper()).idle()
+        val adding = ShadowDialog.getLatestDialog() as AlertDialog
+        assertFalse(adding.window!!.decorView.findViewWithTag<CheckBox>(R.string.website_block_screenshots).isChecked)
+        adding.dismiss()
     }
 
     @Test fun `cancelling unlock closes a cold website without loading or deleting its login cookie`() {

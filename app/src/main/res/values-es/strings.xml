@@ -1049,4 +1049,5 @@
     <string name="batch_rules">Configuración de la regla</string>
     <string name="batch_preview">Vista previa</string>
     <string name="batch_preview_count">Cambiarán %1$d de %2$d nombres</string>
+    <string name="website_block_screenshots">Impedir capturas de pantalla</string>
 </resources>
