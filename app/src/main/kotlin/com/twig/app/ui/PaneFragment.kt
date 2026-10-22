@@ -37,7 +37,7 @@ import com.twig.app.CompareStore
 import com.twig.app.ConnectionStore
 import com.twig.app.Connections
 import com.twig.app.HistoryEntry
-import com.twig.app.HistoryStore
+import com.twig.app.PlaybackMark
 import com.twig.app.PrivShell
 import com.twig.app.Privileged
 import com.twig.app.MainActivity
@@ -50,14 +50,12 @@ import com.twig.app.Format
 import com.twig.app.favoriteDisplayName
 import com.twig.app.isMovableSource
 import com.twig.app.favoriteFullPath
-import com.twig.app.formatLocationPath
 import com.twig.app.databinding.DialogCompressBinding
 import com.twig.app.databinding.DialogConflictBinding
 import com.twig.app.databinding.DialogCopyConfirmBinding
 import com.twig.app.databinding.DialogCopyProgressBinding
 import com.twig.app.databinding.DialogProgressTitleBinding
 import com.twig.app.databinding.FragmentPaneBinding
-import com.twig.app.databinding.ItemHistoryBinding
 import com.twig.core.CopyEngine
 import com.twig.fs.archive.ArchiveWriter
 import com.twig.core.FsException
@@ -713,41 +711,30 @@ class PaneFragment : Fragment() {
     /** Undo [mountLocated]; false when no such mount is up. */
     fun unmountLocated(): Boolean = viewModel.unmountLocated()
 
-    /**
-     * Recent: directories where files have been opened / Git views entered (most recent first, up to
-     * [HistoryStore.MAX] entries). Tap one to jump there. Long-press to delete a single entry.
-     */
+    /** Open on recent locations, with unfinished videos available in a separate tab. */
     fun actionHistory() {
+        HistoryDialog.show(requireContext(), ::jumpToHistory, ::openRecentVideo)
+    }
+
+    private fun openRecentVideo(mark: PlaybackMark, fromStart: Boolean = false) {
         val ctx = requireContext()
-        val list = HistoryStore.all(ctx)
-        if (list.isEmpty()) { toast(getString(R.string.history_empty)); return }
-        // Look up connections in one pass: entries only store the label, but display wants the type / custom name — both come from here.
-        val conns = ConnectionStore.all(ctx).associateBy { it.label() }
-        val adapter = object : android.widget.BaseAdapter() {
-            override fun getCount() = list.size
-            override fun getItem(position: Int) = list[position]
-            override fun getItemId(position: Int) = position.toLong()
-            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val vb = convertView?.let { ItemHistoryBinding.bind(it) }
-                    ?: ItemHistoryBinding.inflate(layoutInflater, parent, false)
-                val e = list[position]
-                vb.name.text = historyLabel(e, conns[e.connLabel])
-                vb.icon.setImageResource(historyIcon(e, conns[e.connLabel]))
-                return vb.root
-            }
+        val conn = if (mark.connLabel.isEmpty()) null else Connections.find(ctx, mark.connLabel)
+        if (mark.connLabel.isNotEmpty() && conn == null) {
+            toast(getString(R.string.history_conn_missing))
+            return
         }
-        val dlg = AlertDialog.Builder(ctx)
-            .setTitle(R.string.history_title)
-            .setAdapter(adapter) { _, w -> jumpToHistory(list[w]) }
-            .setNeutralButton(R.string.history_clear) { _, _ -> HistoryStore.clear(ctx) }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
-        // The inner ListView has no long-click callback entry point; once we have it, hook one ourselves: long-press deletes that entry and reopens the dialog.
-        dlg.listView?.setOnItemLongClickListener { _, _, pos, _ ->
-            HistoryStore.remove(ctx, list[pos])
-            dlg.dismiss()
-            actionHistory()
-            true
+        lifecycleScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                runCatching {
+                    val scheme = if (conn == null) "file" else Connections.ensure(ctx, conn)
+                    val file = FsRegistry.of(scheme).stat(mark.path)
+                    require(file != null && !file.isDir) { getString(R.string.history_video_missing) }
+                    file
+                }
+            }
+            if (!isAdded) return@launch
+            result.fold(onSuccess = { MediaPlayerActivity.start(ctx, it, asVideo = true, fromStart = fromStart) },
+                onFailure = { toast(it.message ?: getString(R.string.err_failed)) })
         }
     }
 
@@ -758,26 +745,6 @@ class PaneFragment : Fragment() {
             pendingScrollToCurrent = false // Didn't jump — don't leave the pending-scroll state messing up subsequent actions.
             toast(getString(R.string.history_conn_missing))
         }
-    }
-
-    /**
-     * History entry display name: network locations are `type:/server/path` (e.g. `smb:/pi/docs/photos`, same format as the path bar),
-     * local is the absolute path; git items get a "Git" prefix too. [conn] == null means the connection has been deleted —
-     * fall back to the label frozen in the entry, which is at least still recognizable (same as the Favorites row).
-     */
-    private fun historyLabel(e: HistoryEntry, conn: SavedConnection?): String {
-        val head = formatLocationPath(e.connLabel, e.path, conn)
-        return if (e.kind == "git") getString(R.string.history_git_prefix, head) else head
-    }
-
-    /**
-     * Source-type icon, same set as the path bar / copy-target row ([FileIcons.sourceIconRes]); git items use the git icon.
-     * Entries only store the connection label (`smb://host`), not the scheme; if the connection has been deleted, fall back to the type from the label's head.
-     */
-    private fun historyIcon(e: HistoryEntry, conn: SavedConnection?): Int = when {
-        e.kind == "git" -> R.drawable.ic_git
-        e.connLabel.isEmpty() -> FileIcons.sourceIconOfType("file")
-        else -> FileIcons.sourceIconOfType(conn?.type ?: e.connLabel.substringBefore("://"))
     }
 
     // ---- Space-usage treemap (replaces the tree view in place) ----

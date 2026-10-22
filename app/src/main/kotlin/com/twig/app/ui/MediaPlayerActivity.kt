@@ -253,7 +253,8 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
             loadQueue()
             // Resume memory is for video only: audio file resume is the MusicEngine/PlaylistStore's job
             remote = RemoteProgress.of(this, file)
-            if (remote != null) fetchRemoteResume() else resumeFrom = PlaybackStore.positionFor(this, file)
+            if (intent.getBooleanExtra(EXTRA_FROM_START, false)) resumeFrom = 0L
+            else if (remote != null) fetchRemoteResume() else resumeFrom = PlaybackStore.positionFor(this, file)
             b.surface.holder.addCallback(this)
             watchRootSize()
             b.controls.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> syncSubtitleInset() }
@@ -1614,12 +1615,13 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
         private const val EXTRA_NAME = "name"
         private const val EXTRA_SIZE = "size"
         private const val EXTRA_AS_VIDEO = "asVideo"
+        private const val EXTRA_FROM_START = "fromStart"
 
         /** [asVideo]: the user chose "View as video" — treat the file as video whatever its
          * extension says. An extension no extractor claims leaves the container to sniffing,
          * which is what such a file needs anyway; and there is no episode queue: its siblings are judged
          * by extension, so the file is not among them. */
-        fun start(context: Context, file: XFile, asVideo: Boolean = false) {
+        fun start(context: Context, file: XFile, asVideo: Boolean = false, fromStart: Boolean = false) {
             context.startActivity(
                 Intent(context, MediaPlayerActivity::class.java).apply {
                     putExtra(EXTRA_SCHEME, file.scheme)
@@ -1627,6 +1629,7 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
                     putExtra(EXTRA_NAME, file.name)
                     putExtra(EXTRA_SIZE, file.size)
                     putExtra(EXTRA_AS_VIDEO, asVideo)
+                    putExtra(EXTRA_FROM_START, fromStart)
                 },
             )
         }

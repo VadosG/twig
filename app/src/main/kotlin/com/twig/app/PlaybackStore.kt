@@ -21,9 +21,14 @@ data class PlaybackMark(
     val posMs: Long,
     val durMs: Long,
     val updatedAt: Long,
+    /** Reopenable location of the latest play; absent in old or session-only records. */
+    val path: String = "",
+    val connLabel: String = "",
+    val hidden: Boolean = false,
 ) {
     fun toJson(): JSONObject = JSONObject().apply {
         put("key", key); put("name", name); put("pos", posMs); put("dur", durMs); put("at", updatedAt)
+        put("path", path); put("connLabel", connLabel); put("hidden", hidden)
     }
 
     companion object {
@@ -33,6 +38,9 @@ data class PlaybackMark(
             posMs = o.optLong("pos", 0L),
             durMs = o.optLong("dur", 0L),
             updatedAt = o.optLong("at", 0L),
+            path = o.optString("path", ""),
+            connLabel = o.optString("connLabel", ""),
+            hidden = o.optBoolean("hidden", false),
         )
     }
 }
@@ -85,6 +93,20 @@ object PlaybackStore {
         return all(ctx).firstOrNull { it.key == key }?.posMs ?: 0L
     }
 
+    /** Old records still resume normally, but cannot be reopened from history. */
+    fun recent(ctx: Context): List<PlaybackMark> =
+        if (!Prefs.resumePlayback(ctx)) emptyList()
+        else all(ctx).filter { it.path.isNotEmpty() && !it.hidden }.sortedByDescending { it.updatedAt }
+
+    /** Hiding an entry must not discard its playback position. Playing it again unhides it. */
+    fun hide(ctx: Context, key: String) {
+        persist(ctx, all(ctx).map { if (it.key == key) it.copy(hidden = true) else it })
+    }
+
+    fun hideRecent(ctx: Context) {
+        persist(ctx, all(ctx).map { it.copy(hidden = true) })
+    }
+
     /**
      * Record one position. "Too short / barely started / finished" are all treated
      * as **not worth recording** — and any existing record is also removed, so
@@ -102,7 +124,13 @@ object PlaybackStore {
             if (rest.size != list.size) persist(ctx, rest) // only write back if there was a record to remove
             return
         }
-        val mark = PlaybackMark(key, f.name, posMs, durMs, System.currentTimeMillis())
+        // Store how to reconnect, not a session-scoped filesystem scheme. Archives and
+        // temporary content grants can still remember progress, but are not reopenable.
+        val conn = Connections.ofScheme(f.scheme)
+        val reopenable = f.scheme == "file" || (conn != null &&
+            ConnectionStore.all(ctx).any { it.label() == conn.label() })
+        val mark = PlaybackMark(key, f.name, posMs, durMs, System.currentTimeMillis(),
+            path = if (reopenable) f.path else "", connLabel = conn?.label().orEmpty())
         persist(ctx, (listOf(mark) + rest).take(MAX))
     }
 
