@@ -161,7 +161,9 @@ each write `= null`.
   rules, excluding main-frame navigation. `WebsiteDebugPanel` / `WebsiteElementInspector`
   provide page tools; `WebsiteRemoteDebug` owns the session-only computer debugging switch.
   `WebsiteDownloads` / `WebsiteDownloadTask` use Twig's picker and transfer service,
-  defaulting to `Downloads/twig`. Opt-in background sessions use `WebsiteBackgroundService`
+  defaulting to `Downloads/twig`. WebView file uploads also use `PickerActivity`, with
+  single/multiple selection matching the page's request and stream URIs returned to WebView.
+  Opt-in background sessions use `WebsiteBackgroundService`
   (see [website background execution](docs/lessons/website-background.md)). Basic credentials
   and header values use `Secrets`; `.twigbak` includes website configuration with those
   fields decrypted for export and re-encrypted on import, but excludes WebView cookies

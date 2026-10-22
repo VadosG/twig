@@ -83,8 +83,14 @@ class WebsiteActivity : AppCompatActivity() {
     private val downloads = WebsiteDownloads(this)
     private var upload: ValueCallback<Array<Uri>>? = null
     private val picker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        upload?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data))
+        val callback = upload
         upload = null
+        val data = result.data
+        val uris = if (result.resultCode == RESULT_OK) {
+            data?.clipData?.let { clip -> Array(clip.itemCount) { clip.getItemAt(it).uri } }
+                ?: data?.data?.let { arrayOf(it) }
+        } else null
+        callback?.onReceiveValue(uris)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -406,7 +412,10 @@ class WebsiteActivity : AppCompatActivity() {
                 upload?.onReceiveValue(null)
                 upload = callback
                 try {
-                    picker.launch(params.createIntent())
+                    picker.launch(params.createIntent().apply {
+                        setClass(this@WebsiteActivity, PickerActivity::class.java)
+                        putExtra(Intent.EXTRA_ALLOW_MULTIPLE, params.mode == FileChooserParams.MODE_OPEN_MULTIPLE)
+                    })
                 } catch (_: ActivityNotFoundException) {
                     upload?.onReceiveValue(null)
                     upload = null
