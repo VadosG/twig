@@ -513,7 +513,7 @@
     <string name="settings_slideshow_max_n">%1$d gambar</string>
     <string name="settings_section_thumbs">Thumbnail</string>
     <string name="settings_thumbs_switch">Tampilkan thumbnail</string>
-    <string name="settings_thumbs_switch_desc">Thumbnail gambar, video dan PDF (sisi maks. 256). Ikon besar pada pohon, sel terisi pada kisi. APK selalu menampilkan ikon aplikasinya</string>
+    <string name="settings_thumbs_switch_desc">Thumbnail gambar, video dan PDF (sisi maks. 320). Ikon besar pada pohon, sel terisi pada kisi. APK selalu menampilkan ikon aplikasinya</string>
     <string name="settings_thumbs_network">Thumbnail untuk file jaringan</string>
     <string name="settings_thumbs_network_desc">Unduh dan dekode seluruh file. Jika nonaktif, hanya thumbnail header JPG (sedikit data). Video/PDF hanya lokal</string>
     <string name="settings_thumbs_embedded">Utamakan thumbnail bawaan</string>

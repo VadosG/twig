@@ -513,7 +513,7 @@
     <string name="settings_slideshow_max_n">%1$d Bilder</string>
     <string name="settings_section_thumbs">Vorschaubilder</string>
     <string name="settings_thumbs_switch">Vorschaubilder anzeigen</string>
-    <string name="settings_thumbs_switch_desc">Vorschauen für Bilder, Videos und PDFs (max. 256 Pixel). Große Symbole im Baum, gefüllte Rasterzellen. APK-Symbole erscheinen immer</string>
+    <string name="settings_thumbs_switch_desc">Vorschauen für Bilder, Videos und PDFs (max. 320 Pixel). Große Symbole im Baum, gefüllte Rasterzellen. APK-Symbole erscheinen immer</string>
     <string name="settings_thumbs_network">Vorschaubilder für Netzwerkdateien</string>
     <string name="settings_thumbs_network_desc">Lädt und dekodiert die ganze Datei. Aus: nur eingebettete JPG-Vorschau (wenig Daten). Video/PDF nur lokal</string>
     <string name="settings_thumbs_embedded">Eingebettete Vorschaubilder bevorzugen</string>

@@ -5,6 +5,7 @@ import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.os.Looper
 import android.util.LruCache
@@ -150,6 +151,7 @@ class ThumbnailPlaybackProgressTest {
             adapter.submitList(listOf(node(video.copy(scheme = "offline", path = "/other/${video.name}"))))
             val image = image(bind(adapter), grid)
             assertEquals(.25f, image.playbackFraction)
+            assertTrue("Displayed thumbnails must use bitmap filtering", (image.drawable as BitmapDrawable).paint.isFilterBitmap)
             assertEquals(progressColor, draw(image, 200, 100).getPixel(25, 99))
         }
     }

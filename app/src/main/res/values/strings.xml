@@ -546,7 +546,7 @@
     <string name="settings_slideshow_max_n">%1$d images</string>
     <string name="settings_section_thumbs">Thumbnails</string>
     <string name="settings_thumbs_switch">Show thumbnails</string>
-    <string name="settings_thumbs_switch_desc">Generate thumbnails for images / videos / PDFs (max side 256); tree rows use large icons, grid cells fill in. APKs always show their app icon, unaffected by this switch</string>
+    <string name="settings_thumbs_switch_desc">Generate thumbnails for images / videos / PDFs (max side 320); tree rows use large icons, grid cells fill in. APKs always show their app icon, unaffected by this switch</string>
     <string name="settings_thumbs_network">Generate thumbnails for network files</string>
     <string name="settings_thumbs_network_desc">Requires downloading and decoding the whole file; when off, still reads the embedded thumbnail from the jpg header (minimal traffic). Video / PDF are generated locally only</string>
     <string name="settings_thumbs_embedded">Prefer embedded file thumbnails</string>

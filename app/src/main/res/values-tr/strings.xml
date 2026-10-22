@@ -513,7 +513,7 @@
     <string name="settings_slideshow_max_n">%1$d görüntü</string>
     <string name="settings_section_thumbs">Küçük resimler</string>
     <string name="settings_thumbs_switch">Küçük resimleri göster</string>
-    <string name="settings_thumbs_switch_desc">Görüntü, video ve PDF küçük resimleri (en uzun kenar 256). Ağaçta büyük simge, ızgarada dolu hücre. APK simgeleri daima görünür</string>
+    <string name="settings_thumbs_switch_desc">Görüntü, video ve PDF küçük resimleri (en uzun kenar 320). Ağaçta büyük simge, ızgarada dolu hücre. APK simgeleri daima görünür</string>
     <string name="settings_thumbs_network">Ağ dosyaları için küçük resim üret</string>
     <string name="settings_thumbs_network_desc">Tüm dosyayı indirip çözer. Kapalıyken JPG başlığındaki küçük resmi okur (az veri). Video/PDF yalnızca yerelde</string>
     <string name="settings_thumbs_embedded">Gömülü küçük resimleri tercih et</string>

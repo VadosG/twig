@@ -527,7 +527,7 @@
     <string name="settings_slideshow_max_n">%1$d 张</string>
     <string name="settings_section_thumbs">缩略图</string>
     <string name="settings_thumbs_switch">显示缩略图</string>
-    <string name="settings_thumbs_switch_desc">为图片 / 视频 / PDF 生成缩略图(最大边长 256);树式行用大图标,网格格子回填。APK 始终显示应用图标,不受此开关影响</string>
+    <string name="settings_thumbs_switch_desc">为图片 / 视频 / PDF 生成缩略图(最大边长 320);树式行用大图标,网格格子回填。APK 始终显示应用图标,不受此开关影响</string>
     <string name="settings_thumbs_network">对网络文件生成缩略图</string>
     <string name="settings_thumbs_network_desc">需下载整个文件解码;关闭时仍会读 jpg 文件头的内置缩略图(流量极小)。视频 / PDF 仅本地生成</string>
     <string name="settings_thumbs_embedded">优先使用文件内置缩略图</string>

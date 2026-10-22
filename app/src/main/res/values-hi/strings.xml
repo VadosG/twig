@@ -513,7 +513,7 @@
     <string name="settings_slideshow_max_n">%1$d छवियाँ</string>
     <string name="settings_section_thumbs">थंबनेल</string>
     <string name="settings_thumbs_switch">थंबनेल दिखाएँ</string>
-    <string name="settings_thumbs_switch_desc">छवि, वीडियो और PDF के थंबनेल (अधिकतम किनारा 256)। ट्री में बड़े आइकन, ग्रिड में भरे सेल। APK हमेशा ऐप आइकन दिखाते हैं</string>
+    <string name="settings_thumbs_switch_desc">छवि, वीडियो और PDF के थंबनेल (अधिकतम किनारा 320)। ट्री में बड़े आइकन, ग्रिड में भरे सेल। APK हमेशा ऐप आइकन दिखाते हैं</string>
     <string name="settings_thumbs_network">नेटवर्क फ़ाइलों के थंबनेल बनाएँ</string>
     <string name="settings_thumbs_network_desc">पूरी फ़ाइल डाउनलोड और डिकोड करता है। बंद होने पर भी JPG हेडर का थंबनेल पढ़ता है (कम डेटा)। वीडियो/PDF केवल स्थानीय</string>
     <string name="settings_thumbs_embedded">अंतर्निहित थंबनेल को प्राथमिकता</string>

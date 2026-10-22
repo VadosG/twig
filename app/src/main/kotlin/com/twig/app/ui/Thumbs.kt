@@ -61,7 +61,7 @@ import java.util.concurrent.TimeoutException
  *   think it's "very slow".
  * - Images (local/SAF): "prefer embedded thumbnail" on — try embedded first; off —
  *   decode a downsampled full image directly (local cost is small; unlike network, no
- *   bandwidth/latency concerns). If the original is already ≤256, use the decode result
+ *   bandwidth/latency concerns). If the original is already ≤320, use the decode result
  *   directly without saving a separate thumbnail file (saves disk and a second lossy pass).
  * - Video frame: take the frame at 1/[VIDEO_FRAME_DIVISOR] of the duration rather than
  *   the start ([pickRepresentativeFrame]) — the start is usually a black fade-in or
@@ -150,7 +150,7 @@ import java.util.concurrent.TimeoutException
  */
 object Thumbs {
 
-    private const val MAX_EDGE = 256
+    private const val MAX_EDGE = 320
     private const val HEAD_BYTES = 256 * 1024 // EXIF embedded thumbnail: read the file head only.
     private const val NET_DECODE_CAP = 64L * 1024 * 1024 // Size cap for decoding whole network images.
     private const val DISK_CAP = 100L * 1024 * 1024 // Disk cache cap (LRU-trim to 80% when exceeded).
@@ -558,7 +558,7 @@ object Thumbs {
             }
         }
         val raw = generate(ctx, file) ?: return null
-        // Image itself is already ≤256: no need to save a separate thumbnail file
+        // Image itself is already ≤320: no need to save a separate thumbnail file
         // (saves disk + avoids a second lossy JPEG pass), hand the decode result
         // straight to the memory cache.
         if (OpenFiles.isImage(typed(file)) && maxOf(raw.width, raw.height) <= MAX_EDGE) return raw
@@ -1790,7 +1790,7 @@ object Thumbs {
     private const val COVER_BYTES_CAP = 32L * 1024 * 1024 // Cover image size cap, to guard against misconfig pointing at a huge file.
 
     /** "scheme:directory-path" → raw bytes of the same-directory cover file (null = confirmed missing; negative results are cached too).
-     * One album directory has dozens of songs / the player, notification, playlist are multiple callers; they all only list the directory and download once. We cache the bytes rather than the decoded result — file-manager thumbnails want 256px, the player/notification/playlist want 1024px ([audioCover]); the different sizes can't share a single bitmap, but they can each decode from the same bytes without re-listing and re-downloading. LRU cap is 32 directories, session-memory only. */
+     * One album directory has dozens of songs / the player, notification, playlist are multiple callers; they all only list the directory and download once. We cache the bytes rather than the decoded result — file-manager thumbnails want 320px, the player/notification/playlist want 1024px ([audioCover]); the different sizes can't share a single bitmap, but they can each decode from the same bytes without re-listing and re-downloading. LRU cap is 32 directories, session-memory only. */
     private val dirCoverBytes = object : LinkedHashMap<String, ByteArray?>(16, 0.75f, true) {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, ByteArray?>?) = size > 32
     }
@@ -1891,7 +1891,7 @@ object Thumbs {
         return decodeSampled { ByteArrayInputStream(pic) }
     }
 
-    /** Same-directory cover image (256px thumbnail use); bytes come from [resolveDirCoverBytes]'s directory-level cache. */
+    /** Same-directory cover image (320px thumbnail use); bytes come from [resolveDirCoverBytes]'s directory-level cache. */
     private fun dirCover(file: XFile): Bitmap? =
         resolveDirCoverBytes(file)?.let { b -> decodeSampled { ByteArrayInputStream(b) } }
 

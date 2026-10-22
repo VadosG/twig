@@ -513,7 +513,7 @@
     <string name="settings_slideshow_max_n">%1$d صورة</string>
     <string name="settings_section_thumbs">المصغرات</string>
     <string name="settings_thumbs_switch">عرض المصغرات</string>
-    <string name="settings_thumbs_switch_desc">مصغرات للصور والفيديو وPDF (أقصى ضلع 256). أيقونات كبيرة في الشجرة وخلايا ممتلئة في الشبكة. APK يعرض أيقونة التطبيق دائما</string>
+    <string name="settings_thumbs_switch_desc">مصغرات للصور والفيديو وPDF (أقصى ضلع 320). أيقونات كبيرة في الشجرة وخلايا ممتلئة في الشبكة. APK يعرض أيقونة التطبيق دائما</string>
     <string name="settings_thumbs_network">توليد مصغرات لملفات الشبكة</string>
     <string name="settings_thumbs_network_desc">يتطلب تنزيل الملف كاملا وفك ترميزه. عند تعطيله تقرأ مصغرة رأس JPG (بيانات قليلة). الفيديو وPDF محليا فقط</string>
     <string name="settings_thumbs_embedded">تفضيل المصغرات المضمنة</string>

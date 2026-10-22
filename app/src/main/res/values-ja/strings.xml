@@ -513,7 +513,7 @@
     <string name="settings_slideshow_max_n">%1$d 枚</string>
     <string name="settings_section_thumbs">サムネイル</string>
     <string name="settings_thumbs_switch">サムネイルを表示</string>
-    <string name="settings_thumbs_switch_desc">画像・動画・PDFのサムネイルを生成（最大辺256）。ツリーでは大きなアイコン、グリッドではセルいっぱいに表示します。APKのアイコンは常に表示します</string>
+    <string name="settings_thumbs_switch_desc">画像・動画・PDFのサムネイルを生成（最大辺320）。ツリーでは大きなアイコン、グリッドではセルいっぱいに表示します。APKのアイコンは常に表示します</string>
     <string name="settings_thumbs_network">ネットワークファイルのサムネイルを生成</string>
     <string name="settings_thumbs_network_desc">ファイル全体のダウンロードとデコードが必要です。オフでもJPGヘッダーの内蔵サムネイルを少量の通信で読みます。動画・PDFの生成はローカルのみ</string>
     <string name="settings_thumbs_embedded">内蔵サムネイルを優先</string>

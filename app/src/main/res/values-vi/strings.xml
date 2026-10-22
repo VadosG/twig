@@ -513,7 +513,7 @@
     <string name="settings_slideshow_max_n">%1$d ảnh</string>
     <string name="settings_section_thumbs">Ảnh thu nhỏ</string>
     <string name="settings_thumbs_switch">Hiện ảnh thu nhỏ</string>
-    <string name="settings_thumbs_switch_desc">Ảnh thu nhỏ cho ảnh, video và PDF (cạnh tối đa 256). Biểu tượng lớn trong cây, lấp đầy ô lưới. APK luôn hiện biểu tượng ứng dụng</string>
+    <string name="settings_thumbs_switch_desc">Ảnh thu nhỏ cho ảnh, video và PDF (cạnh tối đa 320). Biểu tượng lớn trong cây, lấp đầy ô lưới. APK luôn hiện biểu tượng ứng dụng</string>
     <string name="settings_thumbs_network">Tạo ảnh thu nhỏ cho tệp mạng</string>
     <string name="settings_thumbs_network_desc">Cần tải và giải mã toàn bộ tệp. Khi tắt vẫn đọc ảnh thu nhỏ nhúng trong đầu JPG (ít dữ liệu). Video/PDF chỉ tạo cục bộ</string>
     <string name="settings_thumbs_embedded">Ưu tiên ảnh thu nhỏ nhúng</string>

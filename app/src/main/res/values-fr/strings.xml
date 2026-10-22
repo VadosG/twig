@@ -513,7 +513,7 @@
     <string name="settings_slideshow_max_n">%1$d images</string>
     <string name="settings_section_thumbs">Miniatures</string>
     <string name="settings_thumbs_switch">Afficher les miniatures</string>
-    <string name="settings_thumbs_switch_desc">Miniatures d’images, vidéos et PDF (côté max. 256). Grandes icônes dans l’arbre, cellules remplies en grille. Les APK gardent leur icône</string>
+    <string name="settings_thumbs_switch_desc">Miniatures d’images, vidéos et PDF (côté max. 320). Grandes icônes dans l’arbre, cellules remplies en grille. Les APK gardent leur icône</string>
     <string name="settings_thumbs_network">Miniatures des fichiers réseau</string>
     <string name="settings_thumbs_network_desc">Télécharge et décode tout le fichier. Désactivé : miniature intégrée au JPG seulement (peu de données). Vidéo/PDF locaux seulement</string>
     <string name="settings_thumbs_embedded">Préférer les miniatures intégrées</string>

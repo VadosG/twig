@@ -513,7 +513,7 @@
     <string name="settings_slideshow_max_n">%1$d장</string>
     <string name="settings_section_thumbs">미리보기</string>
     <string name="settings_thumbs_switch">미리보기 표시</string>
-    <string name="settings_thumbs_switch_desc">이미지·동영상·PDF 미리보기 생성 (최대 변 256). 트리에서는 큰 아이콘, 격자에서는 셀을 채웁니다. APK 앱 아이콘은 항상 표시합니다</string>
+    <string name="settings_thumbs_switch_desc">이미지·동영상·PDF 미리보기 생성 (최대 변 320). 트리에서는 큰 아이콘, 격자에서는 셀을 채웁니다. APK 앱 아이콘은 항상 표시합니다</string>
     <string name="settings_thumbs_network">네트워크 파일 미리보기 생성</string>
     <string name="settings_thumbs_network_desc">파일 전체 다운로드와 디코딩이 필요합니다. 꺼도 JPG 헤더의 내장 미리보기는 적은 통신량으로 읽습니다. 동영상·PDF는 로컬에서만 생성</string>
     <string name="settings_thumbs_embedded">내장 미리보기 우선</string>
