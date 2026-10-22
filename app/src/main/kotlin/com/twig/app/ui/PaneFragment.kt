@@ -299,6 +299,13 @@ class PaneFragment : Fragment() {
         // The map's swipes / touches share the same interaction as the tree list: horizontal swipe switches panes, touch reports the active pane.
         b.map.onTouchDown = { host?.onPaneTouched(this) }
         b.map.onSwipe = { dx -> host?.onPaneSwipe(dx) }
+        b.map.onZoomChanged = { zoomed ->
+            b.mapResetZoom.visibility = if (zoomed) View.VISIBLE else View.GONE
+        }
+        b.mapResetZoom.setOnClickListener {
+            host?.onPaneTouched(this)
+            b.map.resetZoom()
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {

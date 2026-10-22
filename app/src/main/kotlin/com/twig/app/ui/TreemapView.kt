@@ -32,6 +32,7 @@ class TreemapView @JvmOverloads constructor(
     /** Horizontal swipe (net displacement above the threshold and horizontal > vertical) → switch panes, same interaction as the tree list. */
     var onSwipe: ((Float) -> Unit)? = null
     var onTouchDown: (() -> Unit)? = null
+    var onZoomChanged: ((Boolean) -> Unit)? = null
 
     /** Selected block keys ("scheme:path"), drawn with a highlight border; maintained by the host. */
     var selectedKeys: Set<String> = emptySet()
@@ -76,6 +77,11 @@ class TreemapView @JvmOverloads constructor(
 
     // Two-finger zoom + pan (geometric transform, text doesn't scale: zooming in reveals more label space)
     private var scale = 1f
+        set(value) {
+            val wasZoomed = field > 1f
+            field = value
+            if (wasZoomed != (value > 1f)) onZoomChanged?.invoke(value > 1f)
+        }
     private var tx = 0f
     private var ty = 0f
 
@@ -93,8 +99,9 @@ class TreemapView @JvmOverloads constructor(
         invalidate()
     }
 
-    private fun resetZoom() {
+    fun resetZoom() {
         scale = 1f; tx = 0f; ty = 0f
+        invalidate()
     }
 
     private fun clampPan() {

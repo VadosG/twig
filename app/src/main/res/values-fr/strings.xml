@@ -69,6 +69,7 @@
     <string name="treemap_scanning">Analyse… %1$d éléments · %2$s</string>
     <string name="treemap_failed">Échec de l’analyse</string>
     <string name="treemap_empty">Dossier vide</string>
+    <string name="treemap_reset_zoom">Réinitialiser le zoom</string>
     <string name="treemap_reveal">Afficher dans l’autre volet</string>
     <string name="menu_swap_pane">Passer à l’autre volet</string>
     <string name="strip_term">Terminal</string>

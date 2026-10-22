@@ -69,6 +69,7 @@
     <string name="treemap_scanning">Đang quét… %1$d mục · %2$s</string>
     <string name="treemap_failed">Quét thất bại</string>
     <string name="treemap_empty">Thư mục trống</string>
+    <string name="treemap_reset_zoom">Đặt lại thu phóng</string>
     <string name="treemap_reveal">Hiện ở khung kia</string>
     <string name="menu_swap_pane">Chuyển sang khung kia</string>
     <string name="strip_term">Dòng lệnh</string>

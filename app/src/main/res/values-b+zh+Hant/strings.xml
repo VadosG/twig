@@ -69,6 +69,7 @@
     <string name="treemap_scanning">掃描中… %1$d 項 · %2$s</string>
     <string name="treemap_failed">掃描失敗</string>
     <string name="treemap_empty">目錄為空</string>
+    <string name="treemap_reset_zoom">重設縮放</string>
     <string name="treemap_reveal">對側顯示</string>
     <string name="menu_swap_pane">切換到另一面板</string>
     <string name="strip_term">終端</string>

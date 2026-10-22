@@ -69,6 +69,7 @@
     <string name="treemap_scanning">Taranıyor… %1$d öğe · %2$s</string>
     <string name="treemap_failed">Tarama başarısız</string>
     <string name="treemap_empty">Boş klasör</string>
+    <string name="treemap_reset_zoom">Yakınlaştırmayı sıfırla</string>
     <string name="treemap_reveal">Diğer panelde göster</string>
     <string name="menu_swap_pane">Diğer panele geç</string>
     <string name="strip_term">Terminal</string>

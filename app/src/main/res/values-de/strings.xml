@@ -69,6 +69,7 @@
     <string name="treemap_scanning">Analyse… %1$d Einträge · %2$s</string>
     <string name="treemap_failed">Analyse fehlgeschlagen</string>
     <string name="treemap_empty">Leerer Ordner</string>
+    <string name="treemap_reset_zoom">Zoom zurücksetzen</string>
     <string name="treemap_reveal">Im anderen Bereich anzeigen</string>
     <string name="menu_swap_pane">Zum anderen Bereich wechseln</string>
     <string name="strip_term">Terminal</string>

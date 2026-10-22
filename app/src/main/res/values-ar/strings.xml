@@ -69,6 +69,7 @@
     <string name="treemap_scanning">جارٍ الفحص… %1$d عنصر · %2$s</string>
     <string name="treemap_failed">فشل الفحص</string>
     <string name="treemap_empty">مجلد فارغ</string>
+    <string name="treemap_reset_zoom">إعادة ضبط التكبير</string>
     <string name="treemap_reveal">عرض في اللوحة الأخرى</string>
     <string name="menu_swap_pane">التبديل إلى اللوحة الأخرى</string>
     <string name="strip_term">الطرفية</string>

@@ -69,6 +69,7 @@
     <string name="treemap_scanning">扫描中… %1$d 项 · %2$s</string>
     <string name="treemap_failed">扫描失败</string>
     <string name="treemap_empty">目录为空</string>
+    <string name="treemap_reset_zoom">重置缩放</string>
     <string name="treemap_reveal">对侧显示</string>
     <string name="menu_swap_pane">切换到另一面板</string>
     <!-- Short labels for the action strip's pinned top row (9sp, single line; long copy is truncated) -->

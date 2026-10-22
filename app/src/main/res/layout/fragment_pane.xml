@@ -63,6 +63,18 @@
             android:layout_height="match_parent"
             android:visibility="gone" />
 
+        <ImageButton
+            android:id="@+id/map_reset_zoom"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="12dp"
+            android:padding="12dp"
+            android:background="@drawable/bg_treemap_reset"
+            android:src="@drawable/ic_reset_zoom"
+            android:contentDescription="@string/treemap_reset_zoom"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/map_status"
             android:layout_width="wrap_content"

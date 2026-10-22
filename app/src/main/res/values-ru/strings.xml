@@ -69,6 +69,7 @@
     <string name="treemap_scanning">Сканирование… %1$d элементов · %2$s</string>
     <string name="treemap_failed">Сканирование не удалось</string>
     <string name="treemap_empty">Пустая папка</string>
+    <string name="treemap_reset_zoom">Сбросить масштаб</string>
     <string name="treemap_reveal">Показать в другой панели</string>
     <string name="menu_swap_pane">Переключиться на другую панель</string>
     <!-- Short labels for the action strip's pinned top row (9sp, single line; long copy is truncated) -->

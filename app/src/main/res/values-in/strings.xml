@@ -69,6 +69,7 @@
     <string name="treemap_scanning">Memindai… %1$d item · %2$s</string>
     <string name="treemap_failed">Pemindaian gagal</string>
     <string name="treemap_empty">Folder kosong</string>
+    <string name="treemap_reset_zoom">Atur ulang zoom</string>
     <string name="treemap_reveal">Tampilkan di panel lain</string>
     <string name="menu_swap_pane">Beralih ke panel lain</string>
     <string name="strip_term">Terminal</string>

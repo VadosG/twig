@@ -69,6 +69,7 @@
     <string name="treemap_scanning">स्कैन हो रहा है… %1$d आइटम · %2$s</string>
     <string name="treemap_failed">स्कैन विफल</string>
     <string name="treemap_empty">खाली फ़ोल्डर</string>
+    <string name="treemap_reset_zoom">ज़ूम रीसेट करें</string>
     <string name="treemap_reveal">दूसरे पैनल में दिखाएँ</string>
     <string name="menu_swap_pane">दूसरे पैनल पर जाएँ</string>
     <string name="strip_term">टर्मिनल</string>

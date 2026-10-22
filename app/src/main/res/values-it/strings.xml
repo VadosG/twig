@@ -69,6 +69,7 @@
     <string name="treemap_scanning">Scansione… %1$d elementi · %2$s</string>
     <string name="treemap_failed">Scansione non riuscita</string>
     <string name="treemap_empty">Cartella vuota</string>
+    <string name="treemap_reset_zoom">Reimposta zoom</string>
     <string name="treemap_reveal">Mostra nell’altro pannello</string>
     <string name="menu_swap_pane">Passa all’altro pannello</string>
     <string name="strip_term">Terminale</string>

@@ -69,6 +69,7 @@
     <string name="treemap_scanning">스캔 중… %1$d개 항목 · %2$s</string>
     <string name="treemap_failed">검색 실패</string>
     <string name="treemap_empty">빈 폴더</string>
+    <string name="treemap_reset_zoom">확대/축소 초기화</string>
     <string name="treemap_reveal">다른 창에 표시</string>
     <string name="menu_swap_pane">다른 창으로 전환</string>
     <string name="strip_term">터미널</string>

@@ -69,6 +69,7 @@
     <string name="treemap_scanning">Analisando… %1$d itens · %2$s</string>
     <string name="treemap_failed">Falha na análise</string>
     <string name="treemap_empty">Pasta vazia</string>
+    <string name="treemap_reset_zoom">Redefinir zoom</string>
     <string name="treemap_reveal">Mostrar no outro painel</string>
     <string name="menu_swap_pane">Ir para o outro painel</string>
     <string name="strip_term">Terminal</string>

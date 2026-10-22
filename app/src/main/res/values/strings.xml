@@ -69,6 +69,7 @@
     <string name="treemap_scanning">Scanning… %1$d items · %2$s</string>
     <string name="treemap_failed">Scan failed</string>
     <string name="treemap_empty">Empty folder</string>
+    <string name="treemap_reset_zoom">Reset zoom</string>
     <string name="treemap_reveal">Show in other pane</string>
     <string name="menu_swap_pane">Switch to other pane</string>
     <!-- Short labels for the action strip's pinned top row (9sp, single line; long copy is truncated) -->

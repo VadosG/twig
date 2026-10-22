@@ -69,6 +69,7 @@
     <string name="treemap_scanning">Explorando… %1$d elementos · %2$s</string>
     <string name="treemap_failed">Error de exploración</string>
     <string name="treemap_empty">Carpeta vacía</string>
+    <string name="treemap_reset_zoom">Restablecer zoom</string>
     <string name="treemap_reveal">Mostrar en el otro panel</string>
     <string name="menu_swap_pane">Cambiar al otro panel</string>
     <string name="strip_term">Terminal</string>
