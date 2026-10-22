@@ -99,6 +99,8 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
     // last position (looked up once in onCreate; the actual seek happens during player prepare)
     private var resumeFrom = 0L
     private var lastSaveAt = 0L
+    private val saveGate = PlaybackSaveGate()
+    private var lastRemotePosition = 0L
 
     /**
      * When progress is kept by the source itself (Jellyfin / Emby) take this path and don't write
@@ -305,6 +307,7 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
         resumePositionMs: Long = 0L,
     ) {
         if (player != null) return
+        saveGate.reset()
         b.loading.visibility = View.VISIBLE
         // EXTENSION_RENDERER_MODE_ON: prefer the system MediaCodec (power saving); fall back to
         // ffmpeg software decoding when no matching decoder is available.
@@ -400,6 +403,7 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
                 }
             }
             override fun onIsPlayingChanged(isPlaying: Boolean) {
+                saveGate.onPlayingChanged(isPlaying, SystemClock.elapsedRealtime())
                 b.btnPlay.setImageResource(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play)
                 if (isPlaying) wakeScreen() else scheduleDim()
             }
@@ -408,6 +412,9 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
                 newPosition: Player.PositionInfo,
                 reason: Int,
             ) {
+                if (reason == Player.DISCONTINUITY_REASON_SEEK || reason == Player.DISCONTINUITY_REASON_SEEK_ADJUSTMENT) {
+                    saveGate.seek(SystemClock.elapsedRealtime(), p.isPlaying)
+                }
                 android.util.Log.d(
                     "twig",
                     "player: onPositionDiscontinuity reason=$reason old=${oldPosition.positionMs} " +
@@ -1442,6 +1449,7 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
         player = null
         prepared = false
         startedReported = false
+        lastRemotePosition = 0L
         val old = fsSrc
         fsSrc = null
         if (old != null) Thread { runCatching { old.close() } }.apply { isDaemon = true }.start()
@@ -1563,10 +1571,20 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
         val dur = p.duration.takeIf { it != C.TIME_UNSET && it > 0 } ?: return
         lastSaveAt = SystemClock.elapsedRealtime()
         val r = remote
+        saveGate.onPlayingChanged(p.isPlaying, lastSaveAt)
+        if (!saveGate.canSave(lastSaveAt)) {
+            // A quick seek/exit must not update progress, but an existing server session
+            // still needs STOP using its last accepted position.
+            if (r != null && startedReported && state == PlayState.STOP) {
+                r.report(lastRemotePosition, dur, PlayState.STOP)
+            }
+            return
+        }
         if (r != null) {
             // Progress is the server's job: reporting goes on a background thread (see RemoteProgress),
             // the local copy is no longer written
             if (!startedReported) { startedReported = true; r.report(p.currentPosition, dur, PlayState.START) }
+            lastRemotePosition = p.currentPosition
             r.report(p.currentPosition, dur, state)
         } else {
             PlaybackStore.save(this, file, p.currentPosition, dur)
