@@ -518,6 +518,8 @@
     <string name="settings_thumbs_network_desc">يتطلب تنزيل الملف كاملا وفك ترميزه. عند تعطيله تقرأ مصغرة رأس JPG (بيانات قليلة). الفيديو وPDF محليا فقط</string>
     <string name="settings_thumbs_embedded">تفضيل المصغرات المضمنة</string>
     <string name="settings_thumbs_embedded_desc">يستخدم مصغرة EXIF في JPG مباشرة: أسرع، لكنها غالبا 160×120 وأقل وضوحا</string>
+    <string name="settings_thumbs_playback_progress">إظهار تقدم تشغيل الفيديو</string>
+    <string name="settings_thumbs_playback_progress_desc">إظهار شريط تقدم رفيع داخل أسفل الصور المصغرة للفيديو</string>
     <string name="settings_clear_thumbs_cache">مسح ذاكرة المصغرات المؤقتة</string>
     <string name="settings_section_text">النص</string>
     <string name="settings_text_charsets">ترميز النص</string>

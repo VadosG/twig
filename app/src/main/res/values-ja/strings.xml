@@ -518,6 +518,8 @@
     <string name="settings_thumbs_network_desc">ファイル全体のダウンロードとデコードが必要です。オフでもJPGヘッダーの内蔵サムネイルを少量の通信で読みます。動画・PDFの生成はローカルのみ</string>
     <string name="settings_thumbs_embedded">内蔵サムネイルを優先</string>
     <string name="settings_thumbs_embedded_desc">JPGのEXIF内蔵サムネイルを直接使用します。速いですが、通常160×120でぼやけます</string>
+    <string name="settings_thumbs_playback_progress">動画の再生位置を表示</string>
+    <string name="settings_thumbs_playback_progress_desc">動画サムネイルの内側下部に細い進行バーを表示</string>
     <string name="settings_clear_thumbs_cache">サムネイルキャッシュを削除</string>
     <string name="settings_section_text">テキスト</string>
     <string name="settings_text_charsets">文字コード</string>

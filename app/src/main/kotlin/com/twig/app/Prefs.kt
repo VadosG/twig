@@ -375,6 +375,13 @@ object Prefs {
         sp(ctx).edit().putBoolean("thumbs_embedded", on).apply()
     }
 
+    /** Show remembered video progress inside thumbnails; independent of thumbnail generation. */
+    fun thumbsPlaybackProgress(ctx: Context): Boolean = sp(ctx).getBoolean("thumbs_playback_progress", true)
+
+    fun setThumbsPlaybackProgress(ctx: Context, on: Boolean) {
+        sp(ctx).edit().putBoolean("thumbs_playback_progress", on).apply()
+    }
+
     /**
      * Read the first bytes of files with no extension to pick their icon, viewer and thumbnail
      * ([FileSniff]), default off. Off means none of it: no head is read at bind time or on a
@@ -454,7 +461,7 @@ object Prefs {
     /** Signature of preferences that affect main UI layout; when it changes after
      * returning from settings, MainActivity recreates. */
     fun uiSignature(ctx: Context): String = listOf(
-        density(ctx), textSize(ctx), thumbs(ctx), thumbsGrid(ctx), thumbsGridNames(ctx), gridCell(ctx),
+        density(ctx), textSize(ctx), thumbs(ctx), thumbsGrid(ctx), thumbsGridNames(ctx), gridCell(ctx), thumbsPlaybackProgress(ctx),
         showHidden(ctx), rowDivider(ctx), sniffTypes(ctx), dateFormat(ctx), folderCounts(ctx), trashEnabled(ctx),
     ).joinToString(",")
 

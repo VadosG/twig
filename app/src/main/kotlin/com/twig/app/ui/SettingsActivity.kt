@@ -302,6 +302,11 @@ class SettingsActivity : AppCompatActivity() {
             get = { Prefs.thumbsEmbedded(this) },
             set = { Prefs.setThumbsEmbedded(this, it) },
         )
+        thumbRows += switchRow(
+            getString(R.string.settings_thumbs_playback_progress), getString(R.string.settings_thumbs_playback_progress_desc),
+            get = { Prefs.thumbsPlaybackProgress(this) },
+            set = { Prefs.setThumbsPlaybackProgress(this, it) },
+        )
         thumbRows += actionRow(getString(R.string.settings_clear_thumbs_cache), Format.size(Thumbs.cacheBytes(this))) { subtitle ->
             Thumbs.clearCache(this)
             subtitle.text = Format.size(0)

@@ -31,6 +31,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.twig.app.AppDetails
 import com.twig.app.FileInfo
+import com.twig.app.FileSniff
+import com.twig.app.OpenFiles
+import com.twig.app.PlaybackStore
 import com.twig.app.Prefs
 import com.twig.app.Format
 import com.twig.app.R
@@ -79,6 +82,38 @@ class FileAdapter(
 
     /** Image edge length (px) for grid cells, back-filled by PaneFragment based on pane width / column count. */
     var cellPx = 0
+
+    /** One small snapshot per adapter/resume, never JSON parsing or network I/O per row. */
+    private var playbackProgress: Map<String, Float>? = null
+
+    private fun playbackSnapshot(ctx: Context): Map<String, Float> =
+        if (!thumbs || !Prefs.thumbsPlaybackProgress(ctx) || !Prefs.resumePlayback(ctx)) emptyMap()
+        else PlaybackStore.all(ctx).filter { it.posMs > 0 && it.durMs > it.posMs }
+            .associate { it.key to (it.posMs.toDouble() / it.durMs).toFloat() }
+
+    private fun videoFile(file: XFile): Boolean = OpenFiles.isVideo(
+        FileSniff.cached(file)?.let { FileSniff.typedTwin(file, it) } ?: file,
+    )
+
+    private fun playbackFraction(ctx: Context, file: XFile): Float {
+        if (!thumbs || !videoFile(file)) return 0f
+        val snapshot = playbackProgress ?: playbackSnapshot(ctx).also { playbackProgress = it }
+        return snapshot[PlaybackStore.keyOf(file)] ?: 0f
+    }
+
+    /** Progress-only payloads preserve loaded images and the thumbnail's measured shape. */
+    fun refreshPlaybackProgress(ctx: Context) {
+        val previous = playbackProgress.orEmpty()
+        val next = playbackSnapshot(ctx)
+        playbackProgress = next
+        currentList.forEachIndexed { index, node ->
+            val file = (node as? PaneViewModel.FileNode)?.file ?: return@forEachIndexed
+            if (videoFile(file)) {
+                val key = PlaybackStore.keyOf(file)
+                if (previous[key] != next[key]) notifyItemChanged(index, PAYLOAD_PLAYBACK_PROGRESS)
+            }
+        }
+    }
 
     /** Whether this position renders as a grid cell (spanSize check for GridLayoutManager). */
     fun isCellAt(position: Int): Boolean =
@@ -276,20 +311,25 @@ class FileAdapter(
         position: Int,
         payloads: MutableList<Any>,
     ) {
-        if (payloads.isNotEmpty() && payloads.all { it === PAYLOAD_APP_ICON }) {
-            val node = getItem(position) as? PaneViewModel.FileNode ?: return
-            when (holder) {
-                is VH -> holder.bindDefaultAppIcon(node)
-                is CellVH -> holder.bindDefaultAppIcon(node)
-            }
-            return
-        }
-        if (payloads.isNotEmpty() && payloads.all { it === PAYLOAD_SELECTION }) {
+        if (payloads.isNotEmpty() && payloads.all {
+                it === PAYLOAD_APP_ICON || it === PAYLOAD_SELECTION || it === PAYLOAD_PLAYBACK_PROGRESS
+            }) {
             val node = getItem(position)
-            when (holder) {
-                is VH -> holder.bindSelection(node)
-                is CellVH -> (node as? PaneViewModel.FileNode)?.let { holder.bindSelection(it) }
-                else -> Unit // info cards have no selection state
+            if (payloads.any { it === PAYLOAD_SELECTION }) {
+                when (holder) {
+                    is VH -> holder.bindSelection(node)
+                    is CellVH -> (node as? PaneViewModel.FileNode)?.let { holder.bindSelection(it) }
+                }
+            }
+            if (node is PaneViewModel.FileNode) {
+                if (payloads.any { it === PAYLOAD_APP_ICON }) when (holder) {
+                    is VH -> holder.bindDefaultAppIcon(node)
+                    is CellVH -> holder.bindDefaultAppIcon(node)
+                }
+                if (payloads.any { it === PAYLOAD_PLAYBACK_PROGRESS }) when (holder) {
+                    is VH -> holder.bindPlaybackProgress(node)
+                    is CellVH -> holder.bindPlaybackProgress(node)
+                }
             }
             return
         }
@@ -355,6 +395,9 @@ class FileAdapter(
     /** Grid cell: square thumbnail + corner grey checkbox, file name is toggleable. Indentation is omitted; the parent is the directory row above. */
     inner class CellVH(private val b: ItemThumbCellBinding) : RecyclerView.ViewHolder(b.root) {
         fun bindDefaultAppIcon(node: PaneViewModel.FileNode) { FileIcons.bind(b.thumb, node.file) }
+        fun bindPlaybackProgress(node: PaneViewModel.FileNode) {
+            b.thumb.playbackFraction = playbackFraction(b.root.context, node.file)
+        }
         fun bind(node: PaneViewModel.Node) {
             val ctx = b.root.context
             val dpi = ctx.resources.displayMetrics.density
@@ -372,6 +415,7 @@ class FileAdapter(
                 b.cellName.visibility = View.GONE
             }
             // Placeholder: ordinary type icon centred with inset; once the thumbnail is filled in, it automatically switches to full-cell centerCrop
+            b.thumb.resetThumbnail()
             b.thumb.tag = null
             b.thumb.scaleType = ImageView.ScaleType.FIT_CENTER
             val pad = edge / 5
@@ -391,6 +435,7 @@ class FileAdapter(
             node as PaneViewModel.FileNode
             FileIcons.bind(b.thumb, node.file, onTyped(this, node.file))
             if (thumbs) Thumbs.bind(b.thumb, node.file)
+            bindPlaybackProgress(node)
             b.cellCheck.visibility = View.VISIBLE
             b.infoToggle.visibility = View.VISIBLE
 
@@ -739,6 +784,9 @@ class FileAdapter(
 
     inner class VH(private val b: ItemFileBinding) : RecyclerView.ViewHolder(b.root) {
         fun bindDefaultAppIcon(node: PaneViewModel.FileNode) { FileIcons.bind(b.icon, node.file) }
+        fun bindPlaybackProgress(node: PaneViewModel.FileNode) {
+            b.icon.playbackFraction = playbackFraction(b.root.context, node.file)
+        }
 
         fun bind(node: PaneViewModel.Node) {
             val ctx = b.root.context
@@ -762,6 +810,7 @@ class FileAdapter(
                 ((2 + node.depth * 14) * dpi).toInt(), 0, 0, 0,
             )
             // Reset reusable state
+            b.icon.resetThumbnail()
             b.icon.tag = null // cancel any async icon that hasn't filled in yet
             b.icon.scaleType = ImageView.ScaleType.FIT_CENTER // thumbnail rows switch to centerCrop when filled in
             b.icon.setPadding(0, 0, 0, 0)
@@ -991,6 +1040,7 @@ class FileAdapter(
                     }
                 }
             }
+            bindPlaybackProgress(node)
             setIndicator(if (node.expandable) node.expanded else null)
             if (node.loading) {
                 b.progress.visibility = View.VISIBLE
@@ -1219,6 +1269,7 @@ class FileAdapter(
         /** Partial-refresh marker: only the selection state has changed, the rest of the row (especially icon / thumbnail) doesn't need rebinding. */
         private val PAYLOAD_SELECTION = Any()
         private val PAYLOAD_APP_ICON = Any()
+        private val PAYLOAD_PLAYBACK_PROGRESS = Any()
 
         private val DIFF = object : DiffUtil.ItemCallback<PaneViewModel.Node>() {
             override fun areItemsTheSame(a: PaneViewModel.Node, b: PaneViewModel.Node) = a.key == b.key

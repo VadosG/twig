@@ -518,6 +518,8 @@
     <string name="settings_thumbs_network_desc">파일 전체 다운로드와 디코딩이 필요합니다. 꺼도 JPG 헤더의 내장 미리보기는 적은 통신량으로 읽습니다. 동영상·PDF는 로컬에서만 생성</string>
     <string name="settings_thumbs_embedded">내장 미리보기 우선</string>
     <string name="settings_thumbs_embedded_desc">JPG의 EXIF 내장 미리보기를 직접 사용합니다. 빠르지만 보통 160×120으로 흐립니다</string>
+    <string name="settings_thumbs_playback_progress">동영상 재생 진행률 표시</string>
+    <string name="settings_thumbs_playback_progress_desc">동영상 미리보기 이미지의 안쪽 하단에 얇은 진행률 막대 표시</string>
     <string name="settings_clear_thumbs_cache">미리보기 캐시 지우기</string>
     <string name="settings_section_text">텍스트</string>
     <string name="settings_text_charsets">텍스트 인코딩</string>

@@ -22,7 +22,7 @@ class CurrentDirFrame(context: Context) : RecyclerView.ItemDecoration() {
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        strokeWidth = 1.5f * context.resources.displayMetrics.density
+        strokeWidth = context.resources.getDimension(R.dimen.highlight_stroke_width)
         color = ContextCompat.getColor(context, R.color.accent)
     }
     private val rect = RectF()

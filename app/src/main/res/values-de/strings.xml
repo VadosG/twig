@@ -518,6 +518,8 @@
     <string name="settings_thumbs_network_desc">Lädt und dekodiert die ganze Datei. Aus: nur eingebettete JPG-Vorschau (wenig Daten). Video/PDF nur lokal</string>
     <string name="settings_thumbs_embedded">Eingebettete Vorschaubilder bevorzugen</string>
     <string name="settings_thumbs_embedded_desc">JPG-EXIF-Vorschau direkt verwenden: schneller, aber meist nur 160×120 und unschärfer</string>
+    <string name="settings_thumbs_playback_progress">Videofortschritt anzeigen</string>
+    <string name="settings_thumbs_playback_progress_desc">Schmale Fortschrittsleiste unten im Video-Vorschaubild anzeigen</string>
     <string name="settings_clear_thumbs_cache">Vorschaucache leeren</string>
     <string name="settings_section_text">Text</string>
     <string name="settings_text_charsets">Textkodierung</string>

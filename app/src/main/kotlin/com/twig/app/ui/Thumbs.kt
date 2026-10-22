@@ -463,7 +463,7 @@ object Thumbs {
         if (box == null) {
             view.tag = null
             view.scaleType = ImageView.ScaleType.CENTER_CROP
-            view.setImageBitmap(bmp)
+            setThumbnailBitmap(view, bmp)
         } else {
             fillAspect(view, bmp, box, key)
         }
@@ -481,7 +481,7 @@ object Thumbs {
         if (w <= 0 || bw <= 0 || bh <= 0) {
             view.tag = null
             view.scaleType = ImageView.ScaleType.CENTER_CROP
-            view.setImageBitmap(bmp)
+            setThumbnailBitmap(view, bmp)
             return
         }
         val marker = "aspect:$key"
@@ -514,8 +514,13 @@ object Thumbs {
                 // should show (a face sits in the middle, not against the top edge).
                 view.scaleType = ImageView.ScaleType.CENTER_CROP
             }
-            view.setImageBitmap(bmp)
+            setThumbnailBitmap(view, bmp)
         }
+    }
+
+    private fun setThumbnailBitmap(view: ImageView, bitmap: Bitmap) {
+        if (view is ThumbnailImageView) view.setThumbnailBitmap(bitmap)
+        else view.setImageBitmap(bitmap)
     }
 
     private fun keyOf(f: XFile): String {

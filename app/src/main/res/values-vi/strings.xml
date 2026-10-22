@@ -518,6 +518,8 @@
     <string name="settings_thumbs_network_desc">Cần tải và giải mã toàn bộ tệp. Khi tắt vẫn đọc ảnh thu nhỏ nhúng trong đầu JPG (ít dữ liệu). Video/PDF chỉ tạo cục bộ</string>
     <string name="settings_thumbs_embedded">Ưu tiên ảnh thu nhỏ nhúng</string>
     <string name="settings_thumbs_embedded_desc">Dùng trực tiếp ảnh thu nhỏ EXIF của JPG: nhanh hơn nhưng thường chỉ 160×120 và mờ hơn</string>
+    <string name="settings_thumbs_playback_progress">Hiển thị tiến độ phát video</string>
+    <string name="settings_thumbs_playback_progress_desc">Hiển thị thanh tiến độ mảnh ở cạnh dưới bên trong ảnh thu nhỏ video</string>
     <string name="settings_clear_thumbs_cache">Xóa bộ nhớ đệm ảnh thu nhỏ</string>
     <string name="settings_section_text">Văn bản</string>
     <string name="settings_text_charsets">Mã hóa văn bản</string>

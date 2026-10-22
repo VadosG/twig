@@ -518,6 +518,8 @@
     <string name="settings_thumbs_network_desc">Descarga y decodifica el archivo completo. Desactivado: solo miniatura del encabezado JPG (pocos datos). Vídeo/PDF solo locales</string>
     <string name="settings_thumbs_embedded">Preferir miniaturas integradas</string>
     <string name="settings_thumbs_embedded_desc">Usa miniatura EXIF del JPG: más rápida, pero suele ser de 160×120 y menos nítida</string>
+    <string name="settings_thumbs_playback_progress">Mostrar progreso de vídeo</string>
+    <string name="settings_thumbs_playback_progress_desc">Mostrar una barra fina de progreso dentro de las miniaturas de vídeo</string>
     <string name="settings_clear_thumbs_cache">Vaciar caché de miniaturas</string>
     <string name="settings_section_text">Texto</string>
     <string name="settings_text_charsets">Codificación de texto</string>

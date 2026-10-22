@@ -551,6 +551,8 @@
     <string name="settings_thumbs_network_desc">Requires downloading and decoding the whole file; when off, still reads the embedded thumbnail from the jpg header (minimal traffic). Video / PDF are generated locally only</string>
     <string name="settings_thumbs_embedded">Prefer embedded file thumbnails</string>
     <string name="settings_thumbs_embedded_desc">Uses a jpg\'s EXIF-embedded thumbnail directly when available: faster, but usually only 160×120 and blurrier</string>
+    <string name="settings_thumbs_playback_progress">Show video playback progress</string>
+    <string name="settings_thumbs_playback_progress_desc">Draw a thin progress bar inside video thumbnails</string>
     <string name="settings_clear_thumbs_cache">Clear thumbnail cache</string>
     <string name="settings_section_text">Text</string>
     <string name="settings_text_charsets">Text encoding</string>

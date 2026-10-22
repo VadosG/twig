@@ -357,7 +357,10 @@ class PaneFragment : Fragment() {
         takeImageViewerResult()
         // The user may have just picked "Always" in the system resolver: clear the file-association icon cache and redraw so the icon follows.
         FileIcons.clearAppDefaults()
-        if (::adapter.isInitialized) adapter.refreshDefaultAppIcons()
+        if (::adapter.isInitialized) {
+            adapter.refreshDefaultAppIcons()
+            adapter.refreshPlaybackProgress(requireContext())
+        }
         // Re-read the current directory on every backend, plus watched local ancestors.
         viewModel.refreshOnResume()
         syncObservers(viewModel.state.value.rows)

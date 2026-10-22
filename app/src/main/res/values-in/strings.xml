@@ -518,6 +518,8 @@
     <string name="settings_thumbs_network_desc">Unduh dan dekode seluruh file. Jika nonaktif, hanya thumbnail header JPG (sedikit data). Video/PDF hanya lokal</string>
     <string name="settings_thumbs_embedded">Utamakan thumbnail bawaan</string>
     <string name="settings_thumbs_embedded_desc">Gunakan thumbnail EXIF JPG: lebih cepat, tetapi biasanya 160×120 dan lebih buram</string>
+    <string name="settings_thumbs_playback_progress">Tampilkan progres video</string>
+    <string name="settings_thumbs_playback_progress_desc">Tampilkan bilah progres tipis di bagian bawah dalam thumbnail video</string>
     <string name="settings_clear_thumbs_cache">Bersihkan cache thumbnail</string>
     <string name="settings_section_text">Teks</string>
     <string name="settings_text_charsets">Pengodean teks</string>

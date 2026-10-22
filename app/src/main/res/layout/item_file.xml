@@ -18,7 +18,7 @@
             android:layout_height="16dp"
             android:contentDescription="@null" />
 
-        <ImageView
+        <com.twig.app.ui.ThumbnailImageView
             android:id="@+id/icon"
             android:layout_width="26dp"
             android:layout_height="26dp"

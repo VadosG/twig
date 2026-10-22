@@ -518,6 +518,8 @@
     <string name="settings_thumbs_network_desc">需下載整個檔案解碼;關閉時仍會讀 jpg 檔案頭的內建縮圖(流量極小)。影片 / PDF 僅本地生成</string>
     <string name="settings_thumbs_embedded">優先使用檔案內建縮圖</string>
     <string name="settings_thumbs_embedded_desc">jpg 有 EXIF 內建圖時直接用:更快,但通常只有 160×120,較模糊</string>
+    <string name="settings_thumbs_playback_progress">顯示影片播放進度</string>
+    <string name="settings_thumbs_playback_progress_desc">在影片縮圖內部底邊顯示細進度條</string>
     <string name="settings_clear_thumbs_cache">清除縮圖快取</string>
     <string name="settings_section_text">文本</string>
     <string name="settings_text_charsets">文本編碼</string>

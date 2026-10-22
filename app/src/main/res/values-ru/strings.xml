@@ -535,6 +535,8 @@
     <string name="settings_thumbs_network_desc">Требуется загрузка и декодирование всего файла; если отключено, считывается только миниатюра из заголовка jpg (минимальный трафик). Видео / PDF генерируются только локально</string>
     <string name="settings_thumbs_embedded">Предпочитать встроенные миниатюры файлов</string>
     <string name="settings_thumbs_embedded_desc">При наличии использовать встроенную в EXIF ​​миниатюру jpg файла напрямую: это быстрее, но обычно всего 160×120 и более размыто</string>
+    <string name="settings_thumbs_playback_progress">Показывать прогресс видео</string>
+    <string name="settings_thumbs_playback_progress_desc">Тонкая полоса прогресса внизу внутри миниатюры видео</string>
     <string name="settings_clear_thumbs_cache">Очистить кэш миниатюр</string>
     <string name="settings_section_text">Текст</string>
     <string name="settings_text_charsets">Текстовая кодировка</string>

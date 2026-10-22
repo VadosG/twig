@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="highlight_stroke_width">1.5dp</dimen>
     <!--
       Hex viewer row padding. ★ These exist as resources because **two** places need the same
       number: item_hex_row.xml pads the row with them, and HexViewerActivity subtracts them from
