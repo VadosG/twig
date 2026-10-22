@@ -1051,4 +1051,5 @@
     <string name="batch_preview_count">%2$d 個中 %1$d 個の名前を変更</string>
     <string name="website_block_screenshots">スクリーンショットを禁止</string>
     <string name="website_defaults">ウェブサイトの既定設定</string>
+    <string name="website_open_url">URLを開く</string>
 </resources>

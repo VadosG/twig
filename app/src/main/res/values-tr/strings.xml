@@ -1051,4 +1051,5 @@
     <string name="batch_preview_count">%2$d addan %1$d tanesi değişecek</string>
     <string name="website_block_screenshots">Ekran görüntülerini engelle</string>
     <string name="website_defaults">Varsayılan web sitesi ayarları</string>
+    <string name="website_open_url">URL aç</string>
 </resources>

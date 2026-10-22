@@ -1051,4 +1051,5 @@
     <string name="batch_preview_count">Cambiarán %1$d de %2$d nombres</string>
     <string name="website_block_screenshots">Impedir capturas de pantalla</string>
     <string name="website_defaults">Configuración predeterminada de sitios</string>
+    <string name="website_open_url">Abrir URL</string>
 </resources>

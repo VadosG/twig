@@ -142,10 +142,45 @@ class WebsiteActivity : AppCompatActivity() {
         else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
     }
 
+    private fun isBrowserPage() = intent.data?.scheme?.lowercase() in setOf("http", "https")
+
+    private fun requestedWebsite(): Website? {
+        if (isBrowserPage()) {
+            val address = WebsiteStore.normalizeUrl(intent.data.toString()) ?: return null
+            return WebsiteStore.defaults(this).copy(id = "browser:$address",
+                name = Uri.parse(address).host.orEmpty(), url = address)
+        }
+        val id = intent.data?.takeIf { it.scheme == "twig" && it.host == "website" }?.lastPathSegment
+        return WebsiteStore.all(this).firstOrNull { it.id == id }
+    }
+
+    private fun openAddress() {
+        val input = android.widget.EditText(this).apply {
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_URI
+            setSingleLine()
+            setText(b.web.url ?: site.url)
+            selectAll()
+        }
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(R.string.website_open_url).setView(input)
+            .setNegativeButton(R.string.dialog_cancel, null)
+            .setPositiveButton(R.string.dialog_ok, null).create()
+        dialog.setOnShowListener {
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val address = WebsiteStore.normalizeUrl(input.text.toString())
+                if (address == null) input.error = getString(R.string.website_invalid_url)
+                else {
+                    startActivity(browserIntent(this, address))
+                    dialog.dismiss()
+                }
+            }
+        }
+        dialog.show()
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     private fun initializeWebsite(savedInstanceState: Bundle?) {
-        val id = intent.data?.takeIf { it.scheme == "twig" && it.host == "website" }?.lastPathSegment
-        val saved = WebsiteStore.all(this).firstOrNull { it.id == id }
+        val saved = requestedWebsite()
         if (saved == null || WebsiteStore.normalizeUrl(saved.url) == null) {
             Toast.makeText(this, R.string.website_missing, Toast.LENGTH_SHORT).show()
             finish()
@@ -158,7 +193,7 @@ class WebsiteActivity : AppCompatActivity() {
             }
         })
         requestBlocker = WebsiteRequestBlocker.parse(saved.blockedRequests) ?: WebsiteRequestBlocker.EMPTY
-        debugger = WebsiteDebugPanel(this, b.debugHost, b.web, { site }) { updated ->
+        debugger = WebsiteDebugPanel(this, b.debugHost, b.web, { site }, persist = !isBrowserPage()) { updated ->
             site = site.copy(script = updated.script, style = updated.style, hiddenElements = updated.hiddenElements)
             customStyleApplied = WebsiteCustomization.hasStyles(site)
         }
@@ -199,7 +234,14 @@ class WebsiteActivity : AppCompatActivity() {
             true
         }
         b.toolbar.menu.add(R.string.action_refresh).setOnMenuItemClickListener { b.web.reload(); true }
-        b.toolbar.menu.add(R.string.action_pin_shortcut).setOnMenuItemClickListener {
+        if (isBrowserPage()) {
+            b.toolbar.menu.add(R.string.website_open_url).setOnMenuItemClickListener { openAddress(); true }
+            b.toolbar.menu.add(R.string.website_add).setOnMenuItemClickListener {
+                val address = WebsiteStore.normalizeUrl(b.web.url ?: site.url) ?: site.url
+                WebsiteDialogs.add(this, site.copy(name = Uri.parse(address).host.orEmpty(), url = address))
+                true
+            }
+        } else b.toolbar.menu.add(R.string.action_pin_shortcut).setOnMenuItemClickListener {
             WebsiteDialogs.pin(this, site); true
         }
         b.toolbar.menu.add(R.string.website_debug).setOnMenuItemClickListener {
@@ -384,8 +426,7 @@ class WebsiteActivity : AppCompatActivity() {
     private fun applyWebsiteIntent() {
         // Bringing an existing document task forward must keep its live WebView,
         // including navigation, scroll position and unsaved form contents.
-        val id = intent.data?.takeIf { it.scheme == "twig" && it.host == "website" }?.lastPathSegment
-        val saved = WebsiteStore.all(this).firstOrNull { it.id == id }
+        val saved = requestedWebsite()
         if (!::site.isInitialized || saved == null || saved.id != site.id ||
             WebsiteStore.normalizeUrl(saved.url) == null) {
             recreate()
@@ -787,6 +828,10 @@ class WebsiteActivity : AppCompatActivity() {
         internal fun desktopUserAgent(mobile: String): String = mobile
             .replaceFirst(Regex("\\([^)]*\\)"), "(X11; Linux x86_64)")
             .replace(" Version/4.0", "").replace(" Mobile", "")
+
+        internal fun browserIntent(ctx: Context, address: String) = Intent(ctx, WebsiteActivity::class.java)
+            .setAction(Intent.ACTION_VIEW).setData(Uri.parse(address))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
 
         /** A document task per bookmark keeps desktop launches independent of the file browser. */
         fun intent(ctx: Context, id: String) = Intent(ctx, WebsiteActivity::class.java)

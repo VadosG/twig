@@ -28,9 +28,11 @@ import com.twig.app.secure.Secrets
 object WebsiteDialogs {
     fun edit(ctx: Context, site: Website? = null) = editForm(ctx, site)
 
+    fun add(ctx: Context, initial: Website) = editForm(ctx, initial = initial)
+
     private fun editForm(ctx: Context, site: Website? = null, defaults: Boolean = false,
+        initial: Website = site ?: WebsiteStore.defaults(ctx),
         onDefaultsSaved: (() -> Unit)? = null) {
-        val initial = site ?: WebsiteStore.defaults(ctx)
         val padding = (20 * ctx.resources.displayMetrics.density).toInt()
         val form = LinearLayout(ctx).apply {
             orientation = LinearLayout.VERTICAL
@@ -39,13 +41,13 @@ object WebsiteDialogs {
         val name = EditText(ctx).apply {
             hint = ctx.getString(R.string.website_name)
             setSingleLine()
-            setText(site?.name.orEmpty())
+            setText(initial.name)
         }
         val url = EditText(ctx).apply {
             hint = ctx.getString(R.string.website_url)
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
             setSingleLine()
-            setText(site?.url.orEmpty())
+            setText(initial.url)
         }
         form.addView(name)
         form.addView(url)

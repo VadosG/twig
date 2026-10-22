@@ -1051,4 +1051,5 @@
     <string name="batch_preview_count">%1$d dari %2$d nama akan berubah</string>
     <string name="website_block_screenshots">Cegah tangkapan layar</string>
     <string name="website_defaults">Setelan situs default</string>
+    <string name="website_open_url">Buka URL</string>
 </resources>

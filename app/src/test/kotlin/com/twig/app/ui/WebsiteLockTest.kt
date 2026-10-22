@@ -91,6 +91,18 @@ class WebsiteLockTest {
             activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE != 0)
     }
 
+    @Test fun `external browser request waits for unlock before loading a page`() {
+        Secrets.lock()
+        page = Robolectric.buildActivity(WebsiteActivity::class.java,
+            WebsiteActivity.browserIntent(app, "https://external.example/path")).setup()
+        assertNull(shadowOf(web).lastLoadedUrl)
+        assertNotNull(cover)
+        assertTrue(activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE != 0)
+        unlock()
+        assertEquals("https://external.example/path", shadowOf(web).lastLoadedUrl)
+        assertEquals(listOf(site), WebsiteStore.all(app))
+    }
+
     @Test fun `locked shortcut loads nothing until unlock then authenticates with decrypted Basic credentials`() {
         Secrets.lock()
         open()
