@@ -107,6 +107,23 @@ class WebsiteLockTest {
         assertEquals(listOf(site), WebsiteStore.all(app))
     }
 
+    @Test fun `launcher relay forwards no saved action while locked or after cancelling unlock`() {
+        val relay = LauncherShortcutActivity.save(app, WebsiteActivity.intent(app, site.id))
+        Secrets.lock()
+        val controller = Robolectric.buildActivity(LauncherShortcutActivity::class.java, relay).create()
+        try {
+            assertNull(shadowOf(controller.get()).nextStartedActivity)
+            val dialog = ShadowDialog.getLatestDialog() as AlertDialog
+            assertTrue(dialog.isShowing)
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).performClick()
+            shadowOf(Looper.getMainLooper()).idle()
+            assertNull(shadowOf(controller.get()).nextStartedActivity)
+            assertTrue(controller.get().isFinishing)
+        } finally {
+            controller.destroy()
+        }
+    }
+
     @Test fun `external browser request waits for unlock before loading a page`() {
         Secrets.lock()
         page = Robolectric.buildActivity(WebsiteActivity::class.java,

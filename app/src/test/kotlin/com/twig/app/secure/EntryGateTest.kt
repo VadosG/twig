@@ -28,8 +28,13 @@ class EntryGateTest {
     private val manifest = File("src/main/AndroidManifest.xml").readText()
     private val srcRoot = File("src/main/kotlin/com/twig/app")
 
-    /** Explicitly exempt from the gate: none right now. Add one here with a stated reason. */
-    private val exempt = emptySet<String>()
+    /**
+     * WebsiteLinkActivity only validates and forwards an HTTP(S) URL, then finishes.
+     * It reads no saved state and loads no content; WebsiteActivity owns the gate.
+     * WebsiteBrowserTest checks the relay, and WebsiteLockTest verifies that the
+     * forwarded browser request loads nothing until the user unlocks.
+     */
+    private val exempt = setOf(".ui.WebsiteLinkActivity")
 
     @Test
     fun `every exported Activity has wired up SecurityUi_gate`() {
@@ -37,7 +42,11 @@ class EntryGateTest {
         assertTrue("MainActivity at least should be found — if not, the parsing is wrong", exported.contains(".MainActivity"))
 
         val missing = exported.filter { it !in exempt }.filter { name ->
-            val simple = name.substringAfterLast('.')
+            // Shortcut creators inherit PickerActivity's gated initialization.
+            val simple = when (name) {
+                ".ui.CreateShortcutActivity", ".ui.CreateCommandShortcutActivity" -> "PickerActivity"
+                else -> name.substringAfterLast('.')
+            }
             val src = srcRoot.walkTopDown().firstOrNull { it.name == "$simple.kt" }
                 ?: return@filter true // not finding the source is itself a problem
             "SecurityUi.gate(" !in src.readText()

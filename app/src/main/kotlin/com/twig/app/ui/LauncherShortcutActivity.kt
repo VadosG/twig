@@ -10,9 +10,11 @@ import java.util.UUID
 class LauncherShortcutActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val target = load(this, intent)
-        if (target != null) startActivity(target)
-        finish()
+        SecurityUi.gate(this) {
+            val target = load(this, intent)
+            if (target != null) startActivity(target)
+            finish()
+        }
     }
 
     companion object {

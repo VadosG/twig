@@ -101,8 +101,9 @@ class PrivilegedImageTest {
         val generate = Thumbs::class.java.getDeclaredMethod("genImage", android.content.Context::class.java, XFile::class.java)
             .apply { isAccessible = true }
         val bitmap = requireNotNull(generate.invoke(Thumbs, app, restricted) as Bitmap?)
-        assertEquals(256, bitmap.width)
-        assertEquals(128, bitmap.height)
+        // Sampling keeps enough pixels for the final 320-pixel resize.
+        assertEquals(512, bitmap.width)
+        assertEquals(256, bitmap.height)
         assertEquals(Color.RED, bitmap.getPixel(0, 0))
         assertEquals(2, reads)
         bitmap.recycle()

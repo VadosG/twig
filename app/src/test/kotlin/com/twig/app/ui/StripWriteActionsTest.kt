@@ -83,42 +83,26 @@ class StripWriteActionsTest {
         activity.supportFragmentManager.findFragmentByTag("pane1") as PaneFragment
 
     @Test
-    fun `holding any Up icon scrolls to the top while preserving the open list and selection`() {
+    fun `holding any Up icon collapses expanded groups when no frame is offscreen`() {
         val toolbar = activity.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         val navigation = (0 until toolbar.childCount).map { toolbar.getChildAt(it) }
             .first { it is android.widget.ImageButton && it.drawable === toolbar.navigationIcon }
         val controls = listOf(navigation) + listOf(R.id.strip_left, R.id.strip_mid, R.id.strip_right).map {
             activity.findViewById<View>(it).findViewById<View>(R.id.as_up)
         }
+        ReflectionHelpers.setField(activity, "activeIndex", 0)
         val pane = pane0()
         val vm = pane.viewModel
-        vm.expandGroup("fav")
-        idle()
-        val state = vm.state.value
-        val adapter = adapterOf(pane)
-        val nodes = (0 until 80).map {
-            PaneViewModel.FileNode(XFile("file", "/scroll/row$it.txt", false), 1, false, false)
-        }
-        adapter.submitList(nodes)
-        awaitList(adapter, nodes.size)
-        adapter.setSelection(listOf(nodes[50].file))
-        val list = pane.requireView().findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.list)
-        val manager = list.layoutManager as androidx.recyclerview.widget.LinearLayoutManager
-        fun layout() {
-            list.measure(View.MeasureSpec.makeMeasureSpec(400, View.MeasureSpec.EXACTLY),
-                View.MeasureSpec.makeMeasureSpec(400, View.MeasureSpec.EXACTLY))
-            list.layout(0, 0, 400, 400)
-        }
         for (control in controls) {
-            manager.scrollToPositionWithOffset(50, 0)
-            layout()
-            assertEquals(50, manager.findFirstVisibleItemPosition())
+            ReflectionHelpers.setField(vm, "currentKey", null)
+            vm.expandGroup("fav")
+            idle()
+            assertTrue(vm.state.value.rows.filterIsInstance<PaneViewModel.GroupNode>()
+                .any { it.id == "fav" && it.expanded })
             assertTrue(control.performLongClick())
-            layout()
-            assertEquals(0, manager.findFirstVisibleItemPosition())
-            assertEquals(state, vm.state.value)
-            assertEquals(nodes, adapter.currentList)
-            assertEquals(listOf(nodes[50].file), adapter.selectedItems())
+            idle()
+            assertTrue(vm.state.value.rows.filterIsInstance<PaneViewModel.GroupNode>()
+                .none { it.expanded })
         }
     }
 
@@ -205,7 +189,7 @@ class StripWriteActionsTest {
         assertStrip(R.id.as_compress, true)
         assertStrip(R.id.as_move, true)
         assertStrip(R.id.as_delete, true)
-        assertStrip(R.id.as_rename, false)
+        assertStrip(R.id.as_rename, true) // Multiple writable sources support batch rename.
         assertStrip(R.id.as_search, false)
 
         pane1().viewModel.currentDir = dir.copy(canWrite = false)

@@ -178,7 +178,12 @@ option.**
     `exported="true"` in the manifest must contain `SecurityUi.gate(`). It does not launch each
     Activity: that would require constructing six sets of intents/permissions/external
     dependencies, slow and fragile, while "a new entry point forgot to wire it up" is a static
-    fact.
+    fact. `WebsiteLinkActivity` is an explicit exception: it only validates and forwards
+    an HTTP(S) URL, then finishes without reading saved state or loading content.
+    Its destination, `WebsiteActivity`, owns the gate. `WebsiteBrowserTest` checks
+    the relay's validated URL-only handoff; `WebsiteLockTest` checks that browser
+    requests load nothing until unlock. Shortcut creators inherit the gate from
+    `PickerActivity`; `LauncherShortcutActivity` gates before reading its saved action.
   - ★ **The two headless relay Activities `ViewIntentActivity` / `RunCommandActivity` used to be
     `Theme.Translucent` on a bare `Activity`**, while AppCompat's AlertDialog requires an AppCompat
     theme — showing the unlock dialog crashed (`You need to use a Theme.AppCompat theme`).
