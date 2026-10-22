@@ -78,8 +78,9 @@ class WebsiteBrowserTest {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
         val saved = WebsiteStore.all(app).single()
         assertEquals("https://example.com/draft", saved.url)
-        assertEquals("DefaultAgent", saved.userAgent)
-        assertEquals("window.custom = true", saved.script)
+        assertEquals("", saved.userAgent)
+        assertEquals("", saved.script)
+        assertEquals("window.custom = true", WebsiteStore.effective(app, saved).script)
         assertFalse(saved.id.startsWith("browser:"))
         controller.pause().stop().destroy()
     }

@@ -1088,4 +1088,6 @@
     <string name="website_block_screenshots">Запретить снимки экрана</string>
     <string name="website_defaults">Настройки сайтов по умолчанию</string>
     <string name="website_open_url">Открыть URL</string>
+    <string name="website_user_agent_global_hint">Пусто = глобальный User-Agent, затем мобильный/настольный</string>
+    <string name="website_global_settings_hint">Сайт может переопределить глобальный User-Agent. JavaScript, CSS, скрытые элементы и блокировка запросов объединяются с глобальными настройками. Параметры отображения задают значения по умолчанию для новых сайтов.</string>
 </resources>

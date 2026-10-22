@@ -1056,4 +1056,6 @@
     <string name="website_block_screenshots">منع لقطات الشاشة</string>
     <string name="website_defaults">إعدادات المواقع الافتراضية</string>
     <string name="website_open_url">فتح رابط</string>
+    <string name="website_user_agent_global_hint">فارغ = User-Agent العام، ثم افتراضي الهاتف/سطح المكتب</string>
+    <string name="website_global_settings_hint">يمكن لكل موقع تجاوز User-Agent العام. تُدمج JavaScript وCSS والعناصر المخفية وحظر الطلبات مع الإعدادات العامة. خيارات العرض هي القيم الافتراضية للمواقع الجديدة.</string>
 </resources>

@@ -57,6 +57,12 @@ import java.io.ByteArrayInputStream
 class WebsiteActivity : AppCompatActivity() {
     private lateinit var b: ActivityWebsiteBinding
     private lateinit var site: Website
+    private lateinit var localSite: Website
+    private val globalSettingsListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == "defaults" && ::site.isInitialized && !Secrets.locked(this)) {
+            applyWebsiteIntent()
+        }
+    }
     private var pendingSavedState: Bundle? = null
     private var pendingWebsiteIntent = false
     private var lockCover: View? = null
@@ -85,6 +91,7 @@ class WebsiteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         b = ActivityWebsiteBinding.inflate(layoutInflater)
         setContentView(b.root)
+        WebsiteStore.preferences(this).registerOnSharedPreferenceChangeListener(globalSettingsListener)
         pendingSavedState = savedInstanceState
         unlockWebsite()
     }
@@ -147,7 +154,8 @@ class WebsiteActivity : AppCompatActivity() {
     private fun requestedWebsite(): Website? {
         if (isBrowserPage()) {
             val address = WebsiteStore.normalizeUrl(intent.data.toString()) ?: return null
-            return WebsiteStore.defaults(this).copy(id = "browser:$address",
+            if (::localSite.isInitialized && localSite.id == "browser:$address") return localSite
+            return WebsiteStore.newSite(this).copy(id = "browser:$address",
                 name = Uri.parse(address).host.orEmpty(), url = address)
         }
         val id = intent.data?.takeIf { it.scheme == "twig" && it.host == "website" }?.lastPathSegment
@@ -180,12 +188,14 @@ class WebsiteActivity : AppCompatActivity() {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun initializeWebsite(savedInstanceState: Bundle?) {
-        val saved = requestedWebsite()
+        val requested = requestedWebsite()
+        val saved = requested?.let { WebsiteStore.effective(this, it) }
         if (saved == null || WebsiteStore.normalizeUrl(saved.url) == null) {
             Toast.makeText(this, R.string.website_missing, Toast.LENGTH_SHORT).show()
             finish()
             return
         }
+        localSite = requireNotNull(requested)
         site = saved
         lifecycle.addObserver(object : androidx.lifecycle.DefaultLifecycleObserver {
             override fun onResume(owner: androidx.lifecycle.LifecycleOwner) {
@@ -193,8 +203,9 @@ class WebsiteActivity : AppCompatActivity() {
             }
         })
         requestBlocker = WebsiteRequestBlocker.parse(saved.blockedRequests) ?: WebsiteRequestBlocker.EMPTY
-        debugger = WebsiteDebugPanel(this, b.debugHost, b.web, { site }, persist = !isBrowserPage()) { updated ->
-            site = site.copy(script = updated.script, style = updated.style, hiddenElements = updated.hiddenElements)
+        debugger = WebsiteDebugPanel(this, b.debugHost, b.web, { localSite }, persist = !isBrowserPage()) { updated ->
+            localSite = updated
+            site = WebsiteStore.effective(this, updated)
             customStyleApplied = WebsiteCustomization.hasStyles(site)
         }
         backgroundNotificationRequested = savedInstanceState?.getBoolean("background_notification_requested") ?: false
@@ -238,7 +249,7 @@ class WebsiteActivity : AppCompatActivity() {
             b.toolbar.menu.add(R.string.website_open_url).setOnMenuItemClickListener { openAddress(); true }
             b.toolbar.menu.add(R.string.website_add).setOnMenuItemClickListener {
                 val address = WebsiteStore.normalizeUrl(b.web.url ?: site.url) ?: site.url
-                WebsiteDialogs.add(this, site.copy(name = Uri.parse(address).host.orEmpty(), url = address))
+                WebsiteDialogs.add(this, localSite.copy(name = Uri.parse(address).host.orEmpty(), url = address))
                 true
             }
         } else b.toolbar.menu.add(R.string.action_pin_shortcut).setOnMenuItemClickListener {
@@ -426,12 +437,14 @@ class WebsiteActivity : AppCompatActivity() {
     private fun applyWebsiteIntent() {
         // Bringing an existing document task forward must keep its live WebView,
         // including navigation, scroll position and unsaved form contents.
-        val saved = requestedWebsite()
+        val requested = requestedWebsite()
+        val saved = requested?.let { WebsiteStore.effective(this, it) }
         if (!::site.isInitialized || saved == null || saved.id != site.id ||
             WebsiteStore.normalizeUrl(saved.url) == null) {
             recreate()
             return
         }
+        localSite = requireNotNull(requested)
         if (saved == site) return
         val changedUrl = saved.url != site.url
         if (saved.fullscreen != site.fullscreen || saved.openFullscreen != site.openFullscreen ||
@@ -464,7 +477,7 @@ class WebsiteActivity : AppCompatActivity() {
     }
 
     private fun applyCustomStyle() {
-        val styled = debugger.styleSite(site)
+        val styled = WebsiteStore.effective(this, debugger.styleSite(localSite))
         if (!WebsiteCustomization.hasStyles(styled) && !customStyleApplied) return
         if (WebsiteCustomization.sameOrigin(site.url, b.web.url)) {
             b.web.evaluateJavascript(WebsiteCustomization.styleScript(styled), null)
@@ -767,6 +780,7 @@ class WebsiteActivity : AppCompatActivity() {
     }
 
     private fun resumeWebsite() {
+        if (::site.isInitialized && !Secrets.locked(this)) applyWebsiteIntent()
         syncBackgroundRunning()
         syncRemoteDebugMenu()
         if (::b.isInitialized) {
@@ -809,6 +823,7 @@ class WebsiteActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        WebsiteStore.preferences(this).unregisterOnSharedPreferenceChangeListener(globalSettingsListener)
         WebsiteBackground.release(this)
         WebsiteRemoteDebug.stop(this)
         if (::debugger.isInitialized) debugger.destroy()

@@ -91,6 +91,22 @@ class WebsiteLockTest {
             activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE != 0)
     }
 
+    @Test fun `global updates wait until a locked website is unlocked`() {
+        open()
+        val agent = web.settings.userAgentString
+        Secrets.lock()
+        page!!.pause().stop()
+        WebsiteStore.saveDefaults(app, Website(name = "", url = "", userAgent = "UpdatedGlobalAgent"))
+        shadowOf(Looper.getMainLooper()).idle()
+        assertEquals(agent, web.settings.userAgentString)
+        page!!.start().resume()
+        assertNotNull(cover)
+        assertEquals(agent, web.settings.userAgentString)
+        unlock()
+        assertEquals("UpdatedGlobalAgent", web.settings.userAgentString)
+        assertEquals(listOf(site), WebsiteStore.all(app))
+    }
+
     @Test fun `external browser request waits for unlock before loading a page`() {
         Secrets.lock()
         page = Robolectric.buildActivity(WebsiteActivity::class.java,

@@ -1052,4 +1052,6 @@
     <string name="website_block_screenshots">Ekran görüntülerini engelle</string>
     <string name="website_defaults">Varsayılan web sitesi ayarları</string>
     <string name="website_open_url">URL aç</string>
+    <string name="website_user_agent_global_hint">Boş = genel User-Agent, ardından mobil/masaüstü varsayılanı</string>
+    <string name="website_global_settings_hint">User-Agent her site için değiştirilebilir. JavaScript, CSS, gizli öğeler ve istek engelleme genel ayarlarla birleştirilir. Görüntüleme seçenekleri yeni siteler için varsayılandır.</string>
 </resources>

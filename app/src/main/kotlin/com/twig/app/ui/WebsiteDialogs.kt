@@ -31,7 +31,7 @@ object WebsiteDialogs {
     fun add(ctx: Context, initial: Website) = editForm(ctx, initial = initial)
 
     private fun editForm(ctx: Context, site: Website? = null, defaults: Boolean = false,
-        initial: Website = site ?: WebsiteStore.defaults(ctx),
+        initial: Website = site ?: if (defaults) WebsiteStore.defaults(ctx) else WebsiteStore.newSite(ctx),
         onDefaultsSaved: (() -> Unit)? = null) {
         val padding = (20 * ctx.resources.displayMetrics.density).toInt()
         val form = LinearLayout(ctx).apply {
@@ -160,7 +160,9 @@ object WebsiteDialogs {
             setText(value)
             advanced.addView(this)
         }
-        val userAgent = field(R.string.website_user_agent, R.string.website_user_agent_hint, initial.userAgent)
+        advanced.addView(TextView(ctx).apply { setText(R.string.website_global_settings_hint) })
+        val userAgent = field(R.string.website_user_agent,
+            if (defaults) R.string.website_user_agent_hint else R.string.website_user_agent_global_hint, initial.userAgent)
         val headers = field(R.string.website_headers, R.string.website_headers_hint, site?.headers.orEmpty(), true)
         val script = field(R.string.website_script, R.string.website_script_hint, initial.script, true)
         val style = field(R.string.website_style, R.string.website_style_hint, initial.style, true)
@@ -203,11 +205,6 @@ object WebsiteDialogs {
                     pullToRefresh.isChecked = values.pullToRefresh
                     selection.isChecked = values.disableTextSelection
                     scrollAxis.isChecked = values.lockScrollAxis
-                    userAgent.setText(values.userAgent)
-                    script.setText(values.script)
-                    style.setText(values.style)
-                    hidden.setText(values.hiddenElements)
-                    blocked.setText(values.blockedRequests)
                 }
             }
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {

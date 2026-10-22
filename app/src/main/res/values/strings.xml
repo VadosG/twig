@@ -1122,4 +1122,6 @@
     <string name="website_block_screenshots">Prevent screenshots</string>
     <string name="website_defaults">Website defaults</string>
     <string name="website_open_url">Open URL</string>
+    <string name="website_user_agent_global_hint">Blank = global User-Agent, then mobile/desktop default</string>
+    <string name="website_global_settings_hint">User-Agent can be overridden per website. JavaScript, CSS, hidden elements and request blocking combine with global settings. Display options are defaults for new websites.</string>
 </resources>

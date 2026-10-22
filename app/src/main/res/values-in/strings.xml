@@ -1052,4 +1052,6 @@
     <string name="website_block_screenshots">Cegah tangkapan layar</string>
     <string name="website_defaults">Setelan situs default</string>
     <string name="website_open_url">Buka URL</string>
+    <string name="website_user_agent_global_hint">Kosong = User-Agent global, lalu default seluler/desktop</string>
+    <string name="website_global_settings_hint">User-Agent dapat diganti per situs. JavaScript, CSS, elemen tersembunyi dan pemblokiran permintaan digabung dengan setelan global. Opsi tampilan menjadi default untuk situs baru.</string>
 </resources>

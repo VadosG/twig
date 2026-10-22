@@ -281,7 +281,7 @@ internal class WebsiteDebugPanel(
     }
 
     private fun applyStyle(site: Website) {
-        if (WebsiteCustomization.sameOrigin(site.url, web.url)) web.evaluateJavascript(WebsiteCustomization.styleScript(site), null)
+        if (WebsiteCustomization.sameOrigin(site.url, web.url)) web.evaluateJavascript(WebsiteCustomization.styleScript(WebsiteStore.effective(activity, site)), null)
     }
 
     private fun saveCustomization(script: String? = null, style: String? = null, hiddenSelector: String? = null): Website? {

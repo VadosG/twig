@@ -1052,4 +1052,6 @@
     <string name="website_block_screenshots">स्क्रीनशॉट रोकें</string>
     <string name="website_defaults">वेबसाइट की डिफ़ॉल्ट सेटिंग</string>
     <string name="website_open_url">यूआरएल खोलें</string>
+    <string name="website_user_agent_global_hint">खाली = वैश्विक User-Agent, फिर मोबाइल/डेस्कटॉप डिफ़ॉल्ट</string>
+    <string name="website_global_settings_hint">हर वेबसाइट वैश्विक User-Agent को बदल सकती है। JavaScript, CSS, छिपे तत्व और अनुरोध अवरोध वैश्विक सेटिंग से जुड़ते हैं। प्रदर्शन विकल्प नई वेबसाइटों के डिफ़ॉल्ट हैं।</string>
 </resources>

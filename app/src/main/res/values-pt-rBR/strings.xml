@@ -1052,4 +1052,6 @@
     <string name="website_block_screenshots">Impedir capturas de tela</string>
     <string name="website_defaults">Configurações padrão de sites</string>
     <string name="website_open_url">Abrir URL</string>
+    <string name="website_user_agent_global_hint">Vazio = User-Agent global ou padrão móvel/desktop</string>
+    <string name="website_global_settings_hint">Cada site pode substituir o User-Agent global. JavaScript, CSS, elementos ocultos e bloqueio de solicitações se combinam com as configurações globais. As opções de exibição são padrões para novos sites.</string>
 </resources>

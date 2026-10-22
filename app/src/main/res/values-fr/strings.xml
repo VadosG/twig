@@ -1052,4 +1052,6 @@
     <string name="website_block_screenshots">Interdire les captures d’écran</string>
     <string name="website_defaults">Paramètres par défaut des sites</string>
     <string name="website_open_url">Ouvrir une URL</string>
+    <string name="website_user_agent_global_hint">Vide = User-Agent global, puis valeur mobile/bureau</string>
+    <string name="website_global_settings_hint">Chaque site peut remplacer le User-Agent global. JavaScript, CSS, éléments masqués et blocage des requêtes se combinent aux paramètres globaux. Les options d’affichage servent de valeurs par défaut aux nouveaux sites.</string>
 </resources>

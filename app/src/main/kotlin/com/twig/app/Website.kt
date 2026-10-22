@@ -50,7 +50,7 @@ enum class WebsiteOrientation(val key: String) {
 object WebsiteStore {
     fun preferences(ctx: Context) = ctx.getSharedPreferences("twig_websites", Context.MODE_PRIVATE)
 
-    /** A snapshot for new bookmarks and temporary browser pages; existing sites keep their choices. */
+    /** Shared advanced settings and initial display choices for newly created sites. */
     fun defaults(ctx: Context): Website {
         val data = runCatching {
             JSONObject(preferences(ctx).getString("defaults", "{}") ?: "{}")
@@ -62,6 +62,27 @@ object WebsiteStore {
             hideStatusBar = data.optBoolean("hideStatusBar"), hideNavigationBar = data.optBoolean("hideNavigationBar"),
             pullToRefresh = data.optBoolean("pullToRefresh"), disableTextSelection = data.optBoolean("disableTextSelection"),
             lockScrollAxis = data.optBoolean("lockScrollAxis"))
+    }
+
+    /** Advanced fields are site additions/overrides, never copies of the global settings. */
+    fun newSite(ctx: Context): Website = defaults(ctx).copy(
+        userAgent = "", script = "", style = "", hiddenElements = "", blockedRequests = "")
+
+    fun effective(ctx: Context, site: Website): Website {
+        val global = defaults(ctx)
+        fun blocks(first: String, second: String) = listOf(first, second)
+            .filter { it.isNotBlank() }.distinct()
+        fun lines(first: String, second: String) = (first.lineSequence() + second.lineSequence())
+            .map { it.trim() }.filter { it.isNotEmpty() }.distinct().joinToString("\n")
+        val scripts = blocks(global.script, site.script)
+        // Separate scopes and error handling let both additions run independently.
+        val script = if (scripts.size < 2) scripts.firstOrNull().orEmpty() else scripts.joinToString("\n") {
+            "try { (function() {\n$it\n}).call(window); } catch (error) { console.error('Twig custom script:', error); }"
+        }
+        return site.copy(userAgent = site.userAgent.ifBlank { global.userAgent }, script = script,
+            style = blocks(global.style, site.style).joinToString("\n"),
+            hiddenElements = lines(global.hiddenElements, site.hiddenElements),
+            blockedRequests = lines(global.blockedRequests, site.blockedRequests))
     }
 
     fun saveDefaults(ctx: Context, site: Website) {

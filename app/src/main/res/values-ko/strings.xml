@@ -1052,4 +1052,6 @@
     <string name="website_block_screenshots">스크린샷 차단</string>
     <string name="website_defaults">웹사이트 기본 설정</string>
     <string name="website_open_url">URL 열기</string>
+    <string name="website_user_agent_global_hint">비어 있으면 전역 User-Agent, 없으면 모바일/데스크톱 기본값</string>
+    <string name="website_global_settings_hint">사이트별 User-Agent로 전역 값을 덮어쓸 수 있습니다. JavaScript, CSS, 숨김 요소와 요청 차단은 전역 설정과 합쳐집니다. 표시 옵션은 새 사이트의 기본값입니다.</string>
 </resources>

@@ -146,8 +146,12 @@ each write `= null`.
   preferences in `Prefs` — all SharedPreferences.
 - Websites: `WebsiteStore` persists per-site options in `twig_websites`; `WebsiteActivity`
   opens each bookmark in its own reusable document task using the shared WebView profile.
-  `WebsiteDialogs` shares its editor with website defaults: new bookmarks copy the saved
-  display options and UA/JS/CSS/hide/block rules, while existing bookmarks retain their values.
+  `WebsiteDialogs` shares its editor with website defaults: new bookmarks copy display
+  options only. UA/JS/CSS/hide/block settings apply globally at runtime; per-site UA overrides
+  the global value, while scripts/styles/selectors/block rules combine with it. Keep raw
+  per-site fields separate from effective settings, including debug edits and browser saves,
+  so global values never become permanent site additions. Open pages observe global changes;
+  locked pages defer applying them until unlock.
   `WebsiteLinkActivity` accepts external HTTP(S) VIEW intents and forwards only the validated
   URL to a temporary `WebsiteActivity` document using those defaults. Temporary pages enter
   the bookmark list only through the explicit add action; debug edits stay in memory.

@@ -1051,4 +1051,6 @@
     <string name="website_block_screenshots">禁止截圖</string>
     <string name="website_defaults">網站預設設定</string>
     <string name="website_open_url">開啟網址</string>
+    <string name="website_user_agent_global_hint">留空使用全域 User-Agent，未設定時使用手機/桌面預設值</string>
+    <string name="website_global_settings_hint">網站可覆寫全域 User-Agent；JavaScript、CSS、隱藏元素及請求攔截與全域設定合併。顯示選項僅作為新建網站的預設值。</string>
 </resources>

@@ -39,7 +39,7 @@ class WebsiteDefaultsTest {
         org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
         var dialog = ShadowDialog.getLatestDialog() as AlertDialog
         fun field(key: Int) = dialog.window!!.decorView.findViewWithTag<EditText>(key)
-        assertEquals("DefaultAgent", field(R.string.website_user_agent).text.toString())
+        assertEquals("", field(R.string.website_user_agent).text.toString())
         assertEquals("", field(R.string.website_headers).text.toString())
         // The defaults editor saves without requiring a name or URL.
         dialog.getButton(AlertDialog.BUTTON_NEUTRAL).performClick()
@@ -47,7 +47,7 @@ class WebsiteDefaultsTest {
         val defaults = ShadowDialog.getLatestDialog() as AlertDialog
         defaults.window!!.decorView.findViewWithTag<EditText>(R.string.website_user_agent).setText("ChangedAgent")
         defaults.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
-        assertEquals("ChangedAgent", field(R.string.website_user_agent).text.toString())
+        assertEquals("", field(R.string.website_user_agent).text.toString())
         val url = (dialog.window!!.decorView as android.view.ViewGroup).let { root ->
             fun find(view: android.view.View): EditText? {
                 if (view is EditText && view.hint == app.getString(R.string.website_url)) return view
@@ -61,9 +61,10 @@ class WebsiteDefaultsTest {
         url.setText("new.example.com")
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
         val added = WebsiteStore.all(app).last()
-        assertEquals("ChangedAgent", added.userAgent)
-        assertEquals(".advert", added.hiddenElements)
-        assertEquals("ads.example.com", added.blockedRequests)
+        assertEquals("", added.userAgent)
+        assertEquals("", added.hiddenElements)
+        assertEquals("", added.blockedRequests)
+        assertEquals("ChangedAgent", WebsiteStore.effective(app, added).userAgent)
         assertTrue(added.openFullscreen)
         assertTrue(added.fullscreen)
         assertTrue(added.hideStatusBar)

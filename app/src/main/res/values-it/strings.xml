@@ -1052,4 +1052,6 @@
     <string name="website_block_screenshots">Impedisci screenshot</string>
     <string name="website_defaults">Impostazioni predefinite dei siti</string>
     <string name="website_open_url">Apri URL</string>
+    <string name="website_user_agent_global_hint">Vuoto = User-Agent globale, poi predefinito mobile/desktop</string>
+    <string name="website_global_settings_hint">Ogni sito può sostituire lo User-Agent globale. JavaScript, CSS, elementi nascosti e blocco richieste si combinano con le impostazioni globali. Le opzioni di visualizzazione sono predefinite per i nuovi siti.</string>
 </resources>
