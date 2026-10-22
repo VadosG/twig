@@ -1050,4 +1050,5 @@
     <string name="batch_preview">Anteprima</string>
     <string name="batch_preview_count">Verranno modificati %1$d nomi su %2$d</string>
     <string name="website_block_screenshots">Impedisci screenshot</string>
+    <string name="website_defaults">Impostazioni predefinite dei siti</string>
 </resources>

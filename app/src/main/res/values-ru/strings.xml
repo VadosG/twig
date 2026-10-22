@@ -1086,4 +1086,5 @@
     <string name="batch_preview">Предпросмотр</string>
     <string name="batch_preview_count">Будет изменено имён: %1$d из %2$d</string>
     <string name="website_block_screenshots">Запретить снимки экрана</string>
+    <string name="website_defaults">Настройки сайтов по умолчанию</string>
 </resources>

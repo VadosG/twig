@@ -331,6 +331,11 @@ object Backup {
                 val sp = ctx.getSharedPreferences(file, Context.MODE_PRIVATE)
                 val values = all.getJSONObject(file)
                 if (file == "twig_websites") {
+                    val defaults = values.optJSONObject("defaults")?.takeIf { it.optString("t") == "s" }
+                    sp.edit().apply {
+                        if (defaults == null) remove("defaults")
+                        else putString("defaults", org.json.JSONObject(defaults.getString("v")).toString())
+                    }.apply()
                     values.optJSONObject("list")?.takeIf { it.optString("t") == "s" }?.let {
                         WebsiteStore.importJson(ctx, it.getString("v"))
                         prefCount++

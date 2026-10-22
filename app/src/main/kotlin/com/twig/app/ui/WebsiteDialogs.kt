@@ -26,7 +26,11 @@ import com.twig.app.WebsiteOrientation
 import com.twig.app.secure.Secrets
 
 object WebsiteDialogs {
-    fun edit(ctx: Context, site: Website? = null) {
+    fun edit(ctx: Context, site: Website? = null) = editForm(ctx, site)
+
+    private fun editForm(ctx: Context, site: Website? = null, defaults: Boolean = false,
+        onDefaultsSaved: (() -> Unit)? = null) {
+        val initial = site ?: WebsiteStore.defaults(ctx)
         val padding = (20 * ctx.resources.displayMetrics.density).toInt()
         val form = LinearLayout(ctx).apply {
             orientation = LinearLayout.VERTICAL
@@ -70,8 +74,8 @@ object WebsiteDialogs {
             isChecked = checked
             form.addView(this)
         }
-        val openFullscreen = option(R.string.website_open_fullscreen, site?.openFullscreen ?: false)
-        val fullscreen = option(R.string.website_fullscreen, site?.fullscreen ?: false)
+        val openFullscreen = option(R.string.website_open_fullscreen, initial.openFullscreen)
+        val fullscreen = option(R.string.website_fullscreen, initial.fullscreen)
         val doubleTap = option(R.string.website_double_tap_toolbar, site?.doubleTapToolbar ?: true)
         val blockScreenshots = option(R.string.website_block_screenshots,
             site?.blockScreenshots ?: false)
@@ -79,11 +83,11 @@ object WebsiteDialogs {
             text = ctx.getString(R.string.website_allow_background_running_hint,
                 ctx.getString(R.string.website_allow_background_running))
         }
-        val statusBar = option(R.string.website_hide_status_bar, site?.hideStatusBar ?: false)
-        val navigationBar = option(R.string.website_hide_navigation_bar, site?.hideNavigationBar ?: false)
-        val pullToRefresh = option(R.string.website_pull_to_refresh, site?.pullToRefresh ?: false)
-        val selection = option(R.string.website_disable_text_selection, site?.disableTextSelection ?: false)
-        val scrollAxis = option(R.string.website_lock_scroll_axis, site?.lockScrollAxis ?: false)
+        val statusBar = option(R.string.website_hide_status_bar, initial.hideStatusBar)
+        val navigationBar = option(R.string.website_hide_navigation_bar, initial.hideNavigationBar)
+        val pullToRefresh = option(R.string.website_pull_to_refresh, initial.pullToRefresh)
+        val selection = option(R.string.website_disable_text_selection, initial.disableTextSelection)
+        val scrollAxis = option(R.string.website_lock_scroll_axis, initial.lockScrollAxis)
         val desktop = option(R.string.website_desktop_site, site?.desktopSite ?: false)
         form.addView(TextView(ctx).apply { setText(R.string.website_orientation) })
         val orientation = RadioGroup(ctx).apply {
@@ -154,13 +158,25 @@ object WebsiteDialogs {
             setText(value)
             advanced.addView(this)
         }
-        val userAgent = field(R.string.website_user_agent, R.string.website_user_agent_hint, site?.userAgent.orEmpty())
+        val userAgent = field(R.string.website_user_agent, R.string.website_user_agent_hint, initial.userAgent)
         val headers = field(R.string.website_headers, R.string.website_headers_hint, site?.headers.orEmpty(), true)
-        val script = field(R.string.website_script, R.string.website_script_hint, site?.script.orEmpty(), true)
-        val style = field(R.string.website_style, R.string.website_style_hint, site?.style.orEmpty(), true)
-        val hidden = field(R.string.website_hidden_elements, R.string.website_hidden_elements_hint, site?.hiddenElements.orEmpty(), true)
-        val blocked = field(R.string.website_blocked_requests, R.string.website_blocked_requests_hint, site?.blockedRequests.orEmpty(), true)
+        val script = field(R.string.website_script, R.string.website_script_hint, initial.script, true)
+        val style = field(R.string.website_style, R.string.website_style_hint, initial.style, true)
+        val hidden = field(R.string.website_hidden_elements, R.string.website_hidden_elements_hint, initial.hiddenElements, true)
+        val blocked = field(R.string.website_blocked_requests, R.string.website_blocked_requests_hint, initial.blockedRequests, true)
         advanced.addView(TextView(ctx).apply { setText(R.string.website_custom_scope) })
+        if (defaults) {
+            // Keep one editor and validation path for both per-site and default settings.
+            val sharedOptions = setOf(openFullscreen, fullscreen, statusBar, navigationBar,
+                pullToRefresh, selection, scrollAxis)
+            for (index in 0 until form.indexOfChild(advancedHeader)) {
+                val view = form.getChildAt(index)
+                if (view !in sharedOptions) view.visibility = View.GONE
+            }
+            headers.visibility = View.GONE
+            advanced.getChildAt(advanced.indexOfChild(headers) - 1).visibility = View.GONE
+            expandAdvanced(true)
+        }
         fun advancedError(field: EditText, message: Int) {
             expandAdvanced(true)
             field.error = ctx.getString(message)
@@ -168,15 +184,33 @@ object WebsiteDialogs {
             field.post { field.requestRectangleOnScreen(Rect(0, 0, field.width, field.height), true) }
         }
         val dialog = AlertDialog.Builder(ctx)
-            .setTitle(if (site == null) R.string.website_add else R.string.website_edit)
+            .setTitle(if (defaults) R.string.website_defaults else if (site == null) R.string.website_add else R.string.website_edit)
             .setView(ScrollView(ctx).apply { addView(form) })
             .setNegativeButton(R.string.dialog_cancel, null)
+            .setNeutralButton(if (!defaults && site == null) ctx.getString(R.string.website_defaults) else null, null)
             .setPositiveButton(R.string.dialog_ok, null)
             .create()
         dialog.setOnShowListener {
+            if (!defaults && site == null) dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
+                editForm(ctx, defaults = true) {
+                    val values = WebsiteStore.defaults(ctx)
+                    openFullscreen.isChecked = values.openFullscreen
+                    fullscreen.isChecked = values.fullscreen
+                    statusBar.isChecked = values.hideStatusBar
+                    navigationBar.isChecked = values.hideNavigationBar
+                    pullToRefresh.isChecked = values.pullToRefresh
+                    selection.isChecked = values.disableTextSelection
+                    scrollAxis.isChecked = values.lockScrollAxis
+                    userAgent.setText(values.userAgent)
+                    script.setText(values.script)
+                    style.setText(values.style)
+                    hidden.setText(values.hiddenElements)
+                    blocked.setText(values.blockedRequests)
+                }
+            }
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 val address = WebsiteStore.normalizeUrl(url.text.toString())
-                if (address == null) {
+                if (!defaults && address == null) {
                     url.error = ctx.getString(R.string.website_invalid_url)
                     return@setOnClickListener
                 }
@@ -198,9 +232,22 @@ object WebsiteDialogs {
                     advancedError(blocked, R.string.website_blocked_requests_invalid)
                     return@setOnClickListener
                 }
-                val label = name.text.toString().trim().ifEmpty { android.net.Uri.parse(address).host.orEmpty() }
-                val saved = (site ?: Website(name = label, url = address)).copy(
-                    name = label, url = address, fullscreen = fullscreen.isChecked, doubleTapToolbar = doubleTap.isChecked,
+                if (defaults) {
+                    WebsiteStore.saveDefaults(ctx, initial.copy(userAgent = agent,
+                        openFullscreen = openFullscreen.isChecked, fullscreen = fullscreen.isChecked,
+                        hideStatusBar = statusBar.isChecked, hideNavigationBar = navigationBar.isChecked,
+                        pullToRefresh = pullToRefresh.isChecked, disableTextSelection = selection.isChecked,
+                        lockScrollAxis = scrollAxis.isChecked,
+                        script = script.text.toString(), style = style.text.toString(),
+                        hiddenElements = hidden.text.toString(), blockedRequests = blocked.text.toString()))
+                    onDefaultsSaved?.invoke()
+                    dialog.dismiss()
+                    return@setOnClickListener
+                }
+                val validatedAddress = requireNotNull(address)
+                val label = name.text.toString().trim().ifEmpty { android.net.Uri.parse(validatedAddress).host.orEmpty() }
+                val saved = (site ?: Website(name = label, url = validatedAddress)).copy(
+                    name = label, url = validatedAddress, fullscreen = fullscreen.isChecked, doubleTapToolbar = doubleTap.isChecked,
                     openFullscreen = openFullscreen.isChecked, allowBackgroundRunning = backgroundRunning.isChecked,
                     blockScreenshots = blockScreenshots.isChecked,
                     hideStatusBar = statusBar.isChecked, hideNavigationBar = navigationBar.isChecked,

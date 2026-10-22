@@ -1054,4 +1054,5 @@
     <string name="batch_preview">معاينة</string>
     <string name="batch_preview_count">سيتم تغيير %1$d من أصل %2$d اسم</string>
     <string name="website_block_screenshots">منع لقطات الشاشة</string>
+    <string name="website_defaults">إعدادات المواقع الافتراضية</string>
 </resources>

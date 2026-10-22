@@ -50,6 +50,31 @@ enum class WebsiteOrientation(val key: String) {
 object WebsiteStore {
     fun preferences(ctx: Context) = ctx.getSharedPreferences("twig_websites", Context.MODE_PRIVATE)
 
+    /** A snapshot for new bookmarks and temporary browser pages; existing sites keep their choices. */
+    fun defaults(ctx: Context): Website {
+        val data = runCatching {
+            JSONObject(preferences(ctx).getString("defaults", "{}") ?: "{}")
+        }.getOrElse { JSONObject() }
+        return Website(name = "", url = "", userAgent = data.optString("userAgent"),
+            script = data.optString("script"), style = data.optString("style"),
+            hiddenElements = data.optString("hiddenElements"), blockedRequests = data.optString("blockedRequests"),
+            openFullscreen = data.optBoolean("openFullscreen"), fullscreen = data.optBoolean("fullscreen"),
+            hideStatusBar = data.optBoolean("hideStatusBar"), hideNavigationBar = data.optBoolean("hideNavigationBar"),
+            pullToRefresh = data.optBoolean("pullToRefresh"), disableTextSelection = data.optBoolean("disableTextSelection"),
+            lockScrollAxis = data.optBoolean("lockScrollAxis"))
+    }
+
+    fun saveDefaults(ctx: Context, site: Website) {
+        val data = JSONObject().put("userAgent", site.userAgent).put("script", site.script)
+            .put("style", site.style).put("hiddenElements", site.hiddenElements)
+            .put("blockedRequests", site.blockedRequests)
+            .put("openFullscreen", site.openFullscreen).put("fullscreen", site.fullscreen)
+            .put("hideStatusBar", site.hideStatusBar).put("hideNavigationBar", site.hideNavigationBar)
+            .put("pullToRefresh", site.pullToRefresh).put("disableTextSelection", site.disableTextSelection)
+            .put("lockScrollAxis", site.lockScrollAxis)
+        preferences(ctx).edit().putString("defaults", data.toString()).apply()
+    }
+
     fun all(ctx: Context): List<Website> {
         val raw = preferences(ctx).getString("list", null) ?: return emptyList()
         return parse(raw, { value -> runCatching { Secrets.dec(ctx, value) }.getOrDefault(value) })

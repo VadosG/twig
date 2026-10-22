@@ -1050,4 +1050,5 @@
     <string name="batch_preview">미리 보기</string>
     <string name="batch_preview_count">%2$d개 중 %1$d개의 이름 변경 예정</string>
     <string name="website_block_screenshots">스크린샷 차단</string>
+    <string name="website_defaults">웹사이트 기본 설정</string>
 </resources>
