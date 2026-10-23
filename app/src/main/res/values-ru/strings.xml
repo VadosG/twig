@@ -1113,4 +1113,7 @@
     <string name="website_permission_deny">Запретить</string>
     <string name="website_permission_remember">Запомнить решение для этого сайта</string>
     <string name="website_location">Местоположение</string>
+    <string name="website_group_display">Отображение и панель инструментов</string>
+    <string name="website_group_browsing">Просмотр и управление</string>
+    <string name="website_group_privacy">Конфиденциальность и фоновая работа</string>
 </resources>

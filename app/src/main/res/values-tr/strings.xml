@@ -1077,4 +1077,7 @@
     <string name="website_permission_deny">Engelle</string>
     <string name="website_permission_remember">Bu site için bu kararı hatırla</string>
     <string name="website_location">Konum</string>
+    <string name="website_group_display">Görünüm ve araç çubuğu</string>
+    <string name="website_group_browsing">Gezinme ve etkileşim</string>
+    <string name="website_group_privacy">Gizlilik ve arka plan</string>
 </resources>

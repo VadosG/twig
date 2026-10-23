@@ -1107,4 +1107,7 @@
     <string name="website_permission_deny">拒绝</string>
     <string name="website_permission_remember">记住对此网站的决定</string>
     <string name="website_location">位置</string>
+    <string name="website_group_display">显示与工具栏</string>
+    <string name="website_group_browsing">浏览与操作</string>
+    <string name="website_group_privacy">隐私与后台</string>
 </resources>

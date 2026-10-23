@@ -1076,4 +1076,7 @@
     <string name="website_permission_deny">拒絕</string>
     <string name="website_permission_remember">記住對此網站的決定</string>
     <string name="website_location">位置</string>
+    <string name="website_group_display">顯示與工具列</string>
+    <string name="website_group_browsing">瀏覽與操作</string>
+    <string name="website_group_privacy">隱私與背景執行</string>
 </resources>

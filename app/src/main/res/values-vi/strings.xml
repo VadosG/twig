@@ -1076,4 +1076,7 @@
     <string name="website_permission_deny">Chặn</string>
     <string name="website_permission_remember">Ghi nhớ quyết định cho trang web này</string>
     <string name="website_location">Vị trí</string>
+    <string name="website_group_display">Hiển thị và thanh công cụ</string>
+    <string name="website_group_browsing">Duyệt web và tương tác</string>
+    <string name="website_group_privacy">Quyền riêng tư và chạy nền</string>
 </resources>

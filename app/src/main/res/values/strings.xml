@@ -1147,4 +1147,7 @@
     <string name="website_permission_deny">Block</string>
     <string name="website_permission_remember">Remember this decision for this website</string>
     <string name="website_location">Location</string>
+    <string name="website_group_display">Display and toolbar</string>
+    <string name="website_group_browsing">Browsing and interaction</string>
+    <string name="website_group_privacy">Privacy and background</string>
 </resources>

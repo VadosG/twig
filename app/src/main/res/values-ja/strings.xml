@@ -1077,4 +1077,7 @@
     <string name="website_permission_deny">ブロック</string>
     <string name="website_permission_remember">このサイトでの選択を記憶する</string>
     <string name="website_location">位置情報</string>
+    <string name="website_group_display">表示とツールバー</string>
+    <string name="website_group_browsing">閲覧と操作</string>
+    <string name="website_group_privacy">プライバシーとバックグラウンド</string>
 </resources>

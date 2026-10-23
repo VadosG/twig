@@ -1077,4 +1077,7 @@
     <string name="website_permission_deny">Blokir</string>
     <string name="website_permission_remember">Ingat keputusan ini untuk situs ini</string>
     <string name="website_location">Lokasi</string>
+    <string name="website_group_display">Tampilan dan bilah alat</string>
+    <string name="website_group_browsing">Penjelajahan dan interaksi</string>
+    <string name="website_group_privacy">Privasi dan latar belakang</string>
 </resources>

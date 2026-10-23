@@ -1081,4 +1081,7 @@
     <string name="website_permission_deny">حظر</string>
     <string name="website_permission_remember">تذكر هذا القرار لهذا الموقع</string>
     <string name="website_location">الموقع</string>
+    <string name="website_group_display">العرض وشريط الأدوات</string>
+    <string name="website_group_browsing">التصفح والتفاعل</string>
+    <string name="website_group_privacy">الخصوصية والعمل في الخلفية</string>
 </resources>

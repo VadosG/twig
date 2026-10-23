@@ -1077,4 +1077,7 @@
     <string name="website_permission_deny">ब्लॉक करें</string>
     <string name="website_permission_remember">इस वेबसाइट के लिए यह निर्णय याद रखें</string>
     <string name="website_location">स्थान</string>
+    <string name="website_group_display">डिस्प्ले और टूलबार</string>
+    <string name="website_group_browsing">ब्राउज़िंग और इंटरैक्शन</string>
+    <string name="website_group_privacy">गोपनीयता और बैकग्राउंड</string>
 </resources>

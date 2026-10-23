@@ -1077,4 +1077,7 @@
     <string name="website_permission_deny">Bloquer</string>
     <string name="website_permission_remember">Mémoriser cette décision pour ce site</string>
     <string name="website_location">Localisation</string>
+    <string name="website_group_display">Affichage et barre d’outils</string>
+    <string name="website_group_browsing">Navigation et interactions</string>
+    <string name="website_group_privacy">Confidentialité et arrière-plan</string>
 </resources>
