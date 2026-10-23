@@ -114,8 +114,8 @@
 
     <!-- Three stacked rows: elapsed/total, the seek bar on a line of its own (a full-width
          track is far easier to hit than one squeezed between four widgets), then the buttons.
-         Playback controls sit on the left, track/display controls on the right, so the row
-         doesn't shift when the episode buttons appear or disappear. -->
+         Track controls sit on the left, playback controls in the middle, and display controls
+         on the right. -->
     <LinearLayout
         android:id="@+id/controls"
         android:layout_width="match_parent"
@@ -189,48 +189,6 @@
             android:layout_marginEnd="-10dp"
             android:gravity="center_vertical">
 
-            <!-- Previous / next episode: only shown when a playlist queue is computed (a single
-                 video leaves no slot), see MediaPlayerActivity.syncQueueButtons -->
-            <ImageButton
-                android:id="@+id/btn_prev"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:visibility="gone"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="10dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_skip_prev"
-                android:tint="@color/white"
-                android:contentDescription="@string/player_prev_episode" />
-
-            <ImageButton
-                android:id="@+id/btn_play"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="10dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_pause"
-                android:tint="@color/white"
-                android:contentDescription="@string/slideshow" />
-
-            <ImageButton
-                android:id="@+id/btn_next"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:visibility="gone"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="10dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_skip_next"
-                android:tint="@color/white"
-                android:contentDescription="@string/player_next_episode" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
             <ImageButton
                 android:id="@+id/btn_subtitle"
                 android:layout_width="44dp"
@@ -252,6 +210,53 @@
                 android:src="@drawable/ic_audio_track"
                 android:tint="@color/white"
                 android:contentDescription="@string/player_audio_track" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- Previous / next episode: only shown when a playlist queue is computed (a single
+                 video leaves no slot), see MediaPlayerActivity.syncQueueButtons -->
+            <ImageButton
+                android:id="@+id/btn_prev"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:visibility="gone"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_skip_prev"
+                android:tint="@color/white"
+                android:contentDescription="@string/player_prev_episode" />
+
+            <ImageButton
+                android:id="@+id/btn_play"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_pause"
+                android:tint="@color/white"
+                android:contentDescription="@string/slideshow" />
+
+            <ImageButton
+                android:id="@+id/btn_next"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:visibility="gone"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_skip_next"
+                android:tint="@color/white"
+                android:contentDescription="@string/player_next_episode" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
             <ImageButton
                 android:id="@+id/btn_scale"
