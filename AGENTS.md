@@ -152,6 +152,22 @@ each write `= null`.
   per-site fields separate from effective settings, including debug edits and browser saves,
   so global values never become permanent site additions. Open pages observe global changes;
   locked pages defer applying them until unlock.
+  `WebsiteMediaPermissions` handles HTTPS microphone/camera requests with explicit
+  origin-specific consent followed by Android runtime permissions. Grant only selected,
+  recognized capture resources, after the WebView resumes. Saved bookmarks have independent
+  ask/allow/deny policies and may remember prompt decisions for their saved origin only;
+  temporary pages always ask. Foreign frames and redirected origins cannot inherit them.
+  Navigation, WebView cancellation and leaving the foreground invalidate pending requests,
+  except while Android's own permission prompt is active. Camera/microphone hardware stays
+  optional; Chromium audio capture also requires MODIFY_AUDIO_SETTINGS.
+  Set mediaPlaybackRequiresUserGesture=false before loading/restoring website pages:
+  Chromium latches the gesture lock when each media element is created; changing it
+  during permission callbacks does not unlock existing camera preview elements.
+  `WebsiteLocationPermissions` applies the same per-bookmark origin checks to geolocation.
+  Request coarse/fine Android permissions together and accept approximate-only access;
+  never retain decisions in WebView's shared geolocation store (callback retain=false).
+  Website defaults do not inherit these grants. Changing a bookmark's origin resets all
+  three permissions; revoking one refreshes the matching live page.
   `WebsiteLinkActivity` accepts external HTTP(S) VIEW intents and forwards only the validated
   URL to a temporary `WebsiteActivity` document using those defaults. Temporary pages enter
   the bookmark list only through the explicit add action; debug edits stay in memory.

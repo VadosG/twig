@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat
 import com.twig.app.R
 import com.twig.app.Website
 import com.twig.app.WebsiteStore
+import com.twig.app.WebsitePermission
 import com.twig.app.WebsiteOrientation
 import com.twig.app.secure.Secrets
 
@@ -59,7 +60,7 @@ object WebsiteDialogs {
             hint = ctx.getString(R.string.website_basic_auth_username)
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
             setSingleLine()
-            importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
+            if (android.os.Build.VERSION.SDK_INT >= 26) importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
             setText(site?.basicAuthUsername.orEmpty())
         }
         val authPassword = EditText(ctx).apply {
@@ -67,7 +68,7 @@ object WebsiteDialogs {
             hint = ctx.getString(R.string.website_basic_auth_password)
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
             transformationMethod = android.text.method.PasswordTransformationMethod.getInstance()
-            importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
+            if (android.os.Build.VERSION.SDK_INT >= 26) importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
             setText(site?.basicAuthPassword.orEmpty())
         }
         form.addView(authUsername)
@@ -145,6 +146,23 @@ object WebsiteDialogs {
         form.addView(advancedHeader, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
             (48 * ctx.resources.displayMetrics.density).toInt()))
         form.addView(advanced)
+        val permissionFields = LinearLayout(ctx).apply {
+            this.orientation = LinearLayout.VERTICAL
+            visibility = if (defaults) View.GONE else View.VISIBLE
+            advanced.addView(this)
+        }
+        fun permission(label: Int, value: WebsitePermission) = android.widget.Spinner(ctx).apply {
+            tag = label
+            permissionFields.addView(TextView(ctx).apply { setText(label) })
+            adapter = android.widget.ArrayAdapter(ctx, android.R.layout.simple_spinner_dropdown_item,
+                listOf(R.string.website_permission_ask, R.string.website_permission_allow,
+                    R.string.website_permission_deny).map { ctx.getString(it) })
+            setSelection(value.ordinal)
+            permissionFields.addView(this)
+        }
+        val microphone = permission(R.string.website_microphone, initial.microphonePermission)
+        val camera = permission(R.string.website_camera, initial.cameraPermission)
+        val location = permission(R.string.website_location, initial.locationPermission)
         fun field(label: Int, hint: Int, value: String, multiline: Boolean = false) = EditText(ctx).apply {
             tag = label
             advanced.addView(TextView(ctx).apply { setText(label) })
@@ -158,7 +176,7 @@ object WebsiteDialogs {
                 typeface = Typeface.MONOSPACE
                 textSize = 13f
             } else setSingleLine()
-            importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
+            if (android.os.Build.VERSION.SDK_INT >= 26) importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
             setText(value)
             advanced.addView(this)
         }
@@ -254,6 +272,9 @@ object WebsiteDialogs {
                     name = label, url = validatedAddress, fullscreen = fullscreen.isChecked, doubleTapToolbar = doubleTap.isChecked,
                     openFullscreen = openFullscreen.isChecked, allowBackgroundRunning = backgroundRunning.isChecked,
                     blockScreenshots = blockScreenshots.isChecked,
+                    microphonePermission = WebsitePermission.entries[microphone.selectedItemPosition],
+                    cameraPermission = WebsitePermission.entries[camera.selectedItemPosition],
+                    locationPermission = WebsitePermission.entries[location.selectedItemPosition],
                     hideStatusBar = statusBar.isChecked, hideNavigationBar = navigationBar.isChecked,
                     pullToRefresh = pullToRefresh.isChecked, disableTextSelection = selection.isChecked,
                     lockScrollAxis = scrollAxis.isChecked, desktopSite = desktop.isChecked,
@@ -263,8 +284,11 @@ object WebsiteDialogs {
                     script = script.text.toString(), style = style.text.toString(), hiddenElements = hidden.text.toString(),
                     blockedRequests = blocked.text.toString(),
                 )
+                val originChanged = site != null && !WebsiteCustomization.sameOrigin(site.url, saved.url)
                 try {
-                    WebsiteStore.save(ctx, saved)
+                    WebsiteStore.save(ctx, if (originChanged) saved.copy(
+                        microphonePermission = WebsitePermission.ASK, cameraPermission = WebsitePermission.ASK,
+                        locationPermission = WebsitePermission.ASK) else saved)
                 } catch (_: Secrets.KeyUnavailable) {
                     if (saved.basicAuthUsername.isNotEmpty() || saved.basicAuthPassword.isNotEmpty()) {
                         authPassword.error = ctx.getString(R.string.backup_locked)

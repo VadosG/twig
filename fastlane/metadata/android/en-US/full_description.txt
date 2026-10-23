@@ -44,4 +44,7 @@ F-Droid distributes the entirely free-software <i>libre</i> build. It excludes j
 
 Twig includes no advertising, no analytics and no telemetry. Network access follows your actions: configured connections, opened websites and their resources, downloads and sharing. Websites may load their own ads or trackers.
 
+Microphone, camera and location permissions are optional and used only when you approve a website’s request. Permission prompts identify the website and let you choose which devices to allow. Saved bookmarks can remember these decisions; temporary pages ask every time.
+
+
 Licensed under GPL-3.0.
