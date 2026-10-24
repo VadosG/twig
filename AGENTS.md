@@ -71,6 +71,13 @@ you get told about it — is every developer's own preference, so it is delibera
 in this file. The setup used on the machine this was written on lives in
 `AGENTS.local.md`, which is not committed.
 
+For GitHub previews, commit a prerelease version such as `1.16.0-beta.1` and its
+English/Chinese changelogs, then run `tools/preview.sh` to build and verify full/libre
+APKs. Add `--publish` to push the current branch/tag and publish a Pre-release without
+changing Latest. `--notes-file PATH` supplies detailed release notes; `--offline`
+uses cached Gradle dependencies. The script respects the configured signing key and
+uses `tools/verify-apk.py` before publishing. Stable releases use `tools/release.sh`.
+
 ## Build environment
 
 - **Release is signed with our own keystore**, whose credentials are read from
