@@ -121,7 +121,7 @@ class PrivateSpaceTest {
         }
     }
 
-    @Test fun `explicit locate unhides its root only in the destination pane`() = runTest(dispatcher) {
+    @Test fun `locating a hidden source pins it above favorites without changing visibility`() = runTest(dispatcher) {
         Prefs.setRootItemVisible(app, 0, "root", false)
         Prefs.setRootItemVisible(app, 1, "root", false)
         val vm = PaneViewModel(app).apply { io = dispatcher }
@@ -129,10 +129,17 @@ class PrivateSpaceTest {
         val own = XFile("file", app.applicationInfo.dataDir, true)
         vm.revealPath(own)
         advanceUntilIdle()
-        assertTrue(Prefs.rootItemVisible(app, 0, "root"))
+        assertFalse(Prefs.rootItemVisible(app, 0, "root"))
         assertFalse(Prefs.rootItemVisible(app, 1, "root"))
         assertEquals(own.path, vm.currentDir?.path)
         assertTrue(vm.state.value.rows.any { it.key == vm.state.value.currentKey })
+        val pinned = vm.state.value.rows.first() as PaneViewModel.FileNode
+        assertEquals(own.path, pinned.file.path)
+        assertTrue(pinned.key.startsWith(PaneViewModel.EXTERNAL_KEY_PREFIX))
+        assertEquals("g:fav", vm.state.value.rows.drop(1).first { it.depth == 0 }.key)
+        assertTrue(vm.unmountPinnedDirectory())
+        assertFalse(vm.state.value.rows.any { it.key.startsWith(PaneViewModel.EXTERNAL_KEY_PREFIX) })
+        assertFalse(Prefs.rootItemVisible(app, 0, "root"))
     }
 
     @Test

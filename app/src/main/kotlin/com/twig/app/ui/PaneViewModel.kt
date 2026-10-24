@@ -1012,13 +1012,13 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Temporary directory supplied by the other pane; its Back action stays in the file manager. */
-    fun mountPinnedDirectory(dir: XFile, label: String?) {
+    fun mountPinnedDirectory(dir: XFile, label: String?, focus: XFile? = null) {
         if (!dir.isDir) return
         if (pinnedRestore == null) {
             pinnedRestore = MountSnapshot(externalMount, externalLabel, currentDir, currentKey)
             pinnedExpanded = expanded.toSet()
         }
-        mountAt(dir, label)
+        mountAt(dir, label, focus)
     }
 
     fun unmountPinnedDirectory(): Boolean {
@@ -1041,7 +1041,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
         return true
     }
 
-    private fun mountAt(archive: XFile, label: String?) {
+    private fun mountAt(archive: XFile, label: String?, focus: XFile? = null) {
         val key = EXTERNAL_KEY_PREFIX + fileKey(archive)
         externalMount = archive
         externalLabel = label
@@ -1066,6 +1066,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
                             noteChangedIn(XFile(archive.scheme, archive.parentPath, isDir = true))
                         }
                         accordionExpand(key)
+                        focus?.let { file -> scrollKey = EXTERNAL_KEY_PREFIX + fileKey(file) }
                     }
                     rebuild()
                 },
@@ -1098,8 +1099,8 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
         val conn = if (target.scheme == "file") null else
             schemeToConn[target.scheme]
                 ?: ConnectionStore.all(getApplication()).firstOrNull { Connections.schemeOf(it) == target.scheme }
-        // An explicit locate must have a visible destination, even when that
-        // source was hidden in this pane. Ordinary restoration keeps it hidden.
+        // Reuse the other-pane pin when the normal source is hidden, without
+        // changing the user's root visibility choices.
         if (lockRoot == null) {
             val ext = Environment.getExternalStorageDirectory().absolutePath
             val privatePath = PrivateSpace.directory(getApplication()).path
@@ -1110,8 +1111,9 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
                 else -> "root"
             }
             if (root != null && !rootVisible(root)) {
-                Prefs.setRootItemVisible(getApplication(), paneIndex, root, true)
-                rebuild()
+                revealLoadingKey = null
+                mountPinnedDirectory(target, Format.pathLabel(target), focus)
+                return
             }
         }
         revealLoadingKey = conn?.let { c ->
