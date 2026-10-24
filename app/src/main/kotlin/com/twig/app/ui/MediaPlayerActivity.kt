@@ -54,6 +54,8 @@ import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import com.twig.app.Connections
+import com.twig.app.PlaybackMark
 import com.twig.app.EpisodeSkip
 import com.twig.app.FileInfo
 import com.twig.app.OpenFiles
@@ -223,7 +225,6 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
         // also loses its extension (container recognition degrades to sniff order)
         file = XFile(scheme, path, isDir = false, size = size, displayName = name)
         isVideo = intent.getBooleanExtra(EXTRA_AS_VIDEO, false) || OpenFiles.isVideo(file)
-        loadMemo()
 
         b.toolbar.title = name
         b.toolbar.setNavigationOnClickListener { finish() }
@@ -265,20 +266,73 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
         b.controls.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> arrangePlaybackButtons() }
 
         if (isVideo) {
-            loadQueue()
-            // Resume memory is for video only: audio file resume is the MusicEngine/PlaylistStore's job
-            remote = RemoteProgress.of(this, file)
-            if (intent.getBooleanExtra(EXTRA_FROM_START, false)) resumeFrom = 0L
-            else if (remote != null) fetchRemoteResume() else resumeFrom = PlaybackStore.positionFor(this, file)
+            // Show the player before resolving a history entry. The surface may arrive while
+            // connection/stat is still in flight; keep it behind the same resume gate.
+            resumeReady = false
             b.surface.holder.addCallback(this)
             watchRootSize()
             b.controls.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> syncSubtitleInset() }
-            scanSubtitles()
+            if (intent.hasExtra(EXTRA_HISTORY_CONNECTION)) {
+                // Choices must not be saved against the temporary history descriptor.
+                listOf(b.btnPlay, b.btnSubtitle, b.btnAudioTrack, b.btnScale).forEach { it.isEnabled = false }
+                loadRecentVideo()
+            } else beginVideo()
         } else {
+            loadMemo()
             b.audioInfo.visibility = View.VISIBLE
             b.audioName.text = name
             preparePlayer(null)
         }
+    }
+
+    private fun loadRecentVideo() {
+        val label = intent.getStringExtra(EXTRA_HISTORY_CONNECTION).orEmpty()
+        val path = file.path
+        lifecycleScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                runCatching {
+                    val scheme = if (label.isEmpty()) "file" else {
+                        val conn = Connections.find(this@MediaPlayerActivity, label)
+                            ?: error(getString(R.string.history_conn_missing))
+                        Connections.ensure(this@MediaPlayerActivity, conn)
+                    }
+                    val resolved = FsRegistry.of(scheme).stat(path)
+                    require(resolved != null && !resolved.isDir) { getString(R.string.history_video_missing) }
+                    resolved
+                }
+            }
+            if (isFinishing || isDestroyed) return@launch
+            result.fold(onSuccess = {
+                file = it
+                b.toolbar.title = file.name
+                beginVideo()
+            }, onFailure = {
+                b.loading.visibility = View.GONE
+                AlertDialog.Builder(this@MediaPlayerActivity)
+                    .setMessage(it.message ?: getString(R.string.err_failed))
+                    .setPositiveButton(android.R.string.ok) { _, _ -> finish() }
+                    .setOnCancelListener { finish() }
+                    .show()
+            })
+        }
+    }
+
+    private fun beginVideo() {
+        listOf(b.btnPlay, b.btnSubtitle, b.btnAudioTrack, b.btnScale).forEach { it.isEnabled = true }
+        loadMemo()
+        loadQueue()
+        // Progress owned by the backend must be loaded before the first frame.
+        remote = RemoteProgress.of(this, file)
+        if (intent.getBooleanExtra(EXTRA_FROM_START, false)) {
+            resumeFrom = 0L
+            releaseResumeGate()
+        } else if (remote != null) {
+            fetchRemoteResume()
+        } else {
+            resumeFrom = PlaybackStore.positionFor(this, file)
+            releaseResumeGate()
+        }
+        scanSubtitles()
     }
 
     // ---- Player ----
@@ -1755,22 +1809,32 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
         private const val EXTRA_SIZE = "size"
         private const val EXTRA_AS_VIDEO = "asVideo"
         private const val EXTRA_FROM_START = "fromStart"
+        private const val EXTRA_HISTORY_CONNECTION = "historyConnection"
 
         /** [asVideo]: the user chose "View as video" — treat the file as video whatever its
          * extension says. An extension no extractor claims leaves the container to sniffing,
          * which is what such a file needs anyway; and there is no episode queue: its siblings are judged
          * by extension, so the file is not among them. */
         fun start(context: Context, file: XFile, asVideo: Boolean = false, fromStart: Boolean = false) {
-            context.startActivity(
-                Intent(context, MediaPlayerActivity::class.java).apply {
-                    putExtra(EXTRA_SCHEME, file.scheme)
-                    putExtra(EXTRA_PATH, file.path)
-                    putExtra(EXTRA_NAME, file.name)
-                    putExtra(EXTRA_SIZE, file.size)
-                    putExtra(EXTRA_AS_VIDEO, asVideo)
-                    putExtra(EXTRA_FROM_START, fromStart)
-                },
-            )
+            context.startActivity(playerIntent(context, file, asVideo, fromStart))
         }
+
+        /** Start immediately; the activity resolves the connection and real metadata behind its spinner. */
+        fun startRecent(context: Context, mark: PlaybackMark, fromStart: Boolean = false) {
+            val pending = XFile("file", mark.path, isDir = false, displayName = mark.name)
+            context.startActivity(playerIntent(context, pending, asVideo = true, fromStart = fromStart).apply {
+                putExtra(EXTRA_HISTORY_CONNECTION, mark.connLabel)
+            })
+        }
+
+        private fun playerIntent(context: Context, file: XFile, asVideo: Boolean, fromStart: Boolean): Intent =
+            Intent(context, MediaPlayerActivity::class.java).apply {
+                putExtra(EXTRA_SCHEME, file.scheme)
+                putExtra(EXTRA_PATH, file.path)
+                putExtra(EXTRA_NAME, file.name)
+                putExtra(EXTRA_SIZE, file.size)
+                putExtra(EXTRA_AS_VIDEO, asVideo)
+                putExtra(EXTRA_FROM_START, fromStart)
+            }
     }
 }

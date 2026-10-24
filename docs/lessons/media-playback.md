@@ -4,6 +4,14 @@
 > shared conventions are in [AGENTS.md](../../AGENTS.md); the other sections live
 > beside this file in [docs/lessons/](.).
 
+- **History appeared unresponsive before opening the video player (2026-10-24)**:
+  connecting and statting the file in `PaneFragment` delayed activity launch. Start the player
+  immediately with the history title/path, resolve the connection and real metadata on IO
+  inside the activity, and hold its surface behind the resume gate. Do not derive resume keys
+  from the placeholder file: load progress only after stat supplies the real name and size.
+  Errors appear in the opened player; leaving cancels the pending load.
+  `HistoryPlayerLoadingTest` covers blocked metadata, resume/from-start, failure and exit.
+
 - **Fast lyric swipes could seek or toggle the cover (2026-10-16)**: classify both MOVE
   and UP with `SwipeGesture` before deciding to tap. `LyricsSwipeTest` covers releases
   without MOVE, vertical drags and cancellation.

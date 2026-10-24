@@ -727,25 +727,7 @@ class PaneFragment : Fragment() {
     }
 
     private fun openRecentVideo(mark: PlaybackMark, fromStart: Boolean = false) {
-        val ctx = requireContext()
-        val conn = if (mark.connLabel.isEmpty()) null else Connections.find(ctx, mark.connLabel)
-        if (mark.connLabel.isNotEmpty() && conn == null) {
-            toast(getString(R.string.history_conn_missing))
-            return
-        }
-        lifecycleScope.launch {
-            val result = withContext(Dispatchers.IO) {
-                runCatching {
-                    val scheme = if (conn == null) "file" else Connections.ensure(ctx, conn)
-                    val file = FsRegistry.of(scheme).stat(mark.path)
-                    require(file != null && !file.isDir) { getString(R.string.history_video_missing) }
-                    file
-                }
-            }
-            if (!isAdded) return@launch
-            result.fold(onSuccess = { MediaPlayerActivity.start(ctx, it, asVideo = true, fromStart = fromStart) },
-                onFailure = { toast(it.message ?: getString(R.string.err_failed)) })
-        }
+        MediaPlayerActivity.startRecent(requireContext(), mark, fromStart)
     }
 
     private fun jumpToHistory(e: HistoryEntry) {
