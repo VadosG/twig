@@ -27,6 +27,7 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.View
 import android.view.WindowManager
+import android.widget.LinearLayout
 import android.widget.SeekBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -53,6 +54,7 @@ import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import com.twig.app.EpisodeSkip
 import com.twig.app.FileInfo
 import com.twig.app.OpenFiles
 import com.twig.app.PlaybackStore
@@ -112,6 +114,12 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
     /** Series queue (episodes of the same show, in order); empty when not computable, in which case the two buttons are not shown. */
     private var queue: List<XFile> = emptyList()
     private var queueIndex = -1
+    private var skipMarks = EpisodeSkip()
+    private var headApplied = false
+    private var skippedEnding = false
+    private var tailArmed = true
+    private var scrubbing = false
+    private var playbackOnSeparateRow = false
 
     /**
      * Whether the resume position is ready. Remote progress requires a network round-trip to
@@ -188,6 +196,7 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
         override fun run() {
             player?.let {
                 if (prepared) {
+                    if (applyEpisodeSkip()) return
                     val pos = it.currentPosition.toInt()
                     if (gesture != Gesture.SEEK) { b.seek.progress = pos; b.tvPos.text = fmt(pos) }
                     updateSubtitle(pos)
@@ -241,15 +250,19 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
             override fun onProgressChanged(s: SeekBar, p: Int, fromUser: Boolean) {
                 if (fromUser) b.tvPos.text = fmt(p)
             }
-            override fun onStartTrackingTouch(s: SeekBar) {}
+            override fun onStartTrackingTouch(s: SeekBar) { scrubbing = true }
             override fun onStopTrackingTouch(s: SeekBar) {
                 android.util.Log.d("twig", "player: seekTo requested ${s.progress}")
+                scrubbing = false
                 player?.seekTo(s.progress.toLong())
             }
         })
 
         b.btnPrev.setOnClickListener { playAt(queueIndex - 1) }
         b.btnNext.setOnClickListener { playAt(queueIndex + 1) }
+        b.btnSkipHead.setOnClickListener { markEpisodeSkip(head = true) }
+        b.btnSkipTail.setOnClickListener { markEpisodeSkip(head = false) }
+        b.controls.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> arrangePlaybackButtons() }
 
         if (isVideo) {
             loadQueue()
@@ -383,6 +396,7 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
                             val dur = p.duration.takeIf { it != C.TIME_UNSET } ?: 0L
                             b.seek.max = dur.toInt().coerceAtLeast(0)
                             b.tvDur.text = fmt(dur.toInt())
+                            syncSkipMarks()
                             handler.post(ticker)
                         }
                     }
@@ -1410,6 +1424,7 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
                 queueIndex = idx
                 syncQueueButtons()
                 adoptSeriesKey(q)
+                loadSkipMarks()
             }
         }.apply { isDaemon = true; name = "twig-queue" }.start()
     }
@@ -1428,6 +1443,110 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
         val has = queueIndex >= 0 && queue.size > 1
         b.btnPrev.visibility = if (has && queueIndex > 0) View.VISIBLE else View.GONE
         b.btnNext.visibility = if (has && queueIndex < queue.size - 1) View.VISIBLE else View.GONE
+        b.btnSkipHead.visibility = if (has) View.VISIBLE else View.GONE
+        b.btnSkipTail.visibility = if (has) View.VISIBLE else View.GONE
+        b.controls.post { arrangePlaybackButtons() }
+    }
+
+    /** Preserve the five playback buttons as a group when portrait width needs two rows. */
+    private fun arrangePlaybackButtons() {
+        val density = resources.displayMetrics.density
+        val playbackWidth = 64 + (if (b.btnPrev.visibility == View.VISIBLE) 44 else 0) +
+            (if (b.btnNext.visibility == View.VISIBLE) 44 else 0) +
+            (if (b.btnSkipHead.visibility == View.VISIBLE) 88 else 0)
+        val sideWidth = listOf(b.btnSubtitle, b.btnAudioTrack, b.btnScale, b.btnOrientation)
+            .count { it.visibility == View.VISIBLE } * 44
+        val separate = b.controls.width > 0 &&
+            (playbackWidth + sideWidth) * density > b.controls.width - b.controls.paddingLeft - b.controls.paddingRight
+        if (separate == playbackOnSeparateRow) return
+        playbackOnSeparateRow = separate
+        (b.playbackButtons.parent as android.view.ViewGroup).removeView(b.playbackButtons)
+        if (separate) {
+            b.controls.addView(b.playbackButtons, LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT,
+            ).apply { gravity = android.view.Gravity.CENTER_HORIZONTAL })
+        } else {
+            b.actionButtons.addView(b.playbackButtons, 3)
+        }
+    }
+
+    private fun skipScope(): String? {
+        if (queue.size < 2 || queueIndex < 0) return null
+        return seriesKeyFor(file)?.let { MediaPrefStore.seriesKey(it) }
+    }
+
+    private fun loadSkipMarks() {
+        skipMarks = skipScope()?.let { MediaPrefStore.skipFor(this, it) } ?: EpisodeSkip()
+        headApplied = false
+        skippedEnding = false
+        tailArmed = true
+        syncSkipMarks()
+    }
+
+    private fun syncSkipMarks() {
+        b.seek.marks = skipMarks
+        val selected = Color.rgb(255, 183, 77)
+        b.btnSkipHead.imageTintList = ColorStateList.valueOf(if (skipMarks.headMs > 0) selected else Color.WHITE)
+        b.btnSkipTail.imageTintList = ColorStateList.valueOf(if (skipMarks.tailMs > 0) selected else Color.WHITE)
+    }
+
+    private fun markEpisodeSkip(head: Boolean) {
+        if ((if (head) skipMarks.headMs else skipMarks.tailMs) > 0) {
+            clearEpisodeSkip(head)
+            return
+        }
+        val p = player ?: return
+        val key = skipScope() ?: return
+        val duration = p.duration
+        if (!prepared || !p.isCurrentMediaItemSeekable || duration <= 0 || duration == C.TIME_UNSET) return
+        val position = p.currentPosition
+        val marks = if (head) skipMarks.copy(headMs = position)
+            else skipMarks.copy(tailMs = duration - position)
+        if (position <= 0 || position >= duration ||
+            (head && marks.headEnd(duration) == 0L) || (!head && marks.tailStart(duration) == null)
+        ) {
+            showGestureHint(getString(R.string.player_skip_invalid), autoHide = true, holdMs = 1500)
+            return
+        }
+        skipMarks = marks
+        // Setting a mark records the boundary without changing the current playback.
+        if (head) headApplied = true else tailArmed = false
+        MediaPrefStore.putSkip(this, key, marks)
+        syncSkipMarks()
+        showGestureHint(getString(R.string.player_skip_marked,
+            getString(if (head) R.string.player_skip_head else R.string.player_skip_tail),
+            fmt((if (head) marks.headMs else marks.tailMs).toInt())), autoHide = true, holdMs = 1500)
+    }
+
+    private fun clearEpisodeSkip(head: Boolean) {
+        val key = skipScope() ?: return
+        skipMarks = if (head) skipMarks.copy(headMs = 0) else skipMarks.copy(tailMs = 0)
+        MediaPrefStore.putSkip(this, key, skipMarks)
+        syncSkipMarks()
+        showGestureHint(getString(R.string.player_skip_cleared,
+            getString(if (head) R.string.player_skip_head else R.string.player_skip_tail)),
+            autoHide = true, holdMs = 1000)
+    }
+
+    /** Stop this ticker when switching episodes or finishing the final episode. */
+    private fun applyEpisodeSkip(): Boolean {
+        val p = player ?: return false
+        if (skipScope() == null || scrubbing || gesture == Gesture.SEEK || !p.isPlaying ||
+            !p.isCurrentMediaItemSeekable || p.duration <= 0 || p.duration == C.TIME_UNSET) return false
+        if (!headApplied) {
+            headApplied = true
+            val end = skipMarks.headEnd(p.duration)
+            if (p.currentPosition < end) { p.seekTo(end); return false }
+        }
+        val tail = skipMarks.tailStart(p.duration)
+        if (tail != null && p.currentPosition < tail) tailArmed = true
+        if (tail != null && tailArmed && p.currentPosition >= tail) {
+            // An explicit ending mark completes the episode without reading the credits.
+            skippedEnding = true
+            if (queueIndex < queue.lastIndex) playAt(queueIndex + 1) else finish()
+            return true
+        }
+        return false
     }
 
     /**
@@ -1470,6 +1589,7 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
         b.tvSubtitle.visibility = View.GONE
         b.pgsView.setCues(emptyList())
         loadMemo()
+        loadSkipMarks()
         scanSubtitles()
 
         // ★ The surface is already created, no surfaceCreated callback coming — manually hand
@@ -1572,7 +1692,7 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
         lastSaveAt = SystemClock.elapsedRealtime()
         val r = remote
         saveGate.onPlayingChanged(p.isPlaying, lastSaveAt)
-        if (!saveGate.canSave(lastSaveAt)) {
+        if (!skippedEnding && !saveGate.canSave(lastSaveAt)) {
             // A quick seek/exit must not update progress, but an existing server session
             // still needs STOP using its last accepted position.
             if (r != null && startedReported && state == PlayState.STOP) {
@@ -1580,14 +1700,15 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
             }
             return
         }
+        val position = if (skippedEnding) dur else p.currentPosition
         if (r != null) {
             // Progress is the server's job: reporting goes on a background thread (see RemoteProgress),
             // the local copy is no longer written
-            if (!startedReported) { startedReported = true; r.report(p.currentPosition, dur, PlayState.START) }
-            lastRemotePosition = p.currentPosition
-            r.report(p.currentPosition, dur, state)
+            if (!startedReported) { startedReported = true; r.report(position, dur, PlayState.START) }
+            lastRemotePosition = position
+            r.report(position, dur, state)
         } else {
-            PlaybackStore.save(this, file, p.currentPosition, dur)
+            PlaybackStore.save(this, file, position, dur)
         }
     }
 

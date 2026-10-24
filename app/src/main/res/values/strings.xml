@@ -1150,4 +1150,9 @@
     <string name="website_group_display">Display and toolbar</string>
     <string name="website_group_browsing">Browsing and interaction</string>
     <string name="website_group_privacy">Privacy and background</string>
+    <string name="player_skip_head">Skip opening</string>
+    <string name="player_skip_tail">Skip ending</string>
+    <string name="player_skip_marked">%1$s: %2$s</string>
+    <string name="player_skip_cleared">%1$s cleared</string>
+    <string name="player_skip_invalid">Choose a point between the opening and ending.</string>
 </resources>

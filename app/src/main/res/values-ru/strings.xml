@@ -1116,4 +1116,9 @@
     <string name="website_group_display">Отображение и панель инструментов</string>
     <string name="website_group_browsing">Просмотр и управление</string>
     <string name="website_group_privacy">Конфиденциальность и фоновая работа</string>
+    <string name="player_skip_head">Пропустить заставку</string>
+    <string name="player_skip_tail">Пропустить титры</string>
+    <string name="player_skip_marked">%1$s: %2$s</string>
+    <string name="player_skip_cleared">%1$s сброшено</string>
+    <string name="player_skip_invalid">Выберите точку между заставкой и титрами.</string>
 </resources>

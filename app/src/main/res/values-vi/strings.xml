@@ -1079,4 +1079,9 @@
     <string name="website_group_display">Hiển thị và thanh công cụ</string>
     <string name="website_group_browsing">Duyệt web và tương tác</string>
     <string name="website_group_privacy">Quyền riêng tư và chạy nền</string>
+    <string name="player_skip_head">Bỏ qua mở đầu</string>
+    <string name="player_skip_tail">Bỏ qua kết thúc</string>
+    <string name="player_skip_marked">%1$s: %2$s</string>
+    <string name="player_skip_cleared">Đã xóa %1$s</string>
+    <string name="player_skip_invalid">Chọn một điểm giữa phần mở đầu và kết thúc.</string>
 </resources>

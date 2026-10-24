@@ -1080,4 +1080,9 @@
     <string name="website_group_display">Exibição e barra de ferramentas</string>
     <string name="website_group_browsing">Navegação e interação</string>
     <string name="website_group_privacy">Privacidade e segundo plano</string>
+    <string name="player_skip_head">Pular abertura</string>
+    <string name="player_skip_tail">Pular créditos</string>
+    <string name="player_skip_marked">%1$s: %2$s</string>
+    <string name="player_skip_cleared">%1$s removido</string>
+    <string name="player_skip_invalid">Escolha um ponto entre a abertura e os créditos.</string>
 </resources>

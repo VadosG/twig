@@ -1080,4 +1080,9 @@
     <string name="website_group_display">डिस्प्ले और टूलबार</string>
     <string name="website_group_browsing">ब्राउज़िंग और इंटरैक्शन</string>
     <string name="website_group_privacy">गोपनीयता और बैकग्राउंड</string>
+    <string name="player_skip_head">शुरुआत छोड़ें</string>
+    <string name="player_skip_tail">अंत छोड़ें</string>
+    <string name="player_skip_marked">%1$s: %2$s</string>
+    <string name="player_skip_cleared">%1$s मिटाया गया</string>
+    <string name="player_skip_invalid">शुरुआत और अंत के बीच का समय चुनें।</string>
 </resources>

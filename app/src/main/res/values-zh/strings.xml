@@ -1110,4 +1110,9 @@
     <string name="website_group_display">显示与工具栏</string>
     <string name="website_group_browsing">浏览与操作</string>
     <string name="website_group_privacy">隐私与后台</string>
+    <string name="player_skip_head">跳过片头</string>
+    <string name="player_skip_tail">跳过片尾</string>
+    <string name="player_skip_marked">%1$s: %2$s</string>
+    <string name="player_skip_cleared">已清除%1$s</string>
+    <string name="player_skip_invalid">请选择片头与片尾之间的时间点。</string>
 </resources>
