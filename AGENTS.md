@@ -280,6 +280,16 @@ each write `= null`.
   VM already has rows, only call `resortAll()` and do not bootstrap again** (after
   recreate the VM survives, and a second bootstrap is either skipped by an internal guard
   or breaks position restoration).
+- Operation completion: `OperationFeedback` tracks resumed Twig activities and checks
+  screen/keyguard state; a detached progress dialog does not mean the app is in the
+  background. Foreground completion notifications and completion vibration are
+  independent, default-off preferences. Background/locked-screen results retain a
+  notification; completion also requests a toast regardless of app visibility.
+  Running transfers always keep their progress notification.
+  `Transfers.finish` handles feedback and service shutdown on the main thread before
+  notifying UI observers, which only refresh their views. Never decide whether to
+  post a result from `Transfers.ui`: completion itself clears that observer, making
+  the old worker-thread check race with dismissal of an open progress dialog.
 - Thumbnails: `Thumbs` (the engine). Two cache layers: an in-memory LruCache and a
   100 MB disk LRU under `cacheDir/thumbs`; the key is md5(name:size:mtime) and is
   **path-independent** (moving a file or remounting still hits, changing it invalidates).

@@ -73,6 +73,7 @@ object DeleteUi {
                 .setPositiveButton(R.string.strip_delete) { _, _ ->
                     val recycle = useTrash?.isChecked == true
                     scope.launch {
+                        OperationFeedback.clear(app)
                         val busy = AlertDialog.Builder(context).setMessage(R.string.trash_busy).setCancelable(false).show()
                         val result = try {
                             withContext(Dispatchers.IO) {
@@ -94,9 +95,10 @@ object DeleteUi {
                                 }
                             }
                         } finally { busy.dismiss() }
-                        result.exceptionOrNull()?.let {
-                            Toast.makeText(context, it.message ?: context.getString(R.string.err_failed), Toast.LENGTH_LONG).show()
-                        }
+                        val message = result.exceptionOrNull()?.message ?: context.getString(
+                            if (result.isSuccess) R.string.msg_done else R.string.err_failed,
+                        )
+                        OperationFeedback.finished(app, context.getString(R.string.strip_delete), message)
                         // Refresh even after a partial batch failure; successful earlier moves remain recoverable.
                         onFinished(result.isSuccess)
                     }

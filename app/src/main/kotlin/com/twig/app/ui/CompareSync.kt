@@ -316,11 +316,10 @@ private fun runSync(
         return
     }
     val app = ctx.applicationContext
-    fun continueSync(deletesOk: Boolean) {
+    fun continueSync() {
         scope.launch {
             if (copies.isEmpty()) {
                 onStarted(deletes.map { it.key })
-                if (deletesOk) toastOn(ctx, ctx.getString(R.string.msg_done))
                 return@launch
             }
             val pairs = withContext(Dispatchers.IO) {
@@ -343,8 +342,8 @@ private fun runSync(
             onStarted((copies + deletes).map { it.key })
         }
     }
-    if (deletes.isEmpty()) continueSync(true)
-    else DeleteUi.confirm(ctx, scope, deletes.map { it.file }) { continueSync(it) }
+    if (deletes.isEmpty()) continueSync()
+    else DeleteUi.confirm(ctx, scope, deletes.map { it.file }) { continueSync() }
 }
 
 private fun toastOn(ctx: Context, msg: String) =

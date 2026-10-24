@@ -1090,4 +1090,11 @@
     <string name="action_root_items">Tampilkan/sembunyikan item akar</string>
     <string name="private_space">Ruang pribadi</string>
     <string name="private_space_create_failed">Tidak dapat membuat ruang pribadi</string>
+
+    <!-- Completion feedback. -->
+    <string name="settings_operation_notifications">Peringatan operasi</string>
+    <string name="settings_completion_vibration">Getar saat selesai</string>
+    <string name="settings_completion_vibration_desc">Salin, pindah, hapus, kompres dan ekstrak arsip</string>
+    <string name="settings_foreground_completion">Notifikasi selesai di latar depan</string>
+    <string name="settings_foreground_completion_desc">Beri notifikasi juga saat menggunakan Twig. Selalu beri notifikasi di latar belakang dan saat layar terkunci.</string>
 </resources>

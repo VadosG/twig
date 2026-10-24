@@ -1120,4 +1120,11 @@
     <string name="action_root_items">显示/隐藏根节点</string>
     <string name="private_space">私有空间</string>
     <string name="private_space_create_failed">无法创建私有空间</string>
+
+    <!-- Completion feedback. -->
+    <string name="settings_operation_notifications">操作提醒</string>
+    <string name="settings_completion_vibration">操作完成时振动</string>
+    <string name="settings_completion_vibration_desc">适用于复制、移动、删除、压缩和解压</string>
+    <string name="settings_foreground_completion">前台操作完成通知</string>
+    <string name="settings_foreground_completion_desc">在 Twig 内操作时也保留完成通知。后台和锁屏时始终通知。</string>
 </resources>

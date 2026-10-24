@@ -1090,4 +1090,11 @@
     <string name="action_root_items">Mostra/nascondi elementi radice</string>
     <string name="private_space">Spazio privato</string>
     <string name="private_space_create_failed">Impossibile creare lo spazio privato</string>
+
+    <!-- Completion feedback. -->
+    <string name="settings_operation_notifications">Avvisi delle operazioni</string>
+    <string name="settings_completion_vibration">Vibra al termine</string>
+    <string name="settings_completion_vibration_desc">Copia, spostamento, eliminazione, compressione ed estrazione</string>
+    <string name="settings_foreground_completion">Notifiche di completamento in primo piano</string>
+    <string name="settings_foreground_completion_desc">Notifica anche durante l’uso di Twig. Notifica sempre in background e a schermo bloccato.</string>
 </resources>

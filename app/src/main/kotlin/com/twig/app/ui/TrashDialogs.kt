@@ -94,11 +94,15 @@ class TrashDialogs(private val ctx: Context, private val owner: LifecycleOwner, 
     }
     private fun work(block: () -> Unit) {
         if (!active()) return
+        OperationFeedback.clear(ctx)
         val progress = AlertDialog.Builder(ctx).setMessage(R.string.trash_busy).setCancelable(false).show().track()
         owner.lifecycleScope.launch {
             try {
                 val result = withContext(Dispatchers.IO) { runCatching(block) }
-                if (active()) result.exceptionOrNull()?.let(::error)
+                val message = result.exceptionOrNull()?.message ?: ctx.getString(
+                    if (result.isSuccess) R.string.msg_done else R.string.err_failed,
+                )
+                OperationFeedback.finished(ctx, ctx.getString(R.string.trash_title), message)
             } finally { progress.dismiss(); changed() }
         }
     }

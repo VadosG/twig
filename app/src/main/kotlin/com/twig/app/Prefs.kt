@@ -12,6 +12,18 @@ object Prefs {
 
     private fun sp(ctx: Context) = ctx.getSharedPreferences(FILE, Context.MODE_PRIVATE)
 
+    fun vibrateOnCompletion(ctx: Context): Boolean = sp(ctx).getBoolean("vibrate_on_completion", false)
+
+    fun setVibrateOnCompletion(ctx: Context, on: Boolean) {
+        sp(ctx).edit().putBoolean("vibrate_on_completion", on).apply()
+    }
+
+    fun foregroundCompletionNotifications(ctx: Context): Boolean = sp(ctx).getBoolean("foreground_completion_notifications", false)
+
+    fun setForegroundCompletionNotifications(ctx: Context, on: Boolean) {
+        sp(ctx).edit().putBoolean("foreground_completion_notifications", on).apply()
+    }
+
     fun rootItemVisible(ctx: Context, pane: Int, id: String): Boolean =
         sp(ctx).getBoolean("root_item_${pane}_$id", RootItems.all.first { it.id == id }.visibleByDefault)
 

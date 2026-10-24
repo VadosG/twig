@@ -1406,26 +1406,7 @@ class PaneFragment : Fragment() {
         clearMapSelection()
         viewModel.refresh()
         host?.siblingOf(this)?.viewModel?.refresh()
-        val r = s.finished ?: return
-        r.fold(
-            onSuccess = {
-                toast(
-                    when {
-                        s.cancelled.get() -> getString(R.string.dialog_cancel)
-                        // Entries whose own name cannot be written into a directory (an archive's
-                        // "..") are skipped rather than failing the batch — say how many
-                        s.refused > 0 -> getString(R.string.msg_done_refused, s.refused)
-                        else -> getString(R.string.msg_done)
-                    },
-                )
-            },
-            onFailure = {
-                toast(
-                    if (it is ArchiveWriter.Cancelled) getString(R.string.dialog_cancel)
-                    else it.message ?: getString(R.string.err_failed),
-                )
-            },
-        )
+        if (s.finished == null) return
         host?.onTransferFinished(s)
     }
 

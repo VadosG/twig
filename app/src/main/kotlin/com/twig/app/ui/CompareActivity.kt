@@ -942,7 +942,6 @@ class CompareActivity : AppCompatActivity() {
             onBackground = { toast(getString(R.string.transfer_background_hint)) },
             onDetach = { transferBox = null },
             onFinished = {
-                toast(it.finished?.exceptionOrNull()?.message ?: getString(R.string.msg_done))
                 // Only revalidate the items actually moved this time; do not rescan the whole tree
                 revalidate(pendingNodes)
                 pendingNodes = emptyList()

@@ -367,6 +367,8 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
     override fun onResume() {
         super.onResume()
         ContextCompat.registerReceiver(this, volumeReceiver, volumeFilter(), ContextCompat.RECEIVER_NOT_EXPORTED)
+        ContextCompat.registerReceiver(this, transferReceiver,
+            android.content.IntentFilter(com.twig.app.ui.Transfers.ACTION_FINISHED), ContextCompat.RECEIVER_NOT_EXPORTED)
         // After locking and switching back (or locking elsewhere) must re-enter — onCreate only handles cold start
         if (com.twig.app.secure.Secrets.locked(this)) {
             com.twig.app.ui.SecurityUi.gate(this) { }
@@ -378,9 +380,9 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
             recreate()
             return
         }
-        // A transfer finished while the UI wasn't around: come back and catch up (clear selection / refresh both sides / announce result).
+        // A transfer finished while the UI wasn't around: come back and catch up (clear selection / refresh both sides).
         // Don't consume if the pane isn't ready — taken too early nothing will handle it, defer to next onResume
-        activePane()?.let { p -> com.twig.app.ui.Transfers.consumeFinished()?.let { p.finishTransfer(it) } }
+        consumeFinishedTransfer()
         invalidateOptionsMenu() // terminal sessions may have been added/removed in another Activity; refresh the entry's visibility
         val land = isLandscape()
         for (s in listOf(b.stripMid, b.stripLeft, b.stripRight)) applyStripState(s, land)
@@ -398,6 +400,17 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
         // Drop the callback: it captures this Activity, leaving it in place is a reference to an already-destroyed UI
         WebShare.onStateChanged = null
         runCatching { unregisterReceiver(volumeReceiver) }
+        runCatching { unregisterReceiver(transferReceiver) }
+    }
+
+    private fun consumeFinishedTransfer() {
+        activePane()?.takeIf { it.isReady() }?.let { pane ->
+            com.twig.app.ui.Transfers.consumeFinished()?.let { pane.finishTransfer(it) }
+        }
+    }
+
+    private val transferReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) = consumeFinishedTransfer()
     }
 
     /** Rescan removable volumes, refresh the volume row on both trees when something changed. One binder IPC, done on the main thread. */

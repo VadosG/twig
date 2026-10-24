@@ -1090,4 +1090,11 @@
     <string name="action_root_items">रूट आइटम दिखाएँ/छिपाएँ</string>
     <string name="private_space">निजी स्थान</string>
     <string name="private_space_create_failed">निजी स्थान नहीं बनाया जा सका</string>
+
+    <!-- Completion feedback. -->
+    <string name="settings_operation_notifications">कार्य सूचनाएँ</string>
+    <string name="settings_completion_vibration">पूरा होने पर कंपन</string>
+    <string name="settings_completion_vibration_desc">कॉपी, स्थानांतरण, हटाना, संपीड़न और निष्कर्षण</string>
+    <string name="settings_foreground_completion">ऐप खुला होने पर पूर्णता सूचना</string>
+    <string name="settings_foreground_completion_desc">Twig इस्तेमाल करते समय भी सूचना दें। पृष्ठभूमि और लॉक स्क्रीन पर हमेशा सूचना दें।</string>
 </resources>

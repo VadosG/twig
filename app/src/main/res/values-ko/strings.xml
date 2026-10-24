@@ -1090,4 +1090,11 @@
     <string name="action_root_items">루트 항목 표시/숨기기</string>
     <string name="private_space">비공개 공간</string>
     <string name="private_space_create_failed">비공개 공간을 만들 수 없습니다</string>
+
+    <!-- Completion feedback. -->
+    <string name="settings_operation_notifications">작업 알림</string>
+    <string name="settings_completion_vibration">완료 시 진동</string>
+    <string name="settings_completion_vibration_desc">복사, 이동, 삭제, 압축 및 압축 해제</string>
+    <string name="settings_foreground_completion">포그라운드 완료 알림</string>
+    <string name="settings_foreground_completion_desc">Twig 사용 중에도 알립니다. 백그라운드 및 화면 잠금 상태에서는 항상 알립니다.</string>
 </resources>

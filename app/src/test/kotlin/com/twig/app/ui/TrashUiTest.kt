@@ -138,6 +138,27 @@ class TrashUiTest {
         } finally { host.pause().stop().destroy() }
     }
 
+    @Test fun `manual deletion uses the optional completion vibration`() {
+        Prefs.setTrashEnabled(app, false)
+        Prefs.setVibrateOnCompletion(app, true)
+        val vibrator = app.getSystemService(android.content.Context.VIBRATOR_SERVICE) as android.os.Vibrator
+        org.robolectric.shadows.ShadowVibrator.reset()
+        shadowOf(vibrator).setHasVibrator(true)
+        val host = Robolectric.buildActivity(Host::class.java).setup()
+        try {
+            val previous = ShadowDialog.getLatestDialog()
+            val finished = AtomicBoolean()
+            DeleteUi.confirm(host.get(), host.get(), listOf(file())) { finished.set(true) }
+            dialogAfter(previous).getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+            waitFor { finished.get() }
+            assertFalse(original.exists())
+            assertEquals(80, shadowOf(vibrator).milliseconds)
+        } finally {
+            Prefs.setVibrateOnCompletion(app, false)
+            host.pause().stop().destroy()
+        }
+    }
+
     @Test fun `globally disabling trash hides checkbox and keeps existing trash recoverable`() {
         val fs = FsRegistry.of("trash") as TrashFileSystem
         val entry = fs.store.move(fs.store.plan(listOf(file())).single())

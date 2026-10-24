@@ -43,6 +43,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * block it here explicitly (see the return value of [start]).
  */
 object Transfers {
+    const val ACTION_FINISHED = "com.twig.app.TRANSFER_FINISHED"
 
     /** What one transfer has to do. **Pure data** — the session outlives the screen that started it, so it can't capture a Fragment. */
     sealed class Work {
@@ -165,6 +166,7 @@ object Transfers {
     @Synchronized
     fun start(ctx: Context, session: Session): Boolean {
         if (active != null) return false
+        OperationFeedback.clear(ctx)
         active = session
         try {
             TransferService.start(ctx)
@@ -188,7 +190,7 @@ object Transfers {
         s.pendingConflict?.let { u.onConflict(s, it) }
     }
 
-    /** Take the "finished but UI not on stage" session; [MainActivity] wraps this up (refresh pane + toast) when it returns to the foreground. */
+    /** Take the "finished but UI not on stage" session; [MainActivity] wraps this up (refresh pane) when it returns to the foreground. */
     @Synchronized
     fun consumeFinished(): Session? = pendingResult.also { pendingResult = null }
 
@@ -197,7 +199,7 @@ object Transfers {
     // ★ Don't name this method `run`: in an anonymous inner class, `run { }` resolves to
     // the stdlib scope function and silently bypasses this one (same trap as renaming
     // NativeSmbClient.exec, see CLAUDE.md)
-    internal fun execute(ctx: Context, s: Session, onTick: () -> Unit) {
+    internal fun execute(ctx: Context, s: Session, onComplete: () -> Unit = {}, onTick: () -> Unit) {
         s.tick = onTick
         val listener = object : CopyEngine.ProgressListener {
             private var lastUi = 0L
@@ -291,7 +293,7 @@ object Transfers {
         }.map { }
 
         s.finished = result
-        finish(s)
+        finish(ctx, s, onComplete)
     }
 
     /** Conflict decision: transfer thread blocks; the UI (if attached) answers via dialog. */
@@ -313,17 +315,29 @@ object Transfers {
         main.post { if (active === s) ui?.onProgress(s) }
     }
 
-    private fun finish(s: Session) {
-        active = null
+    private fun finish(ctx: Context, s: Session, onComplete: () -> Unit) {
         main.post {
+            s.tick = null
+            active = null
             val u = ui
-            if (u != null) {
-                if (active == null) ui = null // A new session has already attached; don't steal its observer
-                u.onFinished(s)
-            } else {
-                // UI not on stage: keep the result, let MainActivity refresh the pane and toast when it returns to the foreground
-                pendingResult = s
+            ui = null
+            if (u == null) pendingResult = s
+            val error = s.finished?.exceptionOrNull()
+            val cancelled = s.cancelled.get() || error is ArchiveWriter.Cancelled
+            val message = when {
+                cancelled -> ctx.getString(R.string.dialog_cancel)
+                error != null -> error.message ?: ctx.getString(R.string.err_failed)
+                s.refused > 0 -> ctx.getString(R.string.msg_done_refused, s.refused)
+                else -> ctx.getString(R.string.msg_done)
             }
+            OperationFeedback.finished(
+                ctx, ctx.getString(if (error == null) R.string.transfer_done else R.string.transfer_failed),
+                message, if (error == null) s.destLabel else message,
+                cancelled = cancelled, openIntent = MainActivity.transferIntent(ctx),
+            )
+            onComplete()
+            u?.onFinished(s)
+            if (u == null) ctx.sendBroadcast(Intent(ACTION_FINISHED).setPackage(ctx.packageName))
         }
     }
 }
@@ -367,10 +381,10 @@ class TransferService : Service() {
         val session = Transfers.active ?: run { stopSelf(); return START_NOT_STICKY }
         startForeground(NOTIF_ID, buildNotification(session))
         Thread({
-            Transfers.execute(this, session) { tick(session) }
-            stopForeground(STOP_FOREGROUND_REMOVE)
-            doneNotification(session)?.let { nm.notify(DONE_ID, it) }
-            stopSelf()
+            Transfers.execute(this, session, onComplete = {
+                stopForeground(STOP_FOREGROUND_REMOVE)
+                stopSelf()
+            }) { tick(session) }
         }, "twig-transfer").start()
         return START_NOT_STICKY
     }
@@ -417,28 +431,6 @@ class TransferService : Service() {
             .build()
     }
 
-    /**
-     * Completion/failure wrap-up notification; if the UI is still on stage it toasts
-     * itself, no need to bother again. **No notification on cancel**: that's the user
-     * pressing it themselves, they already know the result, and another ping is just noise.
-     */
-    private fun doneNotification(s: Session): Notification? {
-        if (Transfers.ui != null) return null
-        if (s.cancelled.get()) return null
-        val r = s.finished ?: return null
-        val failed = r.isFailure && r.exceptionOrNull() !is ArchiveWriter.Cancelled
-        if (r.isFailure && !failed) return null // ArchiveWriter.Cancelled also counts as cancel
-        return baseBuilder()
-            .setContentTitle(
-                if (failed) getString(R.string.transfer_failed) else getString(R.string.transfer_done),
-            )
-            .setContentText(if (failed) r.exceptionOrNull()?.message.orEmpty() else s.destLabel)
-            .setSmallIcon(if (s.isCompress) R.drawable.ic_compress else R.drawable.ic_copy)
-            .setAutoCancel(true)
-            .setContentIntent(contentIntent())
-            .build()
-    }
-
     private fun contentIntent(): PendingIntent = PendingIntent.getActivity(
         this, 0, MainActivity.transferIntent(this),
         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
@@ -457,7 +449,6 @@ class TransferService : Service() {
     companion object {
         private const val CHANNEL = "twig_transfer"
         private const val NOTIF_ID = 4301
-        private const val DONE_ID = 4302
         private const val ACTION_CANCEL = "com.twig.app.TRANSFER_CANCEL"
 
         fun start(ctx: Context) {
