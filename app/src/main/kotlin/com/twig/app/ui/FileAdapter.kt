@@ -994,7 +994,10 @@ class FileAdapter(
             when {
                 // Labeled roots distinguish internal storage, / and removable media.
                 // A picker locked to a server still uses that server's source icon.
-                node.label != null -> b.icon.setImageResource(FileIcons.storageRootIconRes(file))
+                node.label != null -> b.icon.setImageResource(
+                    if (file.scheme == "file" && file.path == com.twig.app.PrivateSpace.directory(b.root.context).path)
+                        R.drawable.ic_private_space else FileIcons.storageRootIconRes(file),
+                )
                 file.scheme.startsWith("git") && file.path == "/" ->
                     b.icon.setImageResource(R.drawable.ic_git)
                 file.isDir -> {

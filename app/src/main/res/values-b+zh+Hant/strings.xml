@@ -1084,4 +1084,9 @@
     <string name="player_skip_marked">%1$s: %2$s</string>
     <string name="player_skip_cleared">已清除%1$s</string>
     <string name="player_skip_invalid">請選擇片頭與片尾之間的時間點。</string>
+
+    <!-- Top-level tree visibility and app-private files. -->
+    <string name="action_root_items">顯示/隱藏根節點</string>
+    <string name="private_space">私有空間</string>
+    <string name="private_space_create_failed">無法建立私有空間</string>
 </resources>

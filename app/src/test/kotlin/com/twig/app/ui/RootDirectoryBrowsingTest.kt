@@ -84,7 +84,10 @@ class RootDirectoryBrowsingTest {
         dirs["/"] = listOf("custom")
         vm.toggle(row("/")); advanceUntilIdle()
         assertEquals(listOf("/", "/custom"), paths())
-        assertTrue(probed.isEmpty())
+        // The app-owned path may be checked for its navigation hint, but no
+        // generic root shortcuts are probed when the root has a real listing.
+        val own = ApplicationProvider.getApplicationContext<Application>().applicationInfo.dataDir
+        assertTrue(probed.all { it == own })
     }
 
     @Test fun `empty root listing also permits direct navigation to known readable directories`() = runTest(dispatcher) {

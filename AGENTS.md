@@ -144,6 +144,13 @@ each write `= null`.
   The tree always expands/collapses **in place**, it never "enters" a directory.
 - Persistence: connections in `ConnectionStore`, favorites in `FavoritesStore`,
   preferences in `Prefs` — all SharedPreferences.
+- Private space: `PrivateSpace` uses `applicationInfo.dataDir/private_space` through
+  the ordinary local filesystem. The main menu's root-item visibility choices are
+  stored per pane in one dialog with left/right columns; Private space defaults
+  hidden. Its files are excluded from all system backup/transfer channels, and
+  configuration-only `.twigbak` never includes them. Known ancestors of Twig's data
+  directory get UI-only navigation hints when Android denies enumeration;
+  filesystem copy/compare listings must still fail.
 - Websites: `WebsiteStore` persists per-site options in `twig_websites`; `WebsiteActivity`
   opens each bookmark in its own reusable document task using the shared WebView profile.
   `WebsiteDialogs` shares its editor with website defaults: new bookmarks copy display

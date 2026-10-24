@@ -225,6 +225,7 @@ class PaneFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        viewModel.paneIndex = paneIndex
         com.twig.app.WebsiteStore.preferences(requireContext()).registerOnSharedPreferenceChangeListener(websiteListener)
         adapter = FileAdapter(
             density = Prefs.density(requireContext()),

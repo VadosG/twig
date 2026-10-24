@@ -1085,4 +1085,9 @@
     <string name="player_skip_marked">%1$s: %2$s</string>
     <string name="player_skip_cleared">%1$s dihapus</string>
     <string name="player_skip_invalid">Pilih titik di antara pembuka dan penutup.</string>
+
+    <!-- Top-level tree visibility and app-private files. -->
+    <string name="action_root_items">Tampilkan/sembunyikan item akar</string>
+    <string name="private_space">Ruang pribadi</string>
+    <string name="private_space_create_failed">Tidak dapat membuat ruang pribadi</string>
 </resources>

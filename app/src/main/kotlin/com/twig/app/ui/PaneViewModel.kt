@@ -22,6 +22,7 @@ import com.twig.app.OpenFiles
 import com.twig.app.XFileGitFs
 import com.twig.git.GitRepo
 import com.twig.app.Prefs
+import com.twig.app.PrivateSpace
 import com.twig.app.R
 import com.twig.app.SafFileSystem
 import com.twig.app.SavedConnection
@@ -78,6 +79,19 @@ private class SearchState(
  * folder / paste (copy/move); its row is bordered to highlight it.
  */
 class PaneViewModel(app: Application) : AndroidViewModel(app) {
+
+    var paneIndex: Int = 0
+
+    private fun rootVisible(id: String) = Prefs.rootItemVisible(getApplication(), paneIndex, id)
+
+    fun refreshRootItems() {
+        rebuild()
+        if (currentKey != null && state.value.rows.none { it.key == currentKey }) {
+            currentKey = null
+            currentDir = null
+            rebuild()
+        }
+    }
 
     // ---- Node types ----
 
@@ -645,7 +659,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
             }
             upgradeContainerKey()
             restoring = false
-            rebuild() // Only the last version of rows is final — UI uses this to stop repeated scroll anchoring.
+            refreshRootItems() // Final rows also discard a location whose source was hidden during restoration.
         }
     }
 
@@ -925,6 +939,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
                     it.scheme == "file" &&
                         (
                             it.path == Environment.getExternalStorageDirectory().absolutePath ||
+                                it.path == PrivateSpace.directory(getApplication()).path ||
                                 StorageVolumes.isVolumeRoot(it.path) // A whole SD card / USB stick shouldn't be the default target either.
                             )
                     )
@@ -1083,6 +1098,22 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
         val conn = if (target.scheme == "file") null else
             schemeToConn[target.scheme]
                 ?: ConnectionStore.all(getApplication()).firstOrNull { Connections.schemeOf(it) == target.scheme }
+        // An explicit locate must have a visible destination, even when that
+        // source was hidden in this pane. Ordinary restoration keeps it hidden.
+        if (lockRoot == null) {
+            val ext = Environment.getExternalStorageDirectory().absolutePath
+            val privatePath = PrivateSpace.directory(getApplication()).path
+            val root = when {
+                target.scheme != "file" -> conn?.let { groupIdFor(it) }
+                target.path == ext || target.path.startsWith("$ext/") -> null
+                rootVisible("private") && (target.path == privatePath || target.path.startsWith("$privatePath/")) -> null
+                else -> "root"
+            }
+            if (root != null && !rootVisible(root)) {
+                Prefs.setRootItemVisible(getApplication(), paneIndex, root, true)
+                rebuild()
+            }
+        }
         revealLoadingKey = conn?.let { c ->
             val visibleDir = _state.value.rows.filterIsInstance<FileNode>()
                 .filter { it.file.scheme == target.scheme && it.file.isDir &&
@@ -1147,7 +1178,12 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
         val fetched = ArrayList<Restored>()
         if (target.scheme == "file") {
             val ext = Environment.getExternalStorageDirectory().absolutePath
-            val root = if (target.path == ext || target.path.startsWith("$ext/")) ext else "/"
+            val privatePath = PrivateSpace.directory(getApplication()).path
+            val root = when {
+                rootVisible("private") && (target.path == privatePath || target.path.startsWith("$privatePath/")) -> privatePath
+                target.path == ext || target.path.startsWith("$ext/") -> ext
+                else -> "/"
+            }
             var p = target.path
             while (true) {
                 chain.add(0, p)
@@ -2581,6 +2617,10 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     private fun listChildren(file: XFile, rowKey: String? = null): Listing =
         if (file.isDir) {
             val fs = FsRegistry.of(file)
+            val app = getApplication<Application>()
+            if (file.scheme == "file" && file.path == PrivateSpace.directory(app).path) {
+                PrivateSpace.ensureDirectory(app)
+            }
             val listed = runCatching { fs.list(file) }
             // Android can deny enumerating / while allowing direct access to known children.
             // These are navigation shortcuts only: filesystem listings must still fail for
@@ -2592,11 +2632,15 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
             val granted = if (AndroidDataAccess.isRoot(file)) AndroidDataAccess.instance?.let { access ->
                 (listOfNotNull(access.ownFolder(file)) + access.grantedFolders(file)).distinctBy { it.path }
             }.orEmpty() else emptyList()
+            val ownChild = if (file.scheme == "file") PrivateSpace.navigationChild(app, file.path)?.takeIf {
+                runCatching { fs.stat(app.applicationInfo.dataDir) }.getOrNull()?.let { own -> own.isDir && own.canRead } == true
+            } else null
             val kids = when {
                 rootShortcuts.isNotEmpty() -> rootShortcuts
                 granted.isNotEmpty() -> listed.getOrDefault(emptyList()).filter { entry -> granted.none { it.name == entry.name } } + granted
+                ownChild != null -> listed.getOrDefault(emptyList())
                 else -> listed.getOrThrow()
-            }
+            }.let { entries -> if (ownChild != null && entries.none { it.path == ownChild.path }) entries + ownChild else entries }
             Listing(
                 children = kids,
                 trashNotices = (fs as? com.twig.app.TrashFileSystem)?.notices?.takeIf { file.path == "/" },
@@ -2822,8 +2866,10 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
             // Register all shortcut identities before rendering any expanded subtree:
             // Root now precedes volume shortcuts, whose paths may also appear below it.
             storageShortcutKeys.add(fileKey(XFile("file", ext, isDir = true)))
-            storageShortcutKeys.add(fileKey(XFile("file", "/", isDir = true)))
+            if (rootVisible("root")) storageShortcutKeys.add(fileKey(XFile("file", "/", isDir = true)))
             volumes.forEach { storageShortcutKeys.add(fileKey(XFile("file", it.path, isDir = true))) }
+            val privateDir = XFile("file", PrivateSpace.directory(getApplication()).path, isDir = true)
+            if (rootVisible("private")) storageShortcutKeys.add(fileKey(privateDir))
             // Externally opened archives go at the top — they don't belong to any storage tree, so wedged in the middle they'd be hard to find.
             externalMount?.let { addFile(rows, it, 0, externalLabel, keyPrefix = EXTERNAL_KEY_PREFIX) }
             addGroup(rows, "fav", str(R.string.group_fav))
@@ -2832,23 +2878,24 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
                 addGroup(rows, "cmp", str(R.string.compare_saved))
             }
             addFile(rows, XFile("file", ext, isDir = true), 0, str(R.string.group_internal_storage), capacity(ext))
-            addFile(rows, XFile("file", "/", isDir = true), 0, str(R.string.group_root), capacity("/"))
+            if (rootVisible("root")) addFile(rows, XFile("file", "/", isDir = true), 0, str(R.string.group_root), capacity("/"))
             // Keep built-in locations together, followed by removable volumes. Use the
             // cached list: rebuild runs on every render, so it must not rescan storage.
             for (v in volumes) {
                 addFile(rows, XFile("file", v.path, isDir = true), 0, v.label, capacity(v.path))
             }
+            if (rootVisible("private")) addFile(rows, privateDir, 0, str(R.string.private_space))
             if (trashEnabled) addFile(rows, XFile("trash", "/", isDir = true, canWrite = false), 0, str(R.string.trash_title))
             addGroup(rows, "lan", str(R.string.group_lan))
-            addGroup(rows, "ftp", "FTP")
-            addGroup(rows, "sftp", "SSH (SFTP)")
-            addGroup(rows, "dav", "WebDAV")
-            addGroup(rows, "s3", "S3")
+            addGroup(rows, "ftp", str(R.string.group_ftp))
+            addGroup(rows, "sftp", str(R.string.group_sftp))
+            addGroup(rows, "dav", str(R.string.group_webdav))
+            addGroup(rows, "s3", str(R.string.group_s3))
             addGroup(rows, "media", str(R.string.group_media))
             addGroup(rows, "saf", str(R.string.group_saf))
             addGroup(rows, "websites", str(R.string.group_websites))
             // Apps management: virtual read-only source, like a storage node it's an in-place expandable tree (installed / system).
-            addFile(
+            if (rootVisible("apps")) addFile(
                 rows,
                 XFile(AppsFileSystem.SCHEME, "/", isDir = true, canWrite = false),
                 0,
@@ -3017,6 +3064,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun addGroup(rows: MutableList<Node>, id: String, label: String) {
+        if (id != "cmp" && !rootVisible(id)) return
         val key = "g:$id"
         val exp = expanded.contains(key)
         rows += GroupNode(id, label, exp)

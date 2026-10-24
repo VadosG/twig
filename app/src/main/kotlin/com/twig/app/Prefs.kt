@@ -12,6 +12,13 @@ object Prefs {
 
     private fun sp(ctx: Context) = ctx.getSharedPreferences(FILE, Context.MODE_PRIVATE)
 
+    fun rootItemVisible(ctx: Context, pane: Int, id: String): Boolean =
+        sp(ctx).getBoolean("root_item_${pane}_$id", RootItems.all.first { it.id == id }.visibleByDefault)
+
+    fun setRootItemVisible(ctx: Context, pane: Int, id: String, visible: Boolean) {
+        sp(ctx).edit().putBoolean("root_item_${pane}_$id", visible).apply()
+    }
+
     /** 0=system region, 1=yy-MM-dd, 2=dd.MM.yy, 3=MM/dd/yy. */
     fun dateFormat(ctx: Context): Int = sp(ctx).getInt("date_format", 0).coerceIn(0, 3)
 
