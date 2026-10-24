@@ -258,6 +258,17 @@ each write `= null`.
   UTF-8 bytes carried by `ShareSourceFileSystem` as an internal data URI. Incoming
   data URIs remain forbidden by `IncomingUri`; attachments take precedence over text
   captions. Text sources are self-contained so retries need no Activity or cache file.
+  The share destination picker and main screen share `view_panes.xml`, `PaneLayout`
+  and the `PaneSwitch` toolbar control: portrait uses one continuous track with the
+  strip between panes; landscape shows both panes around the middle strip.
+  The picker keeps independent root visibility and navigation; the toolbar switch
+  or horizontal swipe changes the active pane. Only
+  that pane controls the destination button, through a replaceable `enableOnWritableDir`
+  observer. The active side and edited filename survive Activity recreation.
+  `SortDialog` is shared with the main screen; picker strip actions delegate search
+  and history to the active pane, while compress and WiFi sharing stay hidden.
+  The share picker follows `Prefs.fullscreen` through `StatusBarFullscreen`, including
+  resume and window-focus changes.
   Incoming `content://` URIs are all carried by `ShareSourceFileSystem` (scheme `share`),
   whose `openRandom` seeks through `openFileDescriptor` — so archives are parsed
   streaming without materializing and video can seek.
