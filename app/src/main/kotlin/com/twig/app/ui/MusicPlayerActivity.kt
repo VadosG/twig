@@ -147,6 +147,10 @@ class MusicPlayerActivity : AppCompatActivity() {
         b.btnNext.setOnClickListener { MusicEngine.next() }
         b.btnPrev.setOnClickListener { MusicEngine.prev() }
         b.btnShuffle.setOnClickListener { MusicEngine.toggleShuffle() }
+        b.btnShuffle.setOnLongClickListener {
+            MusicUi.exit(this)
+            true
+        }
         b.btnRepeat.setOnClickListener { MusicEngine.cycleRepeat() }
         b.btnQueue.setOnClickListener { MusicEngine.queueId.takeIf { it.isNotEmpty() }?.let { PlaylistActivity.start(this, it) } }
         b.btnFav.setOnClickListener { toggleFav() }
