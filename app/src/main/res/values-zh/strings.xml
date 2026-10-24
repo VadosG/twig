@@ -1127,4 +1127,7 @@
     <string name="settings_completion_vibration_desc">适用于复制、移动、删除、压缩和解压</string>
     <string name="settings_foreground_completion">前台操作完成通知</string>
     <string name="settings_foreground_completion_desc">在 Twig 内操作时也保留完成通知。后台和锁屏时始终通知。</string>
+
+    <string name="settings_exit_on_back">返回时退出</string>
+    <string name="settings_exit_on_back_desc">返回关闭主界面时退出 Twig；有运行中的任务时会先确认。</string>
 </resources>

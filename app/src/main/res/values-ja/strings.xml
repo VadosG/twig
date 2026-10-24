@@ -1097,4 +1097,7 @@
     <string name="settings_completion_vibration_desc">コピー、移動、削除、圧縮、展開に適用</string>
     <string name="settings_foreground_completion">フォアグラウンドでの完了通知</string>
     <string name="settings_foreground_completion_desc">Twig の使用中も完了を通知します。バックグラウンドや画面ロック中は常に通知します。</string>
+
+    <string name="settings_exit_on_back">戻る操作で終了</string>
+    <string name="settings_exit_on_back_desc">戻る操作でメイン画面を閉じるときに Twig を終了します。実行中のタスクがある場合は確認します。</string>
 </resources>

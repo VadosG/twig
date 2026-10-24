@@ -225,6 +225,12 @@ class SettingsActivity : AppCompatActivity() {
             set = { Prefs.setRowDivider(this, it) },
         )
 
+        switchRow(
+            getString(R.string.settings_exit_on_back), getString(R.string.settings_exit_on_back_desc),
+            get = { Prefs.exitOnBack(this) },
+            set = { Prefs.setExitOnBack(this, it) },
+        )
+
         section(getString(R.string.settings_section_grid))
         choiceRow(
             getString(R.string.settings_grid_mode),

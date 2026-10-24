@@ -1097,4 +1097,7 @@
     <string name="settings_completion_vibration_desc">Copia, spostamento, eliminazione, compressione ed estrazione</string>
     <string name="settings_foreground_completion">Notifiche di completamento in primo piano</string>
     <string name="settings_foreground_completion_desc">Notifica anche durante l’uso di Twig. Notifica sempre in background e a schermo bloccato.</string>
+
+    <string name="settings_exit_on_back">Esci con Indietro</string>
+    <string name="settings_exit_on_back_desc">Esci da Twig quando Indietro chiude la schermata principale. Chiedi conferma se ci sono attività in corso.</string>
 </resources>

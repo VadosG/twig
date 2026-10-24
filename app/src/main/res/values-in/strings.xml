@@ -1097,4 +1097,7 @@
     <string name="settings_completion_vibration_desc">Salin, pindah, hapus, kompres dan ekstrak arsip</string>
     <string name="settings_foreground_completion">Notifikasi selesai di latar depan</string>
     <string name="settings_foreground_completion_desc">Beri notifikasi juga saat menggunakan Twig. Selalu beri notifikasi di latar belakang dan saat layar terkunci.</string>
+
+    <string name="settings_exit_on_back">Keluar saat Kembali</string>
+    <string name="settings_exit_on_back_desc">Keluar dari Twig saat tombol Kembali menutup layar utama. Minta konfirmasi jika ada tugas yang berjalan.</string>
 </resources>

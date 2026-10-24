@@ -1101,4 +1101,7 @@
     <string name="settings_completion_vibration_desc">النسخ والنقل والحذف وضغط الأرشيفات واستخراجها</string>
     <string name="settings_foreground_completion">إشعارات الاكتمال أثناء استخدام التطبيق</string>
     <string name="settings_foreground_completion_desc">الإشعار أيضًا أثناء استخدام Twig. الإشعار دائمًا في الخلفية وعند قفل الشاشة.</string>
+
+    <string name="settings_exit_on_back">الخروج عند الرجوع</string>
+    <string name="settings_exit_on_back_desc">الخروج من Twig عندما يغلق زر الرجوع الشاشة الرئيسية، مع طلب التأكيد إذا كانت هناك مهام قيد التشغيل.</string>
 </resources>

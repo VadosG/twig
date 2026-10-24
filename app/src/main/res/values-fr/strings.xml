@@ -1097,4 +1097,7 @@
     <string name="settings_completion_vibration_desc">Copie, déplacement, suppression, compression et extraction</string>
     <string name="settings_foreground_completion">Notifications de fin au premier plan</string>
     <string name="settings_foreground_completion_desc">Notifier aussi pendant l’utilisation de Twig. Toujours notifier en arrière-plan et lorsque l’écran est verrouillé.</string>
+
+    <string name="settings_exit_on_back">Quitter avec Retour</string>
+    <string name="settings_exit_on_back_desc">Quitter Twig lorsque Retour ferme l’écran principal. Demander confirmation si des tâches sont en cours.</string>
 </resources>

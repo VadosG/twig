@@ -12,6 +12,12 @@ object Prefs {
 
     private fun sp(ctx: Context) = ctx.getSharedPreferences(FILE, Context.MODE_PRIVATE)
 
+    fun exitOnBack(ctx: Context): Boolean = sp(ctx).getBoolean("exit_on_back", false)
+
+    fun setExitOnBack(ctx: Context, on: Boolean) {
+        sp(ctx).edit().putBoolean("exit_on_back", on).apply()
+    }
+
     fun vibrateOnCompletion(ctx: Context): Boolean = sp(ctx).getBoolean("vibrate_on_completion", false)
 
     fun setVibrateOnCompletion(ctx: Context, on: Boolean) {

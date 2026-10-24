@@ -1096,4 +1096,7 @@
     <string name="settings_completion_vibration_desc">Sao chép, di chuyển, xóa, nén và giải nén</string>
     <string name="settings_foreground_completion">Thông báo hoàn tất khi đang dùng ứng dụng</string>
     <string name="settings_foreground_completion_desc">Cũng thông báo khi đang dùng Twig. Luôn thông báo khi chạy nền hoặc màn hình bị khóa.</string>
+
+    <string name="settings_exit_on_back">Thoát khi nhấn Quay lại</string>
+    <string name="settings_exit_on_back_desc">Thoát Twig khi nút Quay lại đóng màn hình chính. Yêu cầu xác nhận nếu có tác vụ đang chạy.</string>
 </resources>

@@ -356,6 +356,10 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
             )
             return
         }
+        if (Prefs.exitOnBack(this)) {
+            confirmExit()
+            return
+        }
         @Suppress("DEPRECATION") super.onBackPressed()
     }
 

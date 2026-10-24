@@ -1097,4 +1097,7 @@
     <string name="settings_completion_vibration_desc">Kopieren, Verschieben, Löschen, Packen und Entpacken</string>
     <string name="settings_foreground_completion">Abschlussmeldungen im Vordergrund</string>
     <string name="settings_foreground_completion_desc">Auch während der Nutzung von Twig benachrichtigen. Im Hintergrund und bei gesperrtem Bildschirm immer benachrichtigen.</string>
+
+    <string name="settings_exit_on_back">Mit Zurück beenden</string>
+    <string name="settings_exit_on_back_desc">Twig beenden, wenn Zurück den Hauptbildschirm schließt. Bei laufenden Aufgaben wird eine Bestätigung angefordert.</string>
 </resources>

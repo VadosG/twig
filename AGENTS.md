@@ -274,7 +274,10 @@ each write `= null`.
   fields) + `secure/Backup` (`.twigbak` config backup) + `ui/SecurityUi` (dialogs).
   See [docs/lessons/security.md](docs/lessons/security.md).
 - Settings: `SettingsActivity` (a hand-written standalone settings page: display / grid
-  view / thumbnails, no preference library). Layout-affecting preferences (row height,
+  view / thumbnails, no preference library). The default-off `Prefs.exitOnBack` applies
+  only to the main screen: after pane-local Back handling, it reuses `confirmExit`
+  (active tasks require confirmation). Music keeps its long-press Shuffle exit shortcut.
+  Layout-affecting preferences (row height,
   grid, thumbnails) go through `Prefs.uiSignature` — `MainActivity.onResume` compares the
   signature and calls `recreate()` on change; in `PaneFragment.onViewCreated`, **when the
   VM already has rows, only call `resortAll()` and do not bootstrap again** (after

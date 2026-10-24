@@ -1173,4 +1173,7 @@
     <string name="settings_completion_vibration_desc">Copy, move, delete, archive packing and extraction</string>
     <string name="settings_foreground_completion">Completion notifications in foreground</string>
     <string name="settings_foreground_completion_desc">Also notify while using Twig. Background and locked-screen operations always notify.</string>
+
+    <string name="settings_exit_on_back">Exit on Back</string>
+    <string name="settings_exit_on_back_desc">Exit Twig when Back closes the main screen. Ask for confirmation if tasks are running.</string>
 </resources>
