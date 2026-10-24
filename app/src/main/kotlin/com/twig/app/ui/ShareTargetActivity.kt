@@ -26,11 +26,12 @@ import com.twig.core.XFile
 import com.twig.core.isWritableDir
 
 /**
- * Receives a share from another app (image / arbitrary file) and shows the
+ * Receives a share from another app (text / image / arbitrary file) and shows the
  * directory-picker UI ("Copy to"): it reuses the same [PaneFragment] tree
  * navigation as the main screen, the inbound content:// URI is wrapped into an
  * XFile via [ShareSourceFileSystem] and streamed by [CopyEngine] into the chosen
- * destination directory — no new copy logic, just one new read-only source.
+ * destination directory. Plain text uses a self-contained UTF-8 source with an
+ * editable filename and follows the same transfer and conflict handling.
  */
 class ShareTargetActivity : AppCompatActivity(), PaneFragment.Host {
 
@@ -38,6 +39,7 @@ class ShareTargetActivity : AppCompatActivity(), PaneFragment.Host {
 
     private lateinit var b: ActivityShareTargetBinding
     private lateinit var incoming: List<IncomingItem>
+    private var incomingText: String? = null
     private lateinit var shareFs: ShareSourceFileSystem
 
     private val manageAllFilesLauncher =
@@ -63,7 +65,8 @@ class ShareTargetActivity : AppCompatActivity(), PaneFragment.Host {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         incoming = resolveIncoming(intent)
-        if (incoming.isEmpty()) {
+        incomingText = sharedText(intent)
+        if (incoming.isEmpty() && incomingText == null) {
             Toast.makeText(this, getString(R.string.share_no_content), Toast.LENGTH_LONG).show()
             finish(); return
         }
@@ -72,8 +75,14 @@ class ShareTargetActivity : AppCompatActivity(), PaneFragment.Host {
         setContentView(b.root)
         b.toolbar.title = getString(R.string.copy_to)
         b.toolbar.setNavigationOnClickListener { finish() }
-        b.tvSummary.text = if (incoming.size == 1) incoming[0].name
+        b.tvSummary.text = if (incomingText != null) getString(R.string.share_text_filename)
+        else if (incoming.size == 1) incoming[0].name
         else getString(R.string.copy_items, incoming.size)
+        if (incomingText != null) {
+            b.textFilename.visibility = View.VISIBLE
+            b.textFilename.setText(getString(R.string.share_text_filename))
+            b.btnConfirm.setText(R.string.viewer_save)
+        }
 
         com.twig.app.TwigApp.registerBaseFs(this)
         shareFs = FsRegistry.of(ShareSourceFileSystem.SCHEME) as ShareSourceFileSystem
@@ -162,7 +171,15 @@ class ShareTargetActivity : AppCompatActivity(), PaneFragment.Host {
      * the process, and the in-flight copy is gone too (same as before the change).
      */
     private fun startCopy(dest: XFile) {
-        val items = incoming.map { shareFs.wrap(it.uri, it.name, it.size) }
+        val items = incomingText?.let { text ->
+            val name = b.textFilename.text.toString().trim()
+            if (!WebsiteDownloadTask.validName(name)) {
+                b.textFilename.error = getString(R.string.website_download_invalid_name)
+                b.textFilename.requestFocus()
+                return
+            }
+            listOf(shareFs.wrapText(text, name))
+        } ?: incoming.map { shareFs.wrap(it.uri, it.name, it.size) }
         val session = Transfers.Session(
             Transfers.Work.Copy(items, dest, move = false, fromClipboard = false),
             R.string.progress_copy,
@@ -284,5 +301,14 @@ class ShareTargetActivity : AppCompatActivity(), PaneFragment.Host {
 
     companion object {
         private const val PANE_TAG = "share_pane"
+
+        /** Attachments take precedence over captions. Never reinterpret a rejected URI as text. */
+        internal fun sharedText(intent: Intent): String? {
+            if (intent.action != Intent.ACTION_SEND || intent.hasExtra(Intent.EXTRA_STREAM)) return null
+            val clip = intent.clipData
+            if (clip != null && (0 until clip.itemCount).any { clip.getItemAt(it).uri != null }) return null
+            return (intent.getCharSequenceExtra(Intent.EXTRA_TEXT)?.toString()
+                ?: clip?.takeIf { it.itemCount == 1 }?.getItemAt(0)?.text?.toString())?.takeIf { it.isNotEmpty() }
+        }
     }
 }

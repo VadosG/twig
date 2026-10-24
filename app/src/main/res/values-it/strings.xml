@@ -1100,4 +1100,5 @@
 
     <string name="settings_exit_on_back">Esci con Indietro</string>
     <string name="settings_exit_on_back_desc">Esci da Twig quando Indietro chiude la schermata principale. Chiedi conferma se ci sono attività in corso.</string>
+    <string name="share_text_filename">Testo condiviso.txt</string>
 </resources>

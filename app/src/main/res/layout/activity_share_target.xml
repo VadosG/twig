@@ -35,6 +35,16 @@
             android:layout_height="match_parent" />
     </LinearLayout>
 
+    <EditText
+        android:id="@+id/text_filename"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:hint="@string/website_download_name"
+        android:inputType="text"
+        android:singleLine="true"
+        android:visibility="gone" />
+
     <!-- Bottom confirmation bar: the target directory is already shown in the pane's
              path bar, so only cancel/confirm are kept here. -->
     <LinearLayout

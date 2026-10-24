@@ -254,6 +254,10 @@ each write `= null`.
 - Interop with other apps: two ways in (`SEND` → `ShareTargetActivity` "copy to…";
   `VIEW` → `ViewIntentActivity` "open with Twig") and one way out
   (`OpenFiles.openWith` exposes a streaming `content://` via `StreamProvider`).
+  Plain shared text uses the same destination picker with an editable filename and
+  UTF-8 bytes carried by `ShareSourceFileSystem` as an internal data URI. Incoming
+  data URIs remain forbidden by `IncomingUri`; attachments take precedence over text
+  captions. Text sources are self-contained so retries need no Activity or cache file.
   Incoming `content://` URIs are all carried by `ShareSourceFileSystem` (scheme `share`),
   whose `openRandom` seeks through `openFileDescriptor` — so archives are parsed
   streaming without materializing and video can seek.

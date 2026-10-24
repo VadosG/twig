@@ -1100,4 +1100,5 @@
 
     <string name="settings_exit_on_back">Keluar saat Kembali</string>
     <string name="settings_exit_on_back_desc">Keluar dari Twig saat tombol Kembali menutup layar utama. Minta konfirmasi jika ada tugas yang berjalan.</string>
+    <string name="share_text_filename">Teks dibagikan.txt</string>
 </resources>

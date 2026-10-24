@@ -1100,4 +1100,5 @@
 
     <string name="settings_exit_on_back">Salir al volver atrás</string>
     <string name="settings_exit_on_back_desc">Salir de Twig cuando Atrás cierre la pantalla principal. Pedir confirmación si hay tareas en curso.</string>
+    <string name="share_text_filename">Texto compartido.txt</string>
 </resources>

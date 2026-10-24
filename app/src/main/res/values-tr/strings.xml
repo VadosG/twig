@@ -1100,4 +1100,5 @@
 
     <string name="settings_exit_on_back">Geri ile çık</string>
     <string name="settings_exit_on_back_desc">Geri düğmesi ana ekranı kapattığında Twig uygulamasından çık. Çalışan görevler varsa onay iste.</string>
+    <string name="share_text_filename">Paylaşılan metin.txt</string>
 </resources>

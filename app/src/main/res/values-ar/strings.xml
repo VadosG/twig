@@ -1104,4 +1104,5 @@
 
     <string name="settings_exit_on_back">الخروج عند الرجوع</string>
     <string name="settings_exit_on_back_desc">الخروج من Twig عندما يغلق زر الرجوع الشاشة الرئيسية، مع طلب التأكيد إذا كانت هناك مهام قيد التشغيل.</string>
+    <string name="share_text_filename">نص مشارك.txt</string>
 </resources>

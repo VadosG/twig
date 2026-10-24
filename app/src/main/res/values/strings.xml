@@ -1176,4 +1176,5 @@
 
     <string name="settings_exit_on_back">Exit on Back</string>
     <string name="settings_exit_on_back_desc">Exit Twig when Back closes the main screen. Ask for confirmation if tasks are running.</string>
+    <string name="share_text_filename">Shared text.txt</string>
 </resources>

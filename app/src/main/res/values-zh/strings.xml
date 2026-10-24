@@ -1130,4 +1130,5 @@
 
     <string name="settings_exit_on_back">返回时退出</string>
     <string name="settings_exit_on_back_desc">返回关闭主界面时退出 Twig；有运行中的任务时会先确认。</string>
+    <string name="share_text_filename">分享的文本.txt</string>
 </resources>
