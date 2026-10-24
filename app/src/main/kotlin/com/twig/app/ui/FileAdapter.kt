@@ -992,10 +992,9 @@ class FileAdapter(
             // here we only handle what this row itself should look like.
             val dpi = ctx.resources.displayMetrics.density
             when {
-                // Root row with a label: an internal storage one is ic_storage, but when the chooser is locked to a particular server
-                // this row represents that server and should use its source-type icon (same set as the path bar / recents /
-                // copy-target rows, see FileIcons.sourceIconRes)
-                node.label != null -> b.icon.setImageResource(FileIcons.sourceIconRes(file.scheme))
+                // Labeled roots distinguish internal storage, / and removable media.
+                // A picker locked to a server still uses that server's source icon.
+                node.label != null -> b.icon.setImageResource(FileIcons.storageRootIconRes(file))
                 file.scheme.startsWith("git") && file.path == "/" ->
                     b.icon.setImageResource(R.drawable.ic_git)
                 file.isDir -> {
@@ -1070,7 +1069,9 @@ class FileAdapter(
                     "cmp" -> R.drawable.ic_compare_fav
                     "lan" -> R.drawable.ic_lan
                     "ftp" -> R.drawable.ic_ftp
-                    "dav", "s3" -> R.drawable.ic_cloud
+                    "dav" -> R.drawable.ic_webdav
+                    "s3" -> R.drawable.ic_s3
+                    "saf" -> R.drawable.ic_document_tree
                     // The group id "media" is shared by Jellyfin / Emby (the other two names exist only as defensive aliases), so
                     // here we use the neutral monitor icon — the play button with the official colours is on each
                     // server's own row below; the shapes differ so they won't be confused with Emby's green triangle

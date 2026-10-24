@@ -2818,6 +2818,12 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
             addFile(rows, lock, 0, lockLabel)
         } else {
             val ext = Environment.getExternalStorageDirectory().absolutePath
+            val volumes = StorageVolumes.cached(getApplication())
+            // Register all shortcut identities before rendering any expanded subtree:
+            // Root now precedes volume shortcuts, whose paths may also appear below it.
+            storageShortcutKeys.add(fileKey(XFile("file", ext, isDir = true)))
+            storageShortcutKeys.add(fileKey(XFile("file", "/", isDir = true)))
+            volumes.forEach { storageShortcutKeys.add(fileKey(XFile("file", it.path, isDir = true))) }
             // Externally opened archives go at the top — they don't belong to any storage tree, so wedged in the middle they'd be hard to find.
             externalMount?.let { addFile(rows, it, 0, externalLabel, keyPrefix = EXTERNAL_KEY_PREFIX) }
             addGroup(rows, "fav", str(R.string.group_fav))
@@ -2826,11 +2832,12 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
                 addGroup(rows, "cmp", str(R.string.compare_saved))
             }
             addFile(rows, XFile("file", ext, isDir = true), 0, str(R.string.group_internal_storage), capacity(ext))
-            // SD card / USB drive: wedged between internal storage and the root. The list is cached (see StorageVolumes class comments) — rebuild runs on every render, so don't rescan storageVolumes here.
-            for (v in StorageVolumes.cached(getApplication())) {
+            addFile(rows, XFile("file", "/", isDir = true), 0, str(R.string.group_root), capacity("/"))
+            // Keep built-in locations together, followed by removable volumes. Use the
+            // cached list: rebuild runs on every render, so it must not rescan storage.
+            for (v in volumes) {
                 addFile(rows, XFile("file", v.path, isDir = true), 0, v.label, capacity(v.path))
             }
-            addFile(rows, XFile("file", "/", isDir = true), 0, str(R.string.group_root), capacity("/"))
             if (trashEnabled) addFile(rows, XFile("trash", "/", isDir = true, canWrite = false), 0, str(R.string.trash_title))
             addGroup(rows, "lan", str(R.string.group_lan))
             addGroup(rows, "ftp", "FTP")
