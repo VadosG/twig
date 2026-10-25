@@ -226,6 +226,11 @@ class SettingsActivity : AppCompatActivity() {
         )
 
         switchRow(
+            getString(R.string.settings_toolbar_bottom), getString(R.string.settings_toolbar_bottom_desc),
+            get = { Prefs.toolbarAtBottom(this) },
+            set = { Prefs.setToolbarAtBottom(this, it) },
+        )
+        switchRow(
             getString(R.string.settings_exit_on_back), getString(R.string.settings_exit_on_back_desc),
             get = { Prefs.exitOnBack(this) },
             set = { Prefs.setExitOnBack(this, it) },

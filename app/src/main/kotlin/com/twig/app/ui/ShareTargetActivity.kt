@@ -80,6 +80,7 @@ class ShareTargetActivity : AppCompatActivity(), PaneFragment.Host {
         fullscreenLayout = StatusBarFullscreen(this, b.root)
         fullscreenLayout.apply(com.twig.app.Prefs.fullscreen(this))
         b.toolbar.title = getString(R.string.copy_to)
+        ToolbarPlacement.apply(this, b.toolbar, com.twig.app.Prefs.toolbarAtBottom(this))
         b.toolbar.setNavigationOnClickListener { finish() }
         b.tvSummary.text = if (incomingText != null) getString(R.string.share_text_filename)
         else if (incoming.size == 1) incoming[0].name
@@ -173,6 +174,7 @@ class ShareTargetActivity : AppCompatActivity(), PaneFragment.Host {
 
     override fun onResume() {
         super.onResume()
+        if (::b.isInitialized) ToolbarPlacement.apply(this, b.toolbar, com.twig.app.Prefs.toolbarAtBottom(this))
         if (::fullscreenLayout.isInitialized) fullscreenLayout.apply(com.twig.app.Prefs.fullscreen(this))
     }
 

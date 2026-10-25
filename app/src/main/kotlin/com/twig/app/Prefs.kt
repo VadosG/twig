@@ -12,6 +12,12 @@ object Prefs {
 
     private fun sp(ctx: Context) = ctx.getSharedPreferences(FILE, Context.MODE_PRIVATE)
 
+    fun toolbarAtBottom(ctx: Context): Boolean = sp(ctx).getBoolean("toolbar_at_bottom", false)
+
+    fun setToolbarAtBottom(ctx: Context, bottom: Boolean) {
+        sp(ctx).edit().putBoolean("toolbar_at_bottom", bottom).apply()
+    }
+
     fun exitOnBack(ctx: Context): Boolean = sp(ctx).getBoolean("exit_on_back", false)
 
     fun setExitOnBack(ctx: Context, on: Boolean) {
@@ -487,7 +493,7 @@ object Prefs {
      * returning from settings, MainActivity recreates. */
     fun uiSignature(ctx: Context): String = listOf(
         density(ctx), textSize(ctx), thumbs(ctx), thumbsGrid(ctx), thumbsGridNames(ctx), gridCell(ctx), thumbsPlaybackProgress(ctx),
-        showHidden(ctx), rowDivider(ctx), sniffTypes(ctx), dateFormat(ctx), folderCounts(ctx), trashEnabled(ctx),
+        showHidden(ctx), rowDivider(ctx), sniffTypes(ctx), dateFormat(ctx), folderCounts(ctx), trashEnabled(ctx), toolbarAtBottom(ctx),
     ).joinToString(",")
 
     /** Last active queue id (NOW or a named playlist), used by cold-start resume to locate the right list. */

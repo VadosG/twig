@@ -1101,4 +1101,6 @@
     <string name="settings_exit_on_back">Mit Zurück beenden</string>
     <string name="settings_exit_on_back_desc">Twig beenden, wenn Zurück den Hauptbildschirm schließt. Bei laufenden Aufgaben wird eine Bestätigung angefordert.</string>
     <string name="share_text_filename">Geteilter Text.txt</string>
+    <string name="settings_toolbar_bottom">Symbolleiste unten</string>
+    <string name="settings_toolbar_bottom_desc">Die Symbolleiste des Dateibrowsers für eine einfachere Einhandbedienung nach unten verschieben</string>
 </resources>

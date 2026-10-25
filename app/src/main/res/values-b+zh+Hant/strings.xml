@@ -1100,4 +1100,6 @@
     <string name="settings_exit_on_back">返回時退出</string>
     <string name="settings_exit_on_back_desc">返回關閉主畫面時退出 Twig；有執行中的工作時會先確認。</string>
     <string name="share_text_filename">分享的文字.txt</string>
+    <string name="settings_toolbar_bottom">工具列置於底部</string>
+    <string name="settings_toolbar_bottom_desc">將檔案瀏覽畫面的工具列移到底部，方便單手操作</string>
 </resources>

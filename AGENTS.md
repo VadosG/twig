@@ -297,7 +297,13 @@ each write `= null`.
   fields) + `secure/Backup` (`.twigbak` config backup) + `ui/SecurityUi` (dialogs).
   See [docs/lessons/security.md](docs/lessons/security.md).
 - Settings: `SettingsActivity` (a hand-written standalone settings page: display / grid
-  view / thumbnails, no preference library). The default-off `Prefs.exitOnBack` applies
+  view / thumbnails, no preference library). `Prefs.toolbarAtBottom` defaults off;
+  `ToolbarPlacement` moves the existing browser toolbar below content and matches
+  navigation-bar tint to its background. Main and share-picker screens follow it;
+  the main landscape layout keeps the toolbar hidden and the strip centered.
+  The preference is included in `uiSignature` so returning from settings recreates
+  the main layout while retaining pane ViewModels.
+  The default-off `Prefs.exitOnBack` applies
   only to the main screen: after pane-local Back handling, it reuses `confirmExit`
   (active tasks require confirmation). Music keeps its long-press Shuffle exit shortcut.
   Layout-affecting preferences (row height,

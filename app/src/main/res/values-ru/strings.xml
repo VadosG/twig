@@ -1137,4 +1137,6 @@
     <string name="settings_exit_on_back">Выход по кнопке «Назад»</string>
     <string name="settings_exit_on_back_desc">Выходить из Twig, когда кнопка «Назад» закрывает главный экран. Запрашивать подтверждение, если есть выполняющиеся задачи.</string>
     <string name="share_text_filename">Полученный текст.txt</string>
+    <string name="settings_toolbar_bottom">Панель инструментов внизу</string>
+    <string name="settings_toolbar_bottom_desc">Переместить панель инструментов файлового браузера вниз для удобного управления одной рукой</string>
 </resources>

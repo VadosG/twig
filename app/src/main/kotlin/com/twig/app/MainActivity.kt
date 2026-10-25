@@ -619,6 +619,7 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
         b.browser.stripRight.root.visibility = if (!land) View.VISIBLE else View.GONE
         // Landscape has no Toolbar (vertical space is precious); its right-side buttons move into the strip's top pinned row
         b.toolbar.visibility = if (land) View.GONE else View.VISIBLE
+        com.twig.app.ui.ToolbarPlacement.apply(this, b.toolbar, Prefs.toolbarAtBottom(this))
         // Landscape's height can't fit a full single column, so the strip becomes two columns (width doubles)
         for (s in listOf(b.browser.stripMid, b.browser.stripLeft, b.browser.stripRight)) {
             applyStripColumns(s, land)
