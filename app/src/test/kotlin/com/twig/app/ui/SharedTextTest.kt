@@ -117,6 +117,63 @@ class SharedTextTest {
         }
     }
 
+    @Test fun `untouched text share survives repeated measured orientation changes`() =
+        assertShareRotates(send("some text"), text = true)
+
+    @Test fun `single file share survives repeated measured orientation changes`() =
+        assertShareRotates(Intent(Intent.ACTION_SEND).setType("application/octet-stream")
+            .putExtra(Intent.EXTRA_STREAM, Uri.parse("content://external-share/document.bin")), text = false)
+
+    @Test fun `multiple image share survives repeated measured orientation changes`() =
+        assertShareRotates(Intent(Intent.ACTION_SEND_MULTIPLE).setType("image/*")
+            .putParcelableArrayListExtra(Intent.EXTRA_STREAM, arrayListOf(
+                Uri.parse("content://external-share/first.jpg"), Uri.parse("content://external-share/second.jpg"),
+            )), text = false)
+
+    private fun assertShareRotates(intent: Intent, text: Boolean) {
+        shadowOf(app).grantPermissions(android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        Prefs.setRememberLocation(app, false)
+        val controller = Robolectric.buildActivity(ShareTargetActivity::class.java, intent)
+        try {
+            controller.setup()
+            val activity = controller.get()
+            val summary = activity.findViewById<android.widget.TextView>(R.id.tv_summary).text.toString()
+            val panes = (0..1).map { activity.supportFragmentManager.findFragmentByTag("share_pane_$it") }
+            fun measure(land: Boolean) {
+                val root = activity.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar).parent as android.view.View
+                val width = if (land) 800 else 400
+                val height = if (land) 400 else 800
+                root.measure(android.view.View.MeasureSpec.makeMeasureSpec(width, android.view.View.MeasureSpec.EXACTLY),
+                    android.view.View.MeasureSpec.makeMeasureSpec(height, android.view.View.MeasureSpec.EXACTLY))
+                root.layout(0, 0, width, height)
+            }
+            measure(false)
+            repeat(12) { turn ->
+                val land = turn % 2 == 0
+                val config = android.content.res.Configuration(activity.resources.configuration).apply {
+                    orientation = if (land) android.content.res.Configuration.ORIENTATION_LANDSCAPE
+                        else android.content.res.Configuration.ORIENTATION_PORTRAIT
+                    screenWidthDp = if (land) 800 else 400
+                    screenHeightDp = if (land) 400 else 800
+                }
+                controller.configurationChange(config)
+                measure(land)
+                val stripId = if (land) R.id.strip_mid else R.id.strip_right
+                val strip = activity.findViewById<android.view.View>(stripId)
+                assertEquals(android.view.View.VISIBLE, strip.visibility)
+                val grid = strip.findViewById<StripGrid>(R.id.as_grid)
+                assertEquals(if (land) 2 else 1, grid.columnCount)
+                for (i in 0..1) assertSame(panes[i], activity.supportFragmentManager.findFragmentByTag("share_pane_$i"))
+                val filename = activity.findViewById<EditText>(R.id.text_filename)
+                assertEquals(if (text) android.view.View.VISIBLE else android.view.View.GONE, filename.visibility)
+                if (text) assertEquals(activity.getString(R.string.share_text_filename), filename.text.toString())
+                assertEquals(summary, activity.findViewById<android.widget.TextView>(R.id.tv_summary).text.toString())
+                assertFalse(activity.isFinishing)
+            }
+        } finally { controller.pause().stop().destroy() }
+    }
+
     @Test fun `switching panes uses independent root visibility and only the active destination controls Save`() {
         shadowOf(app).grantPermissions(android.Manifest.permission.READ_EXTERNAL_STORAGE,
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE)

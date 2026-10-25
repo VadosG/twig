@@ -637,7 +637,7 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
         s.asGrid.dividers = on
         s.asTop.dividers = on
         val cols = if (land) 2 else 1
-        if (s.asGrid.columnCount != cols) s.asGrid.columnCount = cols
+        s.asGrid.setColumns(cols)
         val w = (STRIP_COL_DP * cols * resources.displayMetrics.density).toInt()
         val lp = s.root.layoutParams
         if (lp.width != w) {

@@ -4,6 +4,18 @@
 > shared conventions are in [AGENTS.md](../../AGENTS.md); the other sections live
 > beside this file in [docs/lessons/](.).
 
+- **Rotating an untouched share destination picker crashed (2026-10-25, issue #28)**:
+  after measuring a two-column action strip, GridLayout writes assigned row/column
+  indices into child LayoutParams. Reducing columnCount to one validates those old
+  indices first and throws IllegalArgumentException. StripGrid.setColumns resets
+  automatic row/column specs, including hidden buttons, before changing the count;
+  keep equal column weights and fill alignment. Main and share screens use this
+  common path. A rotation test that only calls configuration callbacks misses it:
+  SharedTextTest measures/layouts between twelve actual configuration changes for
+  text, single-file and multiple-image shares; it reproduces the original exception
+  before the fix. StripGridTest covers both grids,
+  hidden actions, equal widths and retained click handlers on API 24 and 34.
+
 - **Content comparison reported read failures as differences** (2026-10-21, #17):
   `contentEquals` swallowed stream failures and returned false, making sync offer to
   overwrite an unreadable pair. Propagate read errors to `compareFiles`, which records

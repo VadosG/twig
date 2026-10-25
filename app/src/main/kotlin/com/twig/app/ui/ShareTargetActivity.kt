@@ -154,7 +154,7 @@ class ShareTargetActivity : AppCompatActivity(), PaneFragment.Host {
         b.browser.stripMid.root.visibility = if (land) View.VISIBLE else View.GONE
         b.browser.stripRight.root.visibility = if (land) View.GONE else View.VISIBLE
         for (strip in listOf(b.browser.stripLeft, b.browser.stripMid, b.browser.stripRight)) {
-            strip.asGrid.columnCount = if (land) 2 else 1
+            strip.asGrid.setColumns(if (land) 2 else 1)
             strip.asGrid.dividers = com.twig.app.Prefs.rowDivider(this)
             strip.root.layoutParams = strip.root.layoutParams.apply {
                 width = ((if (land) 104 else 52) * resources.displayMetrics.density).toInt()
