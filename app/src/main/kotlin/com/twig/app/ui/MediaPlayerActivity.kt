@@ -1495,8 +1495,8 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
     /** When there's no previous/next episode in the queue, hide the corresponding button to avoid dead taps. */
     private fun syncQueueButtons() {
         val has = queueIndex >= 0 && queue.size > 1
-        b.btnPrev.visibility = if (has && queueIndex > 0) View.VISIBLE else View.GONE
-        b.btnNext.visibility = if (has && queueIndex < queue.size - 1) View.VISIBLE else View.GONE
+        b.btnPrev.visibility = if (has && queueIndex > 0) View.VISIBLE else View.INVISIBLE
+        b.btnNext.visibility = if (has && queueIndex < queue.size - 1) View.VISIBLE else View.INVISIBLE
         b.btnSkipHead.visibility = if (has) View.VISIBLE else View.GONE
         b.btnSkipTail.visibility = if (has) View.VISIBLE else View.GONE
         b.controls.post { arrangePlaybackButtons() }
@@ -1505,8 +1505,7 @@ class MediaPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback {
     /** Preserve the five playback buttons as a group when portrait width needs two rows. */
     private fun arrangePlaybackButtons() {
         val density = resources.displayMetrics.density
-        val playbackWidth = 64 + (if (b.btnPrev.visibility == View.VISIBLE) 44 else 0) +
-            (if (b.btnNext.visibility == View.VISIBLE) 44 else 0) +
+        val playbackWidth = 64 + 44 + 44 +
             (if (b.btnSkipHead.visibility == View.VISIBLE) 88 else 0)
         val sideWidth = listOf(b.btnSubtitle, b.btnAudioTrack, b.btnScale, b.btnOrientation)
             .count { it.visibility == View.VISIBLE } * 44
