@@ -154,7 +154,8 @@ each write `= null`.
 - Private space: `PrivateSpace` uses `applicationInfo.dataDir/private_space` through
   the ordinary local filesystem. The main menu's root-item visibility choices are
   stored per pane in one dialog with left/right columns; Private space defaults
-  hidden. Its files are excluded from all system backup/transfer channels, and
+  visible; an explicit hidden choice is retained. Its files are excluded from all
+  system backup/transfer channels, and
   configuration-only `.twigbak` never includes them. Known ancestors of Twig's data
   directory get UI-only navigation hints when Android denies enumeration;
   filesystem copy/compare listings must still fail.
@@ -315,6 +316,10 @@ each write `= null`.
   notifying UI observers, which only refresh their views. Never decide whether to
   post a result from `Transfers.ui`: completion itself clears that observer, making
   the old worker-thread check race with dismissal of an open progress dialog.
+  Completion vibration uses alarm alert attributes, so silent ringer mode does not
+  suppress it and background completion is allowed. Do not substitute touch usage:
+  Android restricts that usage for background processes. See the
+  [Android haptics guide](https://developer.android.com/develop/ui/views/haptics/haptics-apis).
 - Thumbnails: `Thumbs` (the engine). Two cache layers: an in-memory LruCache and a
   100 MB disk LRU under `cacheDir/thumbs`; the key is md5(name:size:mtime) and is
   **path-independent** (moving a file or remounting still hits, changing it invalidates).
@@ -539,7 +544,7 @@ add its symptom here.
   stream to be cut back into frames (with a double-sync check), and MPEG-4 arrives in coding
   order, sometimes two VOPs to a chunk, sometimes as 1-byte stuffing; episode queues come from
   the backend first, file names second.
-  *Explains*: history video taps appearing unresponsive before the player opens, fast lyric swipes
+  *Explains*: music notifications lingering after app exit, history video taps appearing unresponsive before the player opens, fast lyric swipes
   seeking or toggling the cover, properties stuck loading on a damaged MKV, an AVI that plays as 300 ms of audio, no sound on a TrueHD Blu-ray, "m2ts
   seeks slowly", black AVI thumbnails, "half my AVIs open at 13 seconds and then freeze",
   "the picture keeps shaking", "this one plays at two thirds speed", "this one will not open

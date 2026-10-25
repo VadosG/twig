@@ -116,6 +116,42 @@ class OperationFeedbackTest {
         assertEquals("Done", ShadowToast.getTextOfLatestToast())
     }
 
+    @org.robolectric.annotation.Implements(className = "android.os.SystemVibrator", isInAndroidSdk = false)
+    class RecordingVibrator : org.robolectric.shadows.ShadowSystemVibrator() {
+        var legacyAudio: android.media.AudioAttributes? = null
+
+        @org.robolectric.annotation.Implementation(maxSdk = 25)
+        override fun vibrate(uid: Int, packageName: String?, milliseconds: Long, audio: android.media.AudioAttributes?) {
+            legacyAudio = audio
+            super.vibrate(uid, packageName, milliseconds, audio)
+        }
+    }
+
+    @Test
+    @Config(shadows = [RecordingVibrator::class])
+    fun `enabled completion vibration uses alert policy in silent mode in foreground and background`() {
+        val audio = app.getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
+        audio.ringerMode = android.media.AudioManager.RINGER_MODE_SILENT
+        Prefs.setVibrateOnCompletion(app, true)
+        fun assertCompletionVibration() {
+            vibrator.cancel()
+            feedback()
+            val recorded = shadowOf(vibrator)
+            assertTrue(recorded.isVibrating)
+            assertEquals(80, recorded.milliseconds)
+            if (android.os.Build.VERSION.SDK_INT >= 33) {
+                assertEquals(android.os.VibrationAttributes.USAGE_ALARM,
+                    (recorded.vibrationAttributesFromLastVibration as android.os.VibrationAttributes).usage)
+            } else {
+                assertEquals(android.media.AudioAttributes.USAGE_ALARM,
+                    requireNotNull((recorded as RecordingVibrator).legacyAudio).usage)
+            }
+        }
+        assertCompletionVibration()
+        host.pause(); paused = true
+        assertCompletionVibration()
+    }
+
     @Test fun `screen off counts as background even before the Activity pauses`() {
         shadowOf(app.getSystemService(Context.POWER_SERVICE) as PowerManager).setIsInteractive(false)
         Prefs.setVibrateOnCompletion(app, true)

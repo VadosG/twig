@@ -36,6 +36,8 @@ class MusicService : Service() {
     private val io = Executors.newSingleThreadExecutor { r -> Thread(r, "twig-music-notif").apply { isDaemon = true } }
     private var cover: Bitmap? = null
     private var coverForId: String? = null
+    private val main = Handler(android.os.Looper.getMainLooper())
+    private var destroyed = false
 
     private val listener = object : MusicEngine.Listener {
         override fun onTrackChanged(index: Int, track: PlaylistTrack?) { updateCoverThenNotify() }
@@ -92,7 +94,11 @@ class MusicService : Service() {
     }
 
     override fun onDestroy() {
+        destroyed = true
+        main.removeCallbacksAndMessages(null)
         MusicEngine.removeListener(listener)
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        nm.cancel(NOTIF_ID)
         session.isActive = false
         session.release()
         io.shutdownNow()
@@ -111,13 +117,18 @@ class MusicService : Service() {
         pushNotification() // push a cover-less version first
         io.execute {
             val bmp = runCatching { Thumbs.audioCover(file, 512) }.getOrNull()
-            cover = bmp
-            coverForId = track.id
-            Handler(mainLooper).post { pushNotification() }
+            main.post {
+                if (!destroyed && MusicEngine.currentTrack()?.id == track.id) {
+                    cover = bmp
+                    coverForId = track.id
+                    pushNotification()
+                }
+            }
         }
     }
 
     private fun pushNotification() {
+        if (destroyed) return
         updateSession()
         runCatching { nm.notify(NOTIF_ID, buildNotification()) }
     }

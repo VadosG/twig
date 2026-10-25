@@ -67,7 +67,9 @@ object OperationFeedback : Application.ActivityLifecycleCallbacks {
     private fun vibrate(ctx: Context) {
         val vibrator = ctx.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator ?: return
         if (!vibrator.hasVibrator()) return
-        val audio = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION)
+        // An explicitly enabled completion alert must work in silent mode and in background.
+        // Touch feedback is restricted to foreground processes; alarm usage supports both.
+        val audio = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM)
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
         runCatching {
             if (Build.VERSION.SDK_INT >= 26) vibrator.vibrate(VibrationEffect.createOneShot(80, VibrationEffect.DEFAULT_AMPLITUDE), audio)

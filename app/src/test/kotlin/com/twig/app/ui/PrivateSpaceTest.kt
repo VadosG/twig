@@ -49,20 +49,20 @@ class PrivateSpaceTest {
         Dispatchers.resetMain()
     }
 
-    @Test fun `private space is hidden by default and visibility is independent per pane`() {
+    @Test fun `private space is visible by default and explicit hiding is independent per pane`() {
         val left = PaneViewModel(app).apply { io = dispatcher }
         val right = PaneViewModel(app).apply { io = dispatcher; paneIndex = 1 }
         fun privateRow(vm: PaneViewModel) = vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>()
             .firstOrNull { it.file.path == PrivateSpace.directory(app).path }
         left.bootstrap()
         right.bootstrap()
-        assertNull(privateRow(left))
-        assertNull(privateRow(right))
-        Prefs.setRootItemVisible(app, 0, "private", true)
+        assertNotNull(privateRow(left))
+        assertNotNull(privateRow(right))
+        Prefs.setRootItemVisible(app, 0, "private", false)
         left.refreshRootItems()
         right.refreshRootItems()
-        assertNotNull(privateRow(left))
-        assertNull(privateRow(right))
+        assertNull(privateRow(left))
+        assertNotNull(privateRow(right))
     }
 
     @Test fun `private space uses local files supports favorites and clears hidden copy target`() = runTest(dispatcher) {
@@ -155,17 +155,17 @@ class PrivateSpaceTest {
             assertNotNull(row.findViewById<android.widget.ImageView>(com.twig.app.R.id.icon).drawable)
             val left = row.findViewById<android.widget.CheckBox>(com.twig.app.R.id.left)
             val right = row.findViewById<android.widget.CheckBox>(com.twig.app.R.id.right)
-            assertFalse(left.isChecked)
-            assertFalse(right.isChecked)
+            assertTrue(left.isChecked)
+            assertTrue(right.isChecked)
             row.findViewById<android.view.View>(com.twig.app.R.id.left_cell).performClick()
             assertTrue(dialog.isShowing)
-            assertTrue(left.isChecked)
-            assertFalse(right.isChecked)
-            assertFalse(Prefs.rootItemVisible(app, 0, "private"))
+            assertFalse(left.isChecked)
+            assertTrue(right.isChecked)
+            assertTrue(Prefs.rootItemVisible(app, 0, "private"))
             dialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE).performClick()
             org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
-            assertTrue(Prefs.rootItemVisible(app, 0, "private"))
-            assertFalse(Prefs.rootItemVisible(app, 1, "private"))
+            assertFalse(Prefs.rootItemVisible(app, 0, "private"))
+            assertTrue(Prefs.rootItemVisible(app, 1, "private"))
         } finally {
             controller.stop().destroy()
         }

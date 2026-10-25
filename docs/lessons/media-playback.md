@@ -4,6 +4,13 @@
 > shared conventions are in [AGENTS.md](../../AGENTS.md); the other sections live
 > beside this file in [docs/lessons/](.).
 
+- **Quitting Twig left the music notification behind (2026-10-25)**: the app exit
+  path released `MusicEngine` but did not stop `MusicService`, unlike the music
+  player's exit. Route both through `MusicUi.exit`, which also closes music screens.
+  Service destruction explicitly removes the foreground notification and rejects
+  late notification updates from cover-loading callbacks. `MusicExitTest` covers
+  service-stop requests and notification removal after a delayed update.
+
 - **History appeared unresponsive before opening the video player (2026-10-24)**:
   connecting and statting the file in `PaneFragment` delayed activity launch. Start the player
   immediately with the history title/path, resolve the connection and real metadata on IO
