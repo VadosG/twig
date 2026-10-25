@@ -491,19 +491,37 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
         resortAll()
     }
 
-    fun refreshTrash() {
-        state.value.rows.filterIsInstance<FileNode>().firstOrNull {
-            it.file.scheme == "trash" && it.file.path == "/"
-        }?.let { root ->
-            children.keys.filter { it.startsWith("f:trash:") }.forEach { children.remove(it) }
-            synchronized(expanded) { expanded.removeAll { it.startsWith("f:trash:") && it != root.key } }
-            if (currentDir?.scheme == "trash") {
-                currentDir = root.file
-                currentKey = root.key
+    private var trashPresenceLoaded = false
+    private var trashRefresh: kotlinx.coroutines.Job? = null
+
+    /** Probe even a hidden/collapsed root so a new deletion can make it visible again. */
+    private fun refreshTrashRoot(resetExpansion: Boolean = false) {
+        if (!Prefs.trashEnabled(getApplication())) return
+        trashRefresh?.cancel()
+        trashRefresh = viewModelScope.launch {
+            val root = XFile("trash", "/", isDir = true, canWrite = false)
+            val listing = withContext(io) { runCatching { listChildren(root) }.getOrNull() }
+            trashPresenceLoaded = true
+            if (listing != null) {
+                val key = fileKey(root)
+                if (resetExpansion) {
+                    children.keys.filter { it.startsWith("f:trash:") }.forEach { children.remove(it) }
+                    synchronized(expanded) { expanded.removeAll { it.startsWith("f:trash:") && it != key } }
+                }
+                putListing(key, listing)
+                if (listing.children.isEmpty() && trashNotices.isEmpty()) {
+                    synchronized(expanded) { expanded.removeAll { it.startsWith("f:trash:") } }
+                    if (currentDir?.scheme == "trash") { currentDir = null; currentKey = null }
+                } else if (resetExpansion && currentDir?.scheme == "trash") {
+                    currentDir = root
+                    currentKey = key
+                }
             }
-            refreshNode(root)
+            rebuild()
         }
     }
+
+    fun refreshTrash() = refreshTrashRoot(resetExpansion = true)
 
     /** Re-sort cached children after display settings change. */
     fun resortAll() {
@@ -1624,10 +1642,14 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     }?.key
 
     /** Re-read watched local directories after filesystem events. */
-    fun refreshLocal() = refreshQuietly(localRefreshTargets())
+    fun refreshLocal() {
+        refreshTrashRoot()
+        refreshQuietly(localRefreshTargets())
+    }
 
     /** onResume also checks the current directory on any backend, including server/favorite roots. */
     fun refreshOnResume() {
+        refreshTrashRoot()
         val targets = localRefreshTargets().toMap(LinkedHashMap())
         expandedSnapshot().forEach { key ->
             keyFile[key]?.takeIf { it.scheme == "trash" && it.isDir }?.let { targets[key] = it }
@@ -1707,6 +1729,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Refresh after a mutation: re-list every expanded directory. */
     fun refresh() {
+        refreshTrashRoot()
         val targets = expandedSnapshot().mapNotNull { k -> keyFile[k]?.let { k to it } }
         viewModelScope.launch {
             val fresh = HashMap<String, Listing>()
@@ -2847,6 +2870,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun rebuild() {
         val trashEnabled = Prefs.trashEnabled(getApplication())
+        if (trashEnabled && !trashPresenceLoaded && trashRefresh?.isActive != true) refreshTrashRoot()
         if (!trashEnabled) {
             synchronized(expanded) { expanded.removeAll { it.startsWith("f:trash:") } }
             children.keys.filter { it.startsWith("f:trash:") }.forEach { children.remove(it) }
@@ -2887,7 +2911,10 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
                 addFile(rows, XFile("file", v.path, isDir = true), 0, v.label, capacity(v.path))
             }
             if (rootVisible("private")) addFile(rows, privateDir, 0, str(R.string.private_space))
-            if (trashEnabled) addFile(rows, XFile("trash", "/", isDir = true, canWrite = false), 0, str(R.string.trash_title))
+            if (trashEnabled && (!trashPresenceLoaded ||
+                    children[fileKey(XFile("trash", "/", isDir = true))]?.isNotEmpty() != false || trashNotices.isNotEmpty())) {
+                addFile(rows, XFile("trash", "/", isDir = true, canWrite = false), 0, str(R.string.trash_title))
+            }
             addGroup(rows, "lan", str(R.string.group_lan))
             addGroup(rows, "ftp", str(R.string.group_ftp))
             addGroup(rows, "sftp", str(R.string.group_sftp))

@@ -1775,11 +1775,14 @@ class PaneFragment : Fragment() {
     /** Deleted entries remain read-only; inspection and export use their virtual source. */
     private fun trashFileActions(node: PaneViewModel.FileNode): List<MenuAct> {
         val file = node.file
-        if (file.path == "/") return emptyList()
+        if (file.path == "/") return if (!adapter.hasChildren(node)) emptyList() else listOf(MenuAct(
+            getString(if (adapter.allChildrenSelected(node)) R.string.action_deselect_all else R.string.action_select_all),
+            R.drawable.ic_sel_check,
+        ) { adapter.toggleChildrenSelection(node) })
         val actions = ArrayList<MenuAct>()
         actions.item(getString(R.string.file_info), R.drawable.ic_info) { viewModel.toggleInfo(node) }
-        if (!file.canRead) return actions // A deleted symlink can be inspected/restored, never followed.
         actions.item(getString(R.string.action_select), R.drawable.ic_sel_check) { adapter.toggleSelection(node) }
+        if (!file.canRead) return actions // A deleted symlink can be inspected/restored, never followed.
         if (file.isDir) {
             actions.item(getString(R.string.action_refresh), R.drawable.ic_refresh) { viewModel.refreshNode(node) }
             actions.item(getString(R.string.strip_search), R.drawable.ic_search) { promptSearch(file) }
@@ -1802,27 +1805,37 @@ class PaneFragment : Fragment() {
      */
     private fun showBatchMenu(targets: List<XFile>) {
         val actions = ArrayList<MenuAct>()
+        if (targets.all { it.scheme == "trash" && it.path != "/" }) {
+            actions.item(getString(R.string.trash_restore), R.drawable.ic_up) {
+                TrashDialogs(requireContext(), viewLifecycleOwner) { adapter.clearSelection(); viewModel.refreshTrash() }
+                    .restoreSelected(targets)
+            }
+            actions.item(getString(R.string.trash_delete_permanently), R.drawable.ic_delete, DANGER) {
+                TrashDialogs(requireContext(), viewLifecycleOwner) { adapter.clearSelection(); viewModel.refreshTrash() }
+                    .purgeSelected(targets)
+            }
+        }
         actions.item(getString(R.string.file_info), R.drawable.ic_info) {
             val anchor = adapter.currentList.filterIsInstance<PaneViewModel.FileNode>().firstOrNull { adapter.isSelected(it) }
             pendingSelectionInfoScroll = true
             viewModel.toggleSelectionInfo(targets, anchor?.key)
         }
-        if (targets.none { it.isDir }) {
+        if (targets.all { it.canRead } && targets.none { it.isDir }) {
             actions.item(getString(R.string.action_share), R.drawable.ic_share) { shareFiles(targets) }
         }
-        if (targets.any { it.isDir || Thumbs.canThumb(it) }) {
+        if (targets.all { it.canRead } && targets.any { it.isDir || Thumbs.canThumb(it) }) {
             actions.item(getString(R.string.action_refresh_thumb), R.drawable.ic_file_image) {
                 refreshThumb(targets)
             }
         }
-        actions.item(getString(R.string.action_clip_add), R.drawable.ic_clipboard) { addToClipboard(targets) }
+        if (targets.all { it.canRead }) actions.item(getString(R.string.action_clip_add), R.drawable.ic_clipboard) { addToClipboard(targets) }
         // Same as commonFileActions: copy / compress are pure read-source and always allowed; move / delete require *every* source to be mutable.
         val mutable = targets.all { it.isMutable() }
-        actions.item(getString(R.string.strip_copy), R.drawable.ic_copy) { performCopy(targets, move = false) }
+        if (targets.all { it.canRead }) actions.item(getString(R.string.strip_copy), R.drawable.ic_copy) { performCopy(targets, move = false) }
         if (targets.all { it.isMovableSource() }) {
             actions.item(getString(R.string.strip_move), R.drawable.ic_move) { performCopy(targets, move = true) }
         }
-        actions.item(getString(R.string.strip_compress), R.drawable.ic_compress) { performCompress(targets) }
+        if (targets.all { it.canRead }) actions.item(getString(R.string.strip_compress), R.drawable.ic_compress) { performCompress(targets) }
         if (mutable) {
             actions.item(getString(R.string.batch_rename), R.drawable.ic_rename) { performBatchRename(targets) }
             actions.item(getString(R.string.strip_delete), R.drawable.ic_delete, DANGER) { performDelete(targets) }

@@ -1103,4 +1103,5 @@
     <string name="share_text_filename">साझा पाठ.txt</string>
     <string name="settings_toolbar_bottom">टूलबार नीचे रखें</string>
     <string name="settings_toolbar_bottom_desc">एक हाथ से आसानी से उपयोग करने के लिए फ़ाइल ब्राउज़र का टूलबार नीचे रखें</string>
+    <string name="action_deselect_all">सभी का चयन हटाएँ</string>
 </resources>

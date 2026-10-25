@@ -252,6 +252,50 @@ class TrashUiTest {
             shadowOf(holder.itemView.findViewById<android.widget.ImageView>(R.id.icon).drawable).createdFromResId)
     }
 
+    @Test fun `batch restore continues after a conflict without overwriting either file`() {
+        val other = File(root, "trash-ui-other.txt").apply { writeText("second") }
+        val fs = FsRegistry.of("trash") as TrashFileSystem
+        listOf(file(), XFile("file", other.path, false)).forEach { source ->
+            fs.store.move(fs.store.plan(listOf(source)).single())
+        }
+        val deleted = fs.list(fs.root())
+        original.writeText("conflicting live file")
+        val host = Robolectric.buildActivity(Host::class.java).setup()
+        val changed = AtomicBoolean()
+        try {
+            val before = ShadowDialog.getLatestDialog()
+            TrashDialogs(host.get(), host.get()) { changed.set(true) }.restoreSelected(deleted)
+            dialogAfter(before).getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+            waitFor { changed.get() }
+            assertEquals("conflicting live file", original.readText())
+            assertEquals("second", other.readText())
+            assertEquals(listOf(original.name), fs.list(fs.root()).map { it.name })
+        } finally { host.pause().stop().destroy(); other.delete() }
+    }
+
+    @Test fun `batch purge uses confirmed snapshot and leaves new trash entries untouched`() {
+        val other = File(root, "trash-ui-other.txt").apply { writeText("second") }
+        val fs = FsRegistry.of("trash") as TrashFileSystem
+        listOf(file(), XFile("file", other.path, false)).forEach { source ->
+            fs.store.move(fs.store.plan(listOf(source)).single())
+        }
+        val selected = fs.list(fs.root())
+        val host = Robolectric.buildActivity(Host::class.java).setup()
+        val changed = AtomicBoolean()
+        try {
+            val before = ShadowDialog.getLatestDialog()
+            TrashDialogs(host.get(), host.get()) { changed.set(true) }.purgeSelected(selected)
+            val confirm = dialogAfter(before)
+            original.writeText("new deletion")
+            fs.store.move(fs.store.plan(listOf(file())).single())
+            confirm.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+            executeConfirmedDeletion()
+            waitFor { changed.get() }
+            assertEquals(1, fs.list(fs.root()).size)
+            assertEquals("new deletion", fs.openInput(fs.list(fs.root()).single()).bufferedReader().use { it.readText() })
+        } finally { host.pause().stop().destroy(); other.delete() }
+    }
+
     @Test fun `pane expands trash directories one level at a time and refreshes after recovery`() {
         val folder = File(root, "trash-ui-folder").apply { mkdirs() }
         File(folder, ".hidden.txt").writeText("hidden")
@@ -276,7 +320,7 @@ class TrashUiTest {
         val item = fs.item(deep.file)
         fs.store.restoreItem(item.entry, item.relative, "deep.txt", true)
         vm.refreshTrash()
-        waitFor { vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().any { it.file.name == folder.name } }
+        waitFor { vm.state.value.currentKey == rootNode.key && vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().any { it.file.name == folder.name } }
         assertEquals(rootNode.key, vm.state.value.currentKey)
         assertFalse(vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().any { it.file.name == "deep.txt" })
         folder.deleteRecursively()

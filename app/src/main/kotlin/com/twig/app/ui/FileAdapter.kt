@@ -207,6 +207,9 @@ class FileAdapter(
     /** Whether this node has selectable direct children (the "Select all" entry under search results / favorites uses this to decide whether to show). */
     fun hasChildren(node: PaneViewModel.Node): Boolean = directChildren(node).isNotEmpty()
 
+    fun allChildrenSelected(node: PaneViewModel.Node): Boolean =
+        directChildren(node).let { it.isNotEmpty() && it.all { child -> child.key in selected } }
+
     /** Selection for virtual directories (search results / favorites): select/deselect all direct children below —
      *  two states only, no "select the parent itself" state (the virtual row itself is not an object that can be
      *  copied or deleted). Results may span multiple real directories, so the "same-directory multi-select" limit

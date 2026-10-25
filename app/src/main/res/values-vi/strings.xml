@@ -1102,4 +1102,5 @@
     <string name="share_text_filename">Văn bản được chia sẻ.txt</string>
     <string name="settings_toolbar_bottom">Thanh công cụ ở dưới</string>
     <string name="settings_toolbar_bottom_desc">Chuyển thanh công cụ của trình duyệt tệp xuống dưới để dễ sử dụng bằng một tay</string>
+    <string name="action_deselect_all">Bỏ chọn tất cả</string>
 </resources>

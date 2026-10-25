@@ -98,3 +98,13 @@ permanent deletion. Restore remains a separate foreground dialog operation.
 DeleteProgressTest and TrashUiTest cover service/notification progress, detachment,
 reattachment, cancellation, partial failure, real recursive deletion, preserved
 trash decisions and post-confirmation trash additions.
+
+Empty-root visibility (2026-10-25): hide the root after a successful empty listing
+with no damage notices. Probe the root on resume and mutation refresh even while
+hidden or collapsed, otherwise the first new deletion cannot bring it back. Failed
+listings remain unknown; damage notices keep the root visible. The root menu toggles
+selection of its direct children. Selected deleted items support restore and permanent
+purge; normalize away selected descendants of selected folders. Batch restoration
+confirms missing parents, retains conflicting sources without overwriting, continues
+other items and reports failures. Purges retain the existing confirmed-snapshot service
+path. Unreadable symlinks may be selected for recovery/purge but not content export.

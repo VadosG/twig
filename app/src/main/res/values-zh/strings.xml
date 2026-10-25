@@ -1133,4 +1133,5 @@
     <string name="share_text_filename">分享的文本.txt</string>
     <string name="settings_toolbar_bottom">工具栏置于底部</string>
     <string name="settings_toolbar_bottom_desc">将文件浏览界面的工具栏移到底部，方便单手操作</string>
+    <string name="action_deselect_all">取消全选</string>
 </resources>
