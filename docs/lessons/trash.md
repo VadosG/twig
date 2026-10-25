@@ -108,3 +108,9 @@ purge; normalize away selected descendants of selected folders. Batch restoratio
 confirms missing parents, retains conflicting sources without overwriting, continues
 other items and reports failures. Purges retain the existing confirmed-snapshot service
 path. Unreadable symlinks may be selected for recovery/purge but not content export.
+
+Both-pane recovery refresh (2026-10-25): trash management callbacks must refresh the
+initiating pane and its sibling. Refreshing only the dialog's pane leaves the other
+root visible after emptying, especially when it is collapsed and has no filesystem
+observer. TrashUiTest exercises the real empty-menu confirmation and service completion
+with both collapsed and expanded sibling roots.

@@ -1716,11 +1716,17 @@ class PaneFragment : Fragment() {
         }
     }
 
+    /** Trash is shared by both trees, including a sibling whose root is collapsed or hidden. */
+    private fun refreshTrashPanes() {
+        viewModel.refreshTrash()
+        host?.siblingOf(this)?.viewModel?.refreshTrash()
+    }
+
     private fun longClickFile(node: PaneViewModel.FileNode) {
         if (node.file.scheme == "trash") {
             val selected = adapter.selectedItems()
             if (adapter.isSelected(node) && selected.size > 1) { showBatchMenu(selected); return }
-            TrashDialogs(requireContext(), viewLifecycleOwner) { viewModel.refreshTrash() }.show(node.file, trashFileActions(node))
+            TrashDialogs(requireContext(), viewLifecycleOwner) { refreshTrashPanes() }.show(node.file, trashFileActions(node))
             return
         }
         if (node.file.isDir && node.file.scheme.startsWith("git")) {
@@ -1807,11 +1813,11 @@ class PaneFragment : Fragment() {
         val actions = ArrayList<MenuAct>()
         if (targets.all { it.scheme == "trash" && it.path != "/" }) {
             actions.item(getString(R.string.trash_restore), R.drawable.ic_up) {
-                TrashDialogs(requireContext(), viewLifecycleOwner) { adapter.clearSelection(); viewModel.refreshTrash() }
+                TrashDialogs(requireContext(), viewLifecycleOwner) { adapter.clearSelection(); refreshTrashPanes() }
                     .restoreSelected(targets)
             }
             actions.item(getString(R.string.trash_delete_permanently), R.drawable.ic_delete, DANGER) {
-                TrashDialogs(requireContext(), viewLifecycleOwner) { adapter.clearSelection(); viewModel.refreshTrash() }
+                TrashDialogs(requireContext(), viewLifecycleOwner) { adapter.clearSelection(); refreshTrashPanes() }
                     .purgeSelected(targets)
             }
         }

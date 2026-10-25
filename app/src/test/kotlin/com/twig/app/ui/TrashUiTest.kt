@@ -34,8 +34,20 @@ import java.util.concurrent.atomic.AtomicInteger
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, shadows = [TrashOsShadow::class, TrashMovesShadow::class])
 class TrashUiTest {
-    class Host : AppCompatActivity() {
+    open class Host : AppCompatActivity() {
         override fun onCreate(state: android.os.Bundle?) { setTheme(R.style.Theme_Twig); super.onCreate(state) }
+    }
+    class DualPaneHost : Host(), PaneFragment.Host {
+        val left = PaneFragment.newInstance(0)
+        val right = PaneFragment.newInstance(1)
+        override fun siblingOf(self: PaneFragment) = if (self === left) right else left
+        override fun onAddServer(type: String) = Unit
+        override fun onEditServer(conn: com.twig.app.SavedConnection) = Unit
+        override fun onPaneTouched(self: PaneFragment) = Unit
+        override fun onPaneSwipe(velocityX: Float) = Unit
+        override fun refreshTrees() = Unit
+        override fun isPaneActive(self: PaneFragment) = self === left
+        override fun focusPane(pane: PaneFragment) = Unit
     }
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private lateinit var root: File
@@ -294,6 +306,43 @@ class TrashUiTest {
             assertEquals(1, fs.list(fs.root()).size)
             assertEquals("new deletion", fs.openInput(fs.list(fs.root()).single()).bufferedReader().use { it.readText() })
         } finally { host.pause().stop().destroy(); other.delete() }
+    }
+
+    @Test fun `emptying trash updates both panes including a collapsed sibling root`() {
+        for (expandSibling in listOf(false, true)) {
+            original.writeText("keep me")
+            val fs = FsRegistry.of("trash") as TrashFileSystem
+            fs.store.move(fs.store.plan(listOf(file())).single())
+            val controller = Robolectric.buildActivity(DualPaneHost::class.java).setup()
+            val host = controller.get()
+            try {
+                host.supportFragmentManager.beginTransaction()
+                    .add(host.left, "left").add(host.right, "right").commitNow()
+                fun trashRoot(pane: PaneFragment) = pane.viewModel.state.value.rows
+                    .filterIsInstance<PaneViewModel.FileNode>().firstOrNull { it.file.scheme == "trash" && it.file.path == "/" }
+                waitFor {
+                    listOf(host.left, host.right).all {
+                        org.robolectric.util.ReflectionHelpers.getField<Boolean>(it.viewModel, "trashPresenceLoaded") && trashRoot(it) != null
+                    }
+                }
+                if (expandSibling) {
+                    host.right.viewModel.toggle(trashRoot(host.right)!!)
+                    waitFor { host.right.viewModel.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().any { it.file.name == original.name } }
+                }
+                val previous = ShadowDialog.getLatestDialog()
+                org.robolectric.util.ReflectionHelpers.callInstanceMethod<Unit>(host.left, "longClickFile",
+                    org.robolectric.util.ReflectionHelpers.ClassParameter.from(PaneViewModel.FileNode::class.java, trashRoot(host.left)!!))
+                val menu = dialogAfter(previous)
+                val index = (0 until menu.listView.adapter.count).single {
+                    menu.listView.adapter.getItem(it).toString() == app.getString(R.string.trash_empty)
+                }
+                menu.listView.performItemClick(menu.listView.adapter.getView(index, null, menu.listView), index, index.toLong())
+                dialogAfter(menu).getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+                executeConfirmedDeletion()
+                waitFor { trashRoot(host.left) == null && trashRoot(host.right) == null }
+                assertTrue(fs.store.snapshot().entries.isEmpty())
+            } finally { controller.pause().stop().destroy() }
+        }
     }
 
     @Test fun `pane expands trash directories one level at a time and refreshes after recovery`() {
