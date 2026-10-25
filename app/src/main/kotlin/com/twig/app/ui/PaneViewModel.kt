@@ -488,8 +488,30 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Children are written already in the current sort order; virtual nodes (servers, favorites, ...) are unaffected. */
     private fun putChildren(key: String, list: List<XFile>) {
+        selectParentOfRemovedNode(key, list)
         children[key] = sortList(key, list)
         rememberCounts(key, list)
+    }
+
+    /** A successful listing can prove the selected row (or its ancestor) was removed. */
+    private fun selectParentOfRemovedNode(parentKey: String, fresh: List<XFile>): Boolean {
+        val selectedKey = currentKey ?: return false
+        val ancestors = ancestorKeysOf(selectedKey)
+        if (parentKey !in ancestors) return false
+        val cached = children[parentKey] ?: return false
+        val present = fresh.mapTo(HashSet()) { Triple(it.scheme, it.path, it.isDir) }
+        val removed = cached.filter { Triple(it.scheme, it.path, it.isDir) !in present }
+        if (removed.isEmpty()) return false
+        val branch = ancestors + selectedKey
+        val affected = state.value.rows.any { row -> row is FileNode && row.key in branch &&
+            removed.any { it.scheme == row.file.scheme && it.path == row.file.path } }
+        if (!affected) return false
+        // Use the actual tree parent: favorite/server roots and opaque SAF paths
+        // cannot be reconstructed by trimming a filesystem path.
+        currentKey = parentKey
+        currentDir = mountRoots[parentKey] ?: keyFile[parentKey]?.takeIf { it.isDir }
+        scrollKey = null
+        return true
     }
 
     private fun rememberCounts(key: String, list: List<XFile>) {
@@ -1736,6 +1758,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
                     rememberCounts(key, sorted)
                     if ((accessChanged || noticesChanged) && key in expanded) changed = true
                     if (cached == sorted) continue
+                    if (selectParentOfRemovedNode(key, sorted)) changed = true
                     children[key] = sorted
                     if (key in expanded) changed = true
                 }
