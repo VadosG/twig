@@ -1103,4 +1103,11 @@
     <string name="share_text_filename">Geteilter Text.txt</string>
     <string name="settings_toolbar_bottom">Symbolleiste unten</string>
     <string name="settings_toolbar_bottom_desc">Die Symbolleiste des Dateibrowsers für eine einfachere Einhandbedienung nach unten verschieben</string>
+
+    <!-- Default and directory-specific file-tree settings. -->
+    <string name="directory_view_default">Standard</string>
+    <string name="directory_view_selected">Gewählter Ordner</string>
+    <string name="directory_view_custom_sort">Eigene Sortierung</string>
+    <string name="directory_view_custom_view">Eigene Ansicht</string>
+    <string name="directory_view_reset">Standard verwenden</string>
 </resources>

@@ -1203,29 +1203,19 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
     }
 
     private fun showSortDialog() {
-        com.twig.app.ui.SortDialog.show(this) { spec ->
-            paneAt(0)?.viewModel?.setSort(spec)
-            paneAt(1)?.viewModel?.setSort(spec)
+        com.twig.app.ui.SortDialog.show(this, activePane()?.viewModel?.currentDir) {
+            paneAt(0)?.refreshSortAndView()
+            paneAt(1)?.refreshSortAndView()
+            uiSig = Prefs.uiSignature(this)
         }
     }
 
-    /** Quick view-mode switch: three grid states (independent of the thumbnail switch; details on the settings page). */
     private fun showViewModeDialog() {
-        val labels = arrayOf(
-            getString(R.string.view_mode_grid_off),
-            getString(R.string.view_mode_grid_media),
-            getString(R.string.view_mode_grid_all),
-        )
-        AlertDialog.Builder(this)
-            .setTitle(R.string.action_view_mode)
-            .setSingleChoiceItems(labels, Prefs.thumbsGrid(this).coerceIn(0, 2)) { dlg, which ->
-                Prefs.setThumbsGrid(this, which)
-                dlg.dismiss()
-                uiSig = Prefs.uiSignature(this)
-                recreate()
-            }
-            .setNegativeButton(R.string.dialog_cancel, null)
-            .show()
+        com.twig.app.ui.SortDialog.showView(this, activePane()?.viewModel?.currentDir) {
+            paneAt(0)?.refreshSortAndView()
+            paneAt(1)?.refreshSortAndView()
+            uiSig = Prefs.uiSignature(this)
+        }
     }
 
     private fun showThemeDialog() {

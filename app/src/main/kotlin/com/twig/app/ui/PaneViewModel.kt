@@ -12,6 +12,7 @@ import com.twig.app.CompareSession
 import com.twig.app.CompareStore
 import com.twig.app.ConnectionStore
 import com.twig.app.Connections
+import com.twig.app.DirectoryViewStore
 import com.twig.app.Favorite
 import com.twig.app.FavoritesStore
 import com.twig.app.Format
@@ -123,6 +124,8 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
          */
         val keyPrefix: String = "",
         val directoryCount: DirectoryCounts.Count? = null,
+        /** Effective view of the containing directory; -1 uses the adapter default for virtual rows. */
+        val gridMode: Int = -1,
     ) : Node {
         override val key: String get() = keyPrefix + fileKey(file)
     }
@@ -471,6 +474,8 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     internal var io: kotlinx.coroutines.CoroutineDispatcher = Dispatchers.IO
 
     private var sort = SortSpec.load(getApplication())
+    private var directoryViews = DirectoryViewStore.load(getApplication())
+    private var defaultGridMode = Prefs.thumbsGrid(getApplication())
 
     /** Whether to show hidden files; refreshed at the top of every [rebuild]. */
     private var showHidden = Prefs.showHidden(getApplication())
@@ -489,6 +494,17 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     fun setSort(spec: SortSpec) {
         sort = spec
         resortAll()
+    }
+
+    fun refreshSortAndView() {
+        val nextSort = SortSpec.load(getApplication())
+        val nextViews = DirectoryViewStore.load(getApplication())
+        val nextGrid = Prefs.thumbsGrid(getApplication())
+        if (sort == nextSort && directoryViews == nextViews && defaultGridMode == nextGrid) return
+        sort = nextSort
+        directoryViews = nextViews
+        defaultGridMode = nextGrid
+        resortCached()
     }
 
     private var trashPresenceLoaded = false
@@ -525,6 +541,12 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Re-sort cached children after display settings change. */
     fun resortAll() {
+        directoryViews = DirectoryViewStore.load(getApplication())
+        defaultGridMode = Prefs.thumbsGrid(getApplication())
+        resortCached()
+    }
+
+    private fun resortCached() {
         // children may be modified concurrently from IO threads; pull, null-check, then write back — no !!
         for (k in children.keys.toList()) children[k]?.let { children[k] = sortList(k, it) }
         rebuild()
@@ -542,11 +564,12 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     private fun sortList(key: String, list: List<XFile>): List<XFile> {
         if (keepsServerOrder(key)) return list
         val app = getApplication<Application>()
-        val cmp = sort.comparator { file ->
+        val view = DirectoryViewStore.get(directoryViews, mountRoots[key] ?: keyFile[key])
+        val cmp = (view?.sort ?: sort).comparator { file ->
             if (file.scheme == "trash") (FsRegistry.of(file) as? com.twig.app.TrashFileSystem)?.deletedAt(file) ?: 0L
             else file.lastModified
         }
-        val grid = Prefs.thumbsGrid(app)
+        val grid = view?.gridMode ?: defaultGridMode
         // Both off (tree list + no thumbnails): no grouping, matching the long-standing behavior.
         if (!Prefs.thumbs(app) && grid == 0) return SortRules.sorted(list, cmp, null)
         // Grid "All files" mode: archives, like directories, render as full expandable rows;
@@ -2970,6 +2993,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
         capacity: String? = null,
         /** See [FileNode.keyPrefix]; the whole subtree must carry it, otherwise archive entries would clash with the row at their original location. */
         keyPrefix: String = "",
+        gridMode: Int = -1,
     ) {
         // Storage shortcuts also occur below / at their real paths. Distinguish
         // that row from the shortcut so accordion ancestry and DiffUtil stay local.
@@ -2989,6 +3013,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
             file, depth, expandable, exp || searchState.containsKey(key),
             label, capacity, busy(key), rowPrefix,
             if (Prefs.folderCounts(getApplication())) DirectoryCounts.known(file, showHidden) else null,
+            gridMode,
         )
         addAttachments(rows, file, depth)
         if (exp) {
@@ -2998,7 +3023,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
                 val live = (runCatching { FsRegistry.of(s) }.getOrNull() as? GitFileSystem)?.displayName ?: gl
                 addFile(rows, XFile(s, "/", isDir = true, displayName = live, canWrite = false), depth + 1)
             }
-            visible(children[key]).forEach { addFile(rows, it, depth + 1, keyPrefix = keyPrefix) }
+            addListedFiles(rows, key, depth + 1, keyPrefix)
             if (file.scheme == "trash" && file.path == "/" && children.containsKey(key)) {
                 val notices = trashNotices.ifEmpty {
                     if (children[key].isNullOrEmpty()) listOf(str(R.string.trash_no_items)) else emptyList()
@@ -3013,6 +3038,12 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
             }
             if (resticRepos.contains(fileKey(file))) addRestic(rows, file, depth + 1)
         }
+    }
+
+    private fun addListedFiles(rows: MutableList<Node>, key: String, depth: Int, keyPrefix: String = "") {
+        val grid = DirectoryViewStore.get(directoryViews, mountRoots[key] ?: keyFile[key])?.gridMode
+            ?: defaultGridMode
+        visible(children[key]).forEach { addFile(rows, it, depth, keyPrefix = keyPrefix, gridMode = grid) }
     }
 
     /**
@@ -3192,7 +3223,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
         // Info cards / search results hang under it like a regular directory row (key based on the actual directory the favorite points at).
         keyFile[key]?.let { dir -> addAttachments(rows, dir, depth = 1) }
         if (exp) {
-            visible(children[key]).forEach { addFile(rows, it, 2) }
+            addListedFiles(rows, key, 2)
             // The favorite's directory itself is a restic repo root (fav.kind is
             // local/conn, not yet through resolveFavorite's restic branch for unlock):
             // consistent with regular browsing, add a "restic repository" hint row
@@ -3207,7 +3238,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
         rows += ServerNode(conn, exp, busy(key), serverInfo[conn.label()])
         // Info cards / search results hang under it like a regular directory row (key based on the server root directory), same as [addFavorite].
         keyFile[key]?.let { dir -> addAttachments(rows, dir, depth = 1) }
-        if (exp) visible(children[key]).forEach { addFile(rows, it, 2) }
+        if (exp) addListedFiles(rows, key, 2)
     }
 
     // ---- Utilities ----

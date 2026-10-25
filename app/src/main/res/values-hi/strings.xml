@@ -1103,4 +1103,11 @@
     <string name="share_text_filename">साझा पाठ.txt</string>
     <string name="settings_toolbar_bottom">टूलबार नीचे रखें</string>
     <string name="settings_toolbar_bottom_desc">एक हाथ से आसानी से उपयोग करने के लिए फ़ाइल ब्राउज़र का टूलबार नीचे रखें</string>
+
+    <!-- Default and directory-specific file-tree settings. -->
+    <string name="directory_view_default">डिफ़ॉल्ट</string>
+    <string name="directory_view_selected">चुना हुआ फ़ोल्डर</string>
+    <string name="directory_view_custom_sort">कस्टम क्रम</string>
+    <string name="directory_view_custom_view">कस्टम दृश्य</string>
+    <string name="directory_view_reset">डिफ़ॉल्ट इस्तेमाल करें</string>
 </resources>

@@ -1179,4 +1179,11 @@
     <string name="share_text_filename">Shared text.txt</string>
     <string name="settings_toolbar_bottom">Toolbar at bottom</string>
     <string name="settings_toolbar_bottom_desc">Move the file browser toolbar to the bottom for easier one-handed use</string>
+
+    <!-- Default and directory-specific file-tree settings. -->
+    <string name="directory_view_default">Default</string>
+    <string name="directory_view_selected">Selected directory</string>
+    <string name="directory_view_custom_sort">Custom sort</string>
+    <string name="directory_view_custom_view">Custom view</string>
+    <string name="directory_view_reset">Use defaults</string>
 </resources>

@@ -1139,4 +1139,11 @@
     <string name="share_text_filename">Полученный текст.txt</string>
     <string name="settings_toolbar_bottom">Панель инструментов внизу</string>
     <string name="settings_toolbar_bottom_desc">Переместить панель инструментов файлового браузера вниз для удобного управления одной рукой</string>
+
+    <!-- Default and directory-specific file-tree settings. -->
+    <string name="directory_view_default">По умолчанию</string>
+    <string name="directory_view_selected">Выбранная папка</string>
+    <string name="directory_view_custom_sort">Своя сортировка</string>
+    <string name="directory_view_custom_view">Свой вид</string>
+    <string name="directory_view_reset">Использовать по умолчанию</string>
 </resources>

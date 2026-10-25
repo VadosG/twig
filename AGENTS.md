@@ -151,6 +151,14 @@ each write `= null`.
   The tree always expands/collapses **in place**, it never "enters" a directory.
 - Persistence: connections in `ConnectionStore`, favorites in `FavoritesStore`,
   preferences in `Prefs` — all SharedPreferences.
+  `SortDialog` provides separate sorting and view dialogs, each with defaults or overrides
+  for the selected directory. Resetting one leaves the other unchanged.
+  Defaults remain in `twig_sort` / `twig_prefs`; `DirectoryViewStore` stores only explicit
+  directory overrides in `twig_directory_views` (included in `.twigbak`). Sorting and
+  view mode inherit independently; overrides apply to direct children, never descendants.
+  Listing identities (`mountRoots` / `keyFile`) identify the containing directory, including
+  favorites, servers and opaque SAF paths. `FileNode.gridMode` carries its effective view
+  to the adapter; directory overrides are parsed per settings refresh, not per rendered row.
 - Private space: `PrivateSpace` uses `applicationInfo.dataDir/private_space` through
   the ordinary local filesystem. The main menu's root-item visibility choices are
   stored per pane in one dialog with left/right columns; Private space defaults

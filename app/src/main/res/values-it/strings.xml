@@ -1103,4 +1103,11 @@
     <string name="share_text_filename">Testo condiviso.txt</string>
     <string name="settings_toolbar_bottom">Barra degli strumenti in basso</string>
     <string name="settings_toolbar_bottom_desc">Sposta in basso la barra degli strumenti del browser di file per facilitare l’uso con una mano</string>
+
+    <!-- Default and directory-specific file-tree settings. -->
+    <string name="directory_view_default">Predefinito</string>
+    <string name="directory_view_selected">Cartella selezionata</string>
+    <string name="directory_view_custom_sort">Ordine personalizzato</string>
+    <string name="directory_view_custom_view">Vista personalizzata</string>
+    <string name="directory_view_reset">Usa predefiniti</string>
 </resources>

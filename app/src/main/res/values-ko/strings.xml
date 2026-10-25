@@ -1103,4 +1103,11 @@
     <string name="share_text_filename">공유 텍스트.txt</string>
     <string name="settings_toolbar_bottom">도구 모음을 하단에 배치</string>
     <string name="settings_toolbar_bottom_desc">한 손으로 쉽게 사용할 수 있도록 파일 탐색기의 도구 모음을 하단으로 이동</string>
+
+    <!-- Default and directory-specific file-tree settings. -->
+    <string name="directory_view_default">기본값</string>
+    <string name="directory_view_selected">선택한 폴더</string>
+    <string name="directory_view_custom_sort">사용자 지정 정렬</string>
+    <string name="directory_view_custom_view">사용자 지정 보기</string>
+    <string name="directory_view_reset">기본값 사용</string>
 </resources>

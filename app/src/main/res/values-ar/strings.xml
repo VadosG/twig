@@ -1107,4 +1107,11 @@
     <string name="share_text_filename">نص مشارك.txt</string>
     <string name="settings_toolbar_bottom">شريط الأدوات في الأسفل</string>
     <string name="settings_toolbar_bottom_desc">نقل شريط أدوات متصفح الملفات إلى الأسفل لتسهيل الاستخدام بيد واحدة</string>
+
+    <!-- Default and directory-specific file-tree settings. -->
+    <string name="directory_view_default">الافتراضي</string>
+    <string name="directory_view_selected">المجلد المحدد</string>
+    <string name="directory_view_custom_sort">ترتيب مخصص</string>
+    <string name="directory_view_custom_view">عرض مخصص</string>
+    <string name="directory_view_reset">استخدام الإعدادات الافتراضية</string>
 </resources>

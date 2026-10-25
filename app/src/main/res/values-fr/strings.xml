@@ -1103,4 +1103,11 @@
     <string name="share_text_filename">Texte partagé.txt</string>
     <string name="settings_toolbar_bottom">Barre d’outils en bas</string>
     <string name="settings_toolbar_bottom_desc">Déplacer la barre d’outils de l’explorateur de fichiers en bas pour faciliter l’utilisation à une main</string>
+
+    <!-- Default and directory-specific file-tree settings. -->
+    <string name="directory_view_default">Par défaut</string>
+    <string name="directory_view_selected">Dossier sélectionné</string>
+    <string name="directory_view_custom_sort">Tri personnalisé</string>
+    <string name="directory_view_custom_view">Affichage personnalisé</string>
+    <string name="directory_view_reset">Utiliser les réglages par défaut</string>
 </resources>

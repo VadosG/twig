@@ -66,7 +66,7 @@ class FileAdapter(
     private val onInfoTab: (PaneViewModel.InfoNode, Int) -> Unit,
     private val onInfoHash: (PaneViewModel.InfoNode) -> Unit,
     private val thumbs: Boolean = false,
-    private val gridMode: Int = 0,
+    var gridMode: Int = 0,
     private val gridNames: Boolean = true,
     /** Text size tier (0/1/2), independent of [density]; defaults to follow row height, see `Prefs.textSize`. */
     private val textSize: Int = density,
@@ -126,10 +126,10 @@ class FileAdapter(
 
     private fun isCell(n: PaneViewModel.Node): Boolean = when (n) {
         is PaneViewModel.WebsiteNode -> gridMode == 2
-        is PaneViewModel.FileNode -> gridMode > 0 &&
-            n.label == null && !n.file.isDir && !n.expandable &&
-            !n.file.scheme.startsWith("git") &&
-            (gridMode == 2 || Thumbs.canThumb(n.file))
+        is PaneViewModel.FileNode -> (if (n.gridMode >= 0) n.gridMode else gridMode).let { mode ->
+            mode > 0 && n.label == null && !n.file.isDir && !n.expandable &&
+                !n.file.scheme.startsWith("git") && (mode == 2 || Thumbs.canThumb(n.file))
+        }
         else -> false
     }
 

@@ -1103,4 +1103,11 @@
     <string name="share_text_filename">Paylaşılan metin.txt</string>
     <string name="settings_toolbar_bottom">Araç çubuğu altta</string>
     <string name="settings_toolbar_bottom_desc">Tek elle kullanımı kolaylaştırmak için dosya tarayıcısının araç çubuğunu alta taşı</string>
+
+    <!-- Default and directory-specific file-tree settings. -->
+    <string name="directory_view_default">Varsayılan</string>
+    <string name="directory_view_selected">Seçili klasör</string>
+    <string name="directory_view_custom_sort">Özel sıralama</string>
+    <string name="directory_view_custom_view">Özel görünüm</string>
+    <string name="directory_view_reset">Varsayılanları kullan</string>
 </resources>

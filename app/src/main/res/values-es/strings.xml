@@ -1103,4 +1103,11 @@
     <string name="share_text_filename">Texto compartido.txt</string>
     <string name="settings_toolbar_bottom">Barra de herramientas abajo</string>
     <string name="settings_toolbar_bottom_desc">Mover la barra de herramientas del explorador de archivos abajo para facilitar el uso con una mano</string>
+
+    <!-- Default and directory-specific file-tree settings. -->
+    <string name="directory_view_default">Predeterminado</string>
+    <string name="directory_view_selected">Carpeta seleccionada</string>
+    <string name="directory_view_custom_sort">Orden personalizado</string>
+    <string name="directory_view_custom_view">Vista personalizada</string>
+    <string name="directory_view_reset">Usar valores predeterminados</string>
 </resources>

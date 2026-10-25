@@ -360,9 +360,20 @@ class PaneFragment : Fragment() {
         ))
     }
 
+    fun refreshSortAndView() {
+        if (::adapter.isInitialized) {
+            val grid = Prefs.thumbsGrid(requireContext())
+            val changed = adapter.gridMode != grid
+            adapter.gridMode = grid
+            viewModel.refreshSortAndView()
+            if (changed) adapter.notifyDataSetChanged()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         takeImageViewerResult()
+        refreshSortAndView()
         // The user may have just picked "Always" in the system resolver: clear the file-association icon cache and redraw so the icon follows.
         FileIcons.clearAppDefaults()
         if (::adapter.isInitialized) {

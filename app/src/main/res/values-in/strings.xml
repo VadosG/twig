@@ -1103,4 +1103,11 @@
     <string name="share_text_filename">Teks dibagikan.txt</string>
     <string name="settings_toolbar_bottom">Bilah alat di bawah</string>
     <string name="settings_toolbar_bottom_desc">Pindahkan bilah alat penjelajah berkas ke bawah agar lebih mudah digunakan dengan satu tangan</string>
+
+    <!-- Default and directory-specific file-tree settings. -->
+    <string name="directory_view_default">Default</string>
+    <string name="directory_view_selected">Folder terpilih</string>
+    <string name="directory_view_custom_sort">Urutan khusus</string>
+    <string name="directory_view_custom_view">Tampilan khusus</string>
+    <string name="directory_view_reset">Gunakan default</string>
 </resources>

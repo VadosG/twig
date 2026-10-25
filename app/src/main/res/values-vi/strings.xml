@@ -1102,4 +1102,11 @@
     <string name="share_text_filename">Văn bản được chia sẻ.txt</string>
     <string name="settings_toolbar_bottom">Thanh công cụ ở dưới</string>
     <string name="settings_toolbar_bottom_desc">Chuyển thanh công cụ của trình duyệt tệp xuống dưới để dễ sử dụng bằng một tay</string>
+
+    <!-- Default and directory-specific file-tree settings. -->
+    <string name="directory_view_default">Mặc định</string>
+    <string name="directory_view_selected">Thư mục đã chọn</string>
+    <string name="directory_view_custom_sort">Sắp xếp tùy chỉnh</string>
+    <string name="directory_view_custom_view">Chế độ xem tùy chỉnh</string>
+    <string name="directory_view_reset">Dùng mặc định</string>
 </resources>

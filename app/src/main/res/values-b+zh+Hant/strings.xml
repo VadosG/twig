@@ -1102,4 +1102,11 @@
     <string name="share_text_filename">分享的文字.txt</string>
     <string name="settings_toolbar_bottom">工具列置於底部</string>
     <string name="settings_toolbar_bottom_desc">將檔案瀏覽畫面的工具列移到底部，方便單手操作</string>
+
+    <!-- Default and directory-specific file-tree settings. -->
+    <string name="directory_view_default">預設</string>
+    <string name="directory_view_selected">選取的目錄</string>
+    <string name="directory_view_custom_sort">自訂排序</string>
+    <string name="directory_view_custom_view">自訂檢視</string>
+    <string name="directory_view_reset">恢復預設</string>
 </resources>

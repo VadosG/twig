@@ -1103,4 +1103,11 @@
     <string name="share_text_filename">共有テキスト.txt</string>
     <string name="settings_toolbar_bottom">ツールバーを下部に配置</string>
     <string name="settings_toolbar_bottom_desc">ファイルブラウザーのツールバーを下部に移動し、片手で操作しやすくします</string>
+
+    <!-- Default and directory-specific file-tree settings. -->
+    <string name="directory_view_default">既定</string>
+    <string name="directory_view_selected">選択中のフォルダ</string>
+    <string name="directory_view_custom_sort">並べ替えを個別設定</string>
+    <string name="directory_view_custom_view">表示を個別設定</string>
+    <string name="directory_view_reset">既定に戻す</string>
 </resources>

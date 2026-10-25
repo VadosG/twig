@@ -108,7 +108,9 @@ class ShareTargetActivity : AppCompatActivity(), PaneFragment.Host {
             strip.asRefresh.setOnClickListener { pane()?.actionRefresh() }
             strip.asNewFolder.setOnClickListener { pane()?.actionNewFolder() }
             strip.asSort.setOnClickListener {
-                SortDialog.show(this) { spec -> for (i in 0..1) paneAt(i)?.viewModel?.setSort(spec) }
+                SortDialog.show(this, pane()?.viewModel?.currentDir) {
+                    for (i in 0..1) paneAt(i)?.refreshSortAndView()
+                }
             }
             strip.asSearch.setOnClickListener { pane()?.actionSearch() }
             strip.asHistory.setOnClickListener { pane()?.actionHistory() }

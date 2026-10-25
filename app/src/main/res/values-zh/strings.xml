@@ -1133,4 +1133,11 @@
     <string name="share_text_filename">分享的文本.txt</string>
     <string name="settings_toolbar_bottom">工具栏置于底部</string>
     <string name="settings_toolbar_bottom_desc">将文件浏览界面的工具栏移到底部，方便单手操作</string>
+
+    <!-- Default and directory-specific file-tree settings. -->
+    <string name="directory_view_default">默认</string>
+    <string name="directory_view_selected">选中目录</string>
+    <string name="directory_view_custom_sort">自定义排序</string>
+    <string name="directory_view_custom_view">自定义视图</string>
+    <string name="directory_view_reset">恢复默认</string>
 </resources>
