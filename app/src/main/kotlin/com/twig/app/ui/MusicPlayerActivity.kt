@@ -54,6 +54,7 @@ class MusicPlayerActivity : AppCompatActivity() {
     private var tint = MusicTint.of(Color.parseColor("#1A1A1A")) // foreground layer color, derived from bgTone
     private lateinit var plDrawer: PlaylistDrawer
     private val finisher: () -> Unit = { finish() }
+    private val hideVolumeHint = Runnable { b.tvGesture.visibility = View.GONE }
 
     private val ticker = object : Runnable {
         override fun run() {
@@ -126,6 +127,7 @@ class MusicPlayerActivity : AppCompatActivity() {
      *  live in the singleton, so re-inflating views doesn't disturb playback. */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        handler.removeCallbacks(hideVolumeHint)
         b = ActivityMusicPlayerBinding.inflate(layoutInflater)
         setContentView(b.root)
         setupImmersive()
@@ -235,15 +237,20 @@ class MusicPlayerActivity : AppCompatActivity() {
         var startX = 0f
         var startY = 0f
         var startVolume = 0
+        var maxVolume = 0
+        var lastVolume = 0
         var axis = SwipeGesture.UNDECIDED
         var downAt = 0L
         fun adjustVolume(y: Float) {
-            val max = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-            val delta = (startY - y) / b.centerArea.height.coerceAtLeast(1) * max
-            val volume = (startVolume + delta.roundToInt()).coerceIn(0, max)
-            if (volume != audio.getStreamVolume(AudioManager.STREAM_MUSIC)) {
-                audio.setStreamVolume(AudioManager.STREAM_MUSIC, volume, AudioManager.FLAG_SHOW_UI)
+            val delta = (startY - y) / b.centerArea.height.coerceAtLeast(1) * maxVolume
+            val volume = (startVolume + delta.roundToInt()).coerceIn(0, maxVolume)
+            if (volume != lastVolume) {
+                audio.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
+                lastVolume = volume
             }
+            val hint = getString(R.string.player_volume, if (maxVolume > 0) volume * 100 / maxVolume else 0)
+            if (b.tvGesture.text != hint) b.tvGesture.text = hint
+            b.tvGesture.visibility = View.VISIBLE
         }
         b.centerArea.setOnTouchListener { _, ev ->
             if (showingLyrics && !isLandscape()) return@setOnTouchListener false
@@ -252,13 +259,18 @@ class MusicPlayerActivity : AppCompatActivity() {
                     startX = ev.x
                     startY = ev.y
                     downAt = ev.eventTime
-                    startVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
+                    handler.removeCallbacks(hideVolumeHint)
+                    b.tvGesture.visibility = View.GONE
+                    maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC).coerceAtLeast(0)
+                    startVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC).coerceIn(0, maxVolume)
+                    lastVolume = startVolume
                     axis = SwipeGesture.UNDECIDED
                 }
                 MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
                     if (axis == SwipeGesture.UNDECIDED) axis = SwipeGesture.axis(ev.x - startX, ev.y - startY, slop)
                     if (axis == SwipeGesture.VERTICAL) adjustVolume(ev.y)
                     if (ev.actionMasked == MotionEvent.ACTION_UP) {
+                        if (axis == SwipeGesture.VERTICAL) handler.postDelayed(hideVolumeHint, 300)
                         when (axis) {
                             SwipeGesture.HORIZONTAL -> if (kotlin.math.abs(ev.x - startX) > dp(48)) {
                                 if (ev.x < startX) MusicEngine.next() else MusicEngine.prev()
@@ -267,7 +279,11 @@ class MusicPlayerActivity : AppCompatActivity() {
                         }
                     }
                 }
-                MotionEvent.ACTION_CANCEL -> axis = SwipeGesture.UNDECIDED
+                MotionEvent.ACTION_CANCEL -> {
+                    axis = SwipeGesture.UNDECIDED
+                    handler.removeCallbacks(hideVolumeHint)
+                    handler.postDelayed(hideVolumeHint, 300)
+                }
             }
             true
         }
@@ -287,6 +303,8 @@ class MusicPlayerActivity : AppCompatActivity() {
         super.onPause()
         MusicEngine.removeListener(listener)
         handler.removeCallbacks(ticker)
+        handler.removeCallbacks(hideVolumeHint)
+        b.tvGesture.visibility = View.GONE
         MusicEngine.saveResume()
     }
 
@@ -518,6 +536,7 @@ class MusicPlayerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        handler.removeCallbacks(hideVolumeHint)
         MusicUi.unregister(finisher)
     }
 

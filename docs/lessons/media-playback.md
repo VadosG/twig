@@ -4,6 +4,15 @@
 > shared conventions are in [AGENTS.md](../../AGENTS.md); the other sections live
 > beside this file in [docs/lessons/](.).
 
+- **Music volume swipes opened a laggy system panel (2026-10-25, issue #23)**:
+  cover swipes used FLAG_SHOW_UI and queried AudioManager on each movement. Match the
+  video player's in-player percentage overlay and use volume flags=0. Snapshot the
+  range/current volume at touch-down; write only when the target step changes. Keep
+  feedback visible during the swipe and dismiss 300 ms after release/cancel; a new
+  gesture cancels the previous timeout. Both music layouts provide the same overlay.
+  MusicVolumeGestureTest checks flags, repeated calls, hint timing and landscape,
+  alongside tap/lyrics/horizontal-swipe behavior.
+
 - **Quitting Twig left the music notification behind (2026-10-25)**: the app exit
   path released `MusicEngine` but did not stop `MusicService`, unlike the music
   player's exit. Route both through `MusicUi.exit`, which also closes music screens.
