@@ -16,6 +16,7 @@ import com.twig.app.SavedConnection
 import com.twig.app.formatLocationPath
 import com.twig.app.DirectoryView
 import com.twig.app.DirectoryViewStore
+import com.twig.app.FolderSortKey
 import com.twig.app.FileSortKey
 import com.twig.app.Prefs
 import com.twig.app.R
@@ -204,6 +205,33 @@ class DirectoryViewDialogTest {
         withDialog { dialog ->
             dialog.findViewById<RadioGroup>(R.id.rg_scope)!!.check(R.id.scope_directory)
             assertEquals(dir.path, dialog.findViewById<TextView>(R.id.directory_path)!!.text.toString())
+        }
+    }
+
+    @Test
+    fun `reverse folder names save and restore for default and recursive directory sorting`() {
+        withDialog { dialog ->
+            dialog.findViewById<RadioGroup>(R.id.rg_folder)!!.check(R.id.rf_name_reversed)
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+        }
+        assertEquals(FolderSortKey.NAME_REVERSED, SortSpec.load(app).folderBy)
+        withDialog { dialog ->
+            assertEquals(R.id.rf_name_reversed, dialog.findViewById<RadioGroup>(R.id.rg_folder)!!.checkedRadioButtonId)
+            dialog.findViewById<RadioGroup>(R.id.rg_scope)!!.check(R.id.scope_directory)
+            dialog.findViewById<CheckBox>(R.id.cb_custom_sort)!!.isChecked = true
+            dialog.findViewById<RadioGroup>(R.id.rg_folder)!!.check(R.id.rf_name_reversed)
+            dialog.findViewById<CheckBox>(R.id.cb_recursive)!!.isChecked = true
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+        }
+        val views = DirectoryViewStore.load(app)
+        val custom = DirectoryViewStore.get(views, dir)!!
+        assertEquals(FolderSortKey.NAME_REVERSED, custom.sort?.folderBy)
+        assertTrue(custom.sortRecursive)
+        assertEquals(FolderSortKey.NAME_REVERSED,
+            DirectoryViewStore.resolve(views, dir.copy(path = "${dir.path}/child")).sort?.folderBy)
+        withDialog { dialog ->
+            dialog.findViewById<RadioGroup>(R.id.rg_scope)!!.check(R.id.scope_directory)
+            assertEquals(R.id.rf_name_reversed, dialog.findViewById<RadioGroup>(R.id.rg_folder)!!.checkedRadioButtonId)
         }
     }
 

@@ -36,8 +36,8 @@
     <string name="sort_date">Data</string>
     <string name="sort_reversed">Inverso</string>
     <string name="sort_folders_by">Ordem das pastas</string>
-    <string name="sort_date_old">Data (mais antigos primeiro)</string>
-    <string name="sort_date_new">Data (mais recentes primeiro)</string>
+    <string name="sort_date_old">Data: antiga → recente</string>
+    <string name="sort_date_new">Data: recente → antiga</string>
     <string name="density_compact">Compacta</string>
     <string name="density_normal">Normal</string>
     <string name="density_large">Espaçosa</string>
@@ -1111,4 +1111,6 @@
     <string name="directory_view_custom_view">Visualização personalizada</string>
     <string name="directory_view_reset">Usar padrões</string>
     <string name="directory_view_recursive">Aplicar às subpastas</string>
+    <string name="sort_name_az">Nome: A → Z</string>
+    <string name="sort_name_za">Nome: Z → A</string>
 </resources>

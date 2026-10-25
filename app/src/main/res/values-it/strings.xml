@@ -36,8 +36,8 @@
     <string name="sort_date">Data</string>
     <string name="sort_reversed">Invertito</string>
     <string name="sort_folders_by">Ordine cartelle</string>
-    <string name="sort_date_old">Data (meno recenti prima)</string>
-    <string name="sort_date_new">Data (più recenti prima)</string>
+    <string name="sort_date_old">Data: meno recente → più recente</string>
+    <string name="sort_date_new">Data: più recente → meno recente</string>
     <string name="density_compact">Compatta</string>
     <string name="density_normal">Normale</string>
     <string name="density_large">Ampia</string>
@@ -1111,4 +1111,6 @@
     <string name="directory_view_custom_view">Vista personalizzata</string>
     <string name="directory_view_reset">Usa predefiniti</string>
     <string name="directory_view_recursive">Applica alle sottocartelle</string>
+    <string name="sort_name_az">Nome: A → Z</string>
+    <string name="sort_name_za">Nome: Z → A</string>
 </resources>

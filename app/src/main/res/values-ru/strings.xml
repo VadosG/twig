@@ -36,8 +36,8 @@
     <string name="sort_date">Дате</string>
     <string name="sort_reversed">Обратная</string>
     <string name="sort_folders_by">Порядок папок по</string>
-    <string name="sort_date_old">Дате (старые первыми)</string>
-    <string name="sort_date_new">Дате (новые первыми)</string>
+    <string name="sort_date_old">Дата: старые → новые</string>
+    <string name="sort_date_new">Дата: новые → старые</string>
     <string name="density_compact">Компактная</string>
     <string name="density_normal">Нормальная</string>
     <string name="density_large">Увеличенная</string>
@@ -1147,4 +1147,6 @@
     <string name="directory_view_custom_view">Свой вид</string>
     <string name="directory_view_reset">Использовать по умолчанию</string>
     <string name="directory_view_recursive">Применить к подпапкам</string>
+    <string name="sort_name_az">Имя: А → Я</string>
+    <string name="sort_name_za">Имя: Я → А</string>
 </resources>

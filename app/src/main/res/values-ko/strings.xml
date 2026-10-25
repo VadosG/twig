@@ -36,8 +36,8 @@
     <string name="sort_date">날짜</string>
     <string name="sort_reversed">역순</string>
     <string name="sort_folders_by">폴더 순서</string>
-    <string name="sort_date_old">날짜 (오래된 순)</string>
-    <string name="sort_date_new">날짜 (최신순)</string>
+    <string name="sort_date_old">날짜: 오래된 순 → 최신순</string>
+    <string name="sort_date_new">날짜: 최신순 → 오래된 순</string>
     <string name="density_compact">좁게</string>
     <string name="density_normal">보통</string>
     <string name="density_large">넓게</string>
@@ -1111,4 +1111,6 @@
     <string name="directory_view_custom_view">사용자 지정 보기</string>
     <string name="directory_view_reset">기본값 사용</string>
     <string name="directory_view_recursive">하위 폴더에 적용</string>
+    <string name="sort_name_az">이름: A → Z</string>
+    <string name="sort_name_za">이름: Z → A</string>
 </resources>

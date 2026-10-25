@@ -36,8 +36,8 @@
     <string name="sort_date">Date</string>
     <string name="sort_reversed">Reversed</string>
     <string name="sort_folders_by">Folder order</string>
-    <string name="sort_date_old">Date (oldest first)</string>
-    <string name="sort_date_new">Date (newest first)</string>
+    <string name="sort_date_old">Date: oldest → newest</string>
+    <string name="sort_date_new">Date: newest → oldest</string>
     <string name="density_compact">Compact</string>
     <string name="density_normal">Normal</string>
     <string name="density_large">Relaxed</string>
@@ -1187,4 +1187,6 @@
     <string name="directory_view_custom_view">Custom view</string>
     <string name="directory_view_reset">Use defaults</string>
     <string name="directory_view_recursive">Apply to subdirectories</string>
+    <string name="sort_name_az">Name: A → Z</string>
+    <string name="sort_name_za">Name: Z → A</string>
 </resources>

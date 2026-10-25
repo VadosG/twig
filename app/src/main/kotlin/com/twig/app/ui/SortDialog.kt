@@ -62,6 +62,7 @@ object SortDialog {
                 },
                 reversed = d.cbReversed.isChecked,
                 folderBy = when (d.rgFolder.checkedRadioButtonId) {
+                    R.id.rf_name_reversed -> FolderSortKey.NAME_REVERSED
                     R.id.rf_date_old -> FolderSortKey.DATE_OLD
                     R.id.rf_date_new -> FolderSortKey.DATE_NEW
                     else -> FolderSortKey.NAME
@@ -90,6 +91,7 @@ object SortDialog {
             d.cbReversed.isChecked = sort.reversed
             d.rgFolder.check(when (sort.folderBy) {
                 FolderSortKey.NAME -> R.id.rf_name
+                FolderSortKey.NAME_REVERSED -> R.id.rf_name_reversed
                 FolderSortKey.DATE_OLD -> R.id.rf_date_old
                 FolderSortKey.DATE_NEW -> R.id.rf_date_new
             })

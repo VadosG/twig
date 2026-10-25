@@ -89,7 +89,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <RadioButton android:id="@+id/rf_name" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:text="@string/sort_name" />
+                android:layout_height="wrap_content" android:text="@string/sort_name_az" />
+            <RadioButton android:id="@+id/rf_name_reversed" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:text="@string/sort_name_za" />
             <RadioButton android:id="@+id/rf_date_old" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:text="@string/sort_date_old" />
             <RadioButton android:id="@+id/rf_date_new" android:layout_width="match_parent"

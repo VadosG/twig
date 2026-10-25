@@ -36,8 +36,8 @@
     <string name="sort_date">日時</string>
     <string name="sort_reversed">逆順</string>
     <string name="sort_folders_by">フォルダーの並び順</string>
-    <string name="sort_date_old">日時（古い順）</string>
-    <string name="sort_date_new">日時（新しい順）</string>
+    <string name="sort_date_old">日時：古い → 新しい</string>
+    <string name="sort_date_new">日時：新しい → 古い</string>
     <string name="density_compact">コンパクト</string>
     <string name="density_normal">標準</string>
     <string name="density_large">ゆったり</string>
@@ -1111,4 +1111,6 @@
     <string name="directory_view_custom_view">表示を個別設定</string>
     <string name="directory_view_reset">既定に戻す</string>
     <string name="directory_view_recursive">サブフォルダにも適用</string>
+    <string name="sort_name_az">名前：A → Z</string>
+    <string name="sort_name_za">名前：Z → A</string>
 </resources>

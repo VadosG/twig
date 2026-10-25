@@ -36,8 +36,8 @@
     <string name="sort_date">Tarih</string>
     <string name="sort_reversed">Ters sırala</string>
     <string name="sort_folders_by">Klasör sırası</string>
-    <string name="sort_date_old">Tarih (önce en eski)</string>
-    <string name="sort_date_new">Tarih (önce en yeni)</string>
+    <string name="sort_date_old">Tarih: eski → yeni</string>
+    <string name="sort_date_new">Tarih: yeni → eski</string>
     <string name="density_compact">Yoğun</string>
     <string name="density_normal">Normal</string>
     <string name="density_large">Geniş</string>
@@ -1111,4 +1111,6 @@
     <string name="directory_view_custom_view">Özel görünüm</string>
     <string name="directory_view_reset">Varsayılanları kullan</string>
     <string name="directory_view_recursive">Alt klasörlere uygula</string>
+    <string name="sort_name_az">Ad: A → Z</string>
+    <string name="sort_name_za">Ad: Z → A</string>
 </resources>

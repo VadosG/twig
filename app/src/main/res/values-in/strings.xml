@@ -36,8 +36,8 @@
     <string name="sort_date">Tanggal</string>
     <string name="sort_reversed">Terbalik</string>
     <string name="sort_folders_by">Urutan folder</string>
-    <string name="sort_date_old">Tanggal (terlama dahulu)</string>
-    <string name="sort_date_new">Tanggal (terbaru dahulu)</string>
+    <string name="sort_date_old">Tanggal: lama → baru</string>
+    <string name="sort_date_new">Tanggal: baru → lama</string>
     <string name="density_compact">Rapat</string>
     <string name="density_normal">Normal</string>
     <string name="density_large">Longgar</string>
@@ -1111,4 +1111,6 @@
     <string name="directory_view_custom_view">Tampilan khusus</string>
     <string name="directory_view_reset">Gunakan default</string>
     <string name="directory_view_recursive">Terapkan ke subfolder</string>
+    <string name="sort_name_az">Nama: A → Z</string>
+    <string name="sort_name_za">Nama: Z → A</string>
 </resources>

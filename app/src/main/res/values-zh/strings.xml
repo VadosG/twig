@@ -36,8 +36,8 @@
     <string name="sort_date">日期</string>
     <string name="sort_reversed">反转</string>
     <string name="sort_folders_by">文件夹排序</string>
-    <string name="sort_date_old">日期(旧在前)</string>
-    <string name="sort_date_new">日期(新在前)</string>
+    <string name="sort_date_old">时间：旧 → 新</string>
+    <string name="sort_date_new">时间：新 → 旧</string>
     <string name="density_compact">紧凑</string>
     <string name="density_normal">正常</string>
     <string name="density_large">宽松</string>
@@ -1141,4 +1141,6 @@
     <string name="directory_view_custom_view">自定义视图</string>
     <string name="directory_view_reset">恢复默认</string>
     <string name="directory_view_recursive">应用到子目录</string>
+    <string name="sort_name_az">名称：A → Z</string>
+    <string name="sort_name_za">名称：Z → A</string>
 </resources>
