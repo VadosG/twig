@@ -283,11 +283,7 @@ class ShareTargetActivity : AppCompatActivity(), PaneFragment.Host {
     }
 
     /** Written the same way as the panel's path bar (network sources carry the server name); falls back to the no-server-name form when the panel isn't ready yet. */
-    private fun pathLabel(f: XFile): String = pane()?.displayPath(f) ?: when {
-        f.scheme == "file" -> f.path
-        f.scheme == "saf" -> f.name
-        else -> "${Format.schemeLabel(f.scheme)}:${f.path}"
-    }
+    private fun pathLabel(f: XFile): String = pane()?.displayPath(f) ?: Format.pathLabel(f)
 
     // ---- Resolve the share payload ----
 

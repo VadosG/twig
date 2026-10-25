@@ -29,14 +29,17 @@
             android:layout_height="wrap_content" android:textIsSelectable="true"
             android:textColor="@color/text_secondary" />
 
+        <CheckBox android:id="@+id/cb_custom_sort" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="@string/directory_view_custom_sort" />
+
+        <CheckBox android:id="@+id/cb_custom_view" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="@string/directory_view_custom_view" />
+
         <CheckBox android:id="@+id/cb_recursive" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:text="@string/directory_view_recursive" />
 
         <LinearLayout android:id="@+id/sort_options" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:orientation="vertical">
-        <CheckBox android:id="@+id/cb_custom_sort" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:text="@string/directory_view_custom_sort" />
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -97,9 +100,6 @@
 
         <LinearLayout android:id="@+id/view_options" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:orientation="vertical">
-        <CheckBox android:id="@+id/cb_custom_view" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:text="@string/directory_view_custom_view" />
-
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="@string/action_view_mode" android:textColor="@color/primary"
             android:textStyle="bold" android:paddingTop="6dp" android:paddingBottom="4dp" />

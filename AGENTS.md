@@ -163,6 +163,11 @@ each write `= null`.
   Listing identities (`mountRoots` / `keyFile`) identify the containing directory, including
   favorites, servers and opaque SAF paths. `FileNode.gridMode` carries its effective view
   to the adapter; directory overrides are parsed per settings refresh, not per rendered row.
+  Network display paths share `formatLocationPath` / `Format.pathLabel` and use
+  `type://server/path`; aliases follow history, raw addresses are used for favorites and
+  playlist exports. M3U network locations use `type://server/path`; malformed single-slash
+  source addresses are skipped.
+  Internal `scheme:path` keys remain separate from display text.
 - Private space: `PrivateSpace` uses `applicationInfo.dataDir/private_space` through
   the ordinary local filesystem. The main menu's root-item visibility choices are
   stored per pane in one dialog with left/right columns; Private space defaults

@@ -474,24 +474,9 @@ class PaneFragment : Fragment() {
         observers.clear()
     }
 
-    /**
-     * Path-bar text: local is the absolute path; everything else is `type:/path`; network sources insert the server
-     * name after the type (custom label preferred, see [SavedConnection.shortLabel]), matching the "Recent" entries' style.
-     */
-    private fun pathLabel(f: XFile): String = when {
-        f.scheme == "file" -> f.path
-        f.scheme == "saf" -> f.name
-        else -> {
-            // This pane's reverse lookup wins; otherwise ask the global (copy / compress target directories belong to the
-            // *other* pane — this pane hasn't expanded that server, so looking only at the VM would lose the server name; see [Connections.ofScheme]).
-            val conn = viewModel.connOf(f.scheme) ?: Connections.ofScheme(f.scheme)
-            val server = conn?.shortLabel().orEmpty()
-            val path = if (f.path.startsWith("/")) f.path else "/${f.path}"
-            val head = Format.schemeLabel(f.scheme)
-            // Non-server sources (zip/git/restic…) have no server name; don't insert an extra slash.
-            if (server.isEmpty()) "$head:$path" else "$head:/$server$path"
-        }
-    }
+    /** Match history and directory settings, retaining this pane's server lookup. */
+    private fun pathLabel(f: XFile): String =
+        Format.pathLabel(f, viewModel.connOf(f.scheme) ?: Connections.ofScheme(f.scheme))
 
     /** For the host (share-target page) to display a path in the same format. */
     fun displayPath(f: XFile): String = pathLabel(f)

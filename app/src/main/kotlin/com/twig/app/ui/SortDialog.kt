@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.twig.app.DirectoryView
 import com.twig.app.DirectoryViewStore
 import com.twig.app.FileSortKey
+import com.twig.app.Format
 import com.twig.app.FolderSortKey
 import com.twig.app.Prefs
 import com.twig.app.SortSpec
@@ -103,15 +104,15 @@ object SortDialog {
             d.cbRecursive.visibility = visibility
             d.cbRecursive.isChecked = if (viewOnly) cur.viewRecursive else cur.sortRecursive
             d.directoryPath.visibility = visibility
-            d.cbCustomSort.visibility = visibility
-            d.cbCustomView.visibility = visibility
+            d.cbCustomSort.visibility = if (scope == 1 && !viewOnly) View.VISIBLE else View.GONE
+            d.cbCustomView.visibility = if (scope == 1 && viewOnly) View.VISIBLE else View.GONE
             dialog.getButton(AlertDialog.BUTTON_NEUTRAL)?.visibility = visibility
             enableOptions()
             filling = false
         }
 
         d.scopeDirectory.isEnabled = directory != null
-        d.directoryPath.text = directory?.let { "${it.scheme}:${it.path}" }
+        d.directoryPath.text = directory?.let { Format.pathLabel(it) }
         d.rgScope.check(R.id.scope_default)
         dialog = AlertDialog.Builder(activity)
             .setTitle(if (viewOnly) R.string.action_view_mode else R.string.action_sort)

@@ -7,8 +7,13 @@ import android.view.View
 import android.widget.CheckBox
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.test.core.app.ApplicationProvider
+import com.twig.app.ConnectionStore
+import com.twig.app.Connections
+import com.twig.app.SavedConnection
+import com.twig.app.formatLocationPath
 import com.twig.app.DirectoryView
 import com.twig.app.DirectoryViewStore
 import com.twig.app.FileSortKey
@@ -16,6 +21,7 @@ import com.twig.app.Prefs
 import com.twig.app.R
 import com.twig.app.SortSpec
 import com.twig.core.XFile
+import com.twig.core.FsRegistry
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -175,6 +181,30 @@ class DirectoryViewDialogTest {
         }
         assertNull(DirectoryViewStore.get(DirectoryViewStore.load(app), dir))
         assertEquals(1, DirectoryViewStore.load(app).size)
+    }
+
+    @Test
+    fun `selected directory shows the history path with server alias instead of the internal scheme`() {
+        val conn = SavedConnection("sftp", "directory-display.test", port = 2222, name = "My server")
+        ConnectionStore.save(app, conn)
+        val scheme = Connections.schemeOf(conn)
+        FsRegistry.register(FakeFileSystem(scheme, mapOf("/" to emptyList())))
+        Connections.ensure(app, conn)
+        val remote = XFile(scheme, "/photos", isDir = true)
+        try {
+            withDialog(remote) { dialog ->
+                dialog.findViewById<RadioGroup>(R.id.rg_scope)!!.check(R.id.scope_directory)
+                val displayed = dialog.findViewById<TextView>(R.id.directory_path)!!.text.toString()
+                assertEquals("sftp://My server/photos", displayed)
+                assertEquals(formatLocationPath(conn.label(), remote.path, conn), displayed)
+            }
+        } finally {
+            Connections.drop(scheme)
+        }
+        withDialog { dialog ->
+            dialog.findViewById<RadioGroup>(R.id.rg_scope)!!.check(R.id.scope_directory)
+            assertEquals(dir.path, dialog.findViewById<TextView>(R.id.directory_path)!!.text.toString())
+        }
     }
 
     @Test
