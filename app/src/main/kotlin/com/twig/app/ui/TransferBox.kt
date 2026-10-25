@@ -52,6 +52,12 @@ class TransferBox(
         .create()
 
     init {
+        if (session.isDelete) {
+            pb.barFile.isIndeterminate = true
+            pb.tvTotalSize.visibility = android.view.View.GONE
+            (pb.tvSpeed.parent as android.view.View).visibility = android.view.View.GONE
+            (pb.ivDest.parent as android.view.View).visibility = android.view.View.GONE
+        }
         tb.tvTitle.setText(session.titleRes)
         pb.tvDest.text = session.destLabel
         pb.ivDest.setImageResource(session.destIcon)

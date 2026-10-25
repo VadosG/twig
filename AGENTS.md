@@ -291,7 +291,8 @@ each write `= null`.
   main UI present.
 - Trash: `TrashStore` keeps local shared-storage deletions on their original volume;
   `DeleteUi` distinguishes recoverable and permanent deletion across pane/viewer/compare
-  entry points. `TrashFileSystem` expands in the pane; `TrashDialogs` restores or purges entries. No privileged, SAF or
+  entry points. Confirmed deletions and trash purges use `Transfers` / `TransferService`
+  for background progress; cancellation stops between backend calls. `TrashFileSystem` expands in the pane; `TrashDialogs` restores or purges entries. No privileged, SAF or
   network fallback for recycling. See [trash safety](docs/lessons/trash.md).
 - Security: `secure/Secrets` (two-layer Keystore/master-password encryption of sensitive
   fields) + `secure/Backup` (`.twigbak` config backup) + `ui/SecurityUi` (dialogs).

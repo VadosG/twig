@@ -608,9 +608,9 @@
     <string name="stream_bad_token">Ungültiges Stream-Token</string>
     <string name="transfer_channel">Dateiübertragungen</string>
     <string name="transfer_background">Im Hintergrund ausführen</string>
-    <string name="transfer_background_hint">Übertragung im Hintergrund — Benachrichtigung zum Zurückkehren antippen</string>
+    <string name="transfer_background_hint">Vorgang im Hintergrund — zum Zurückkehren auf die Benachrichtigung tippen</string>
     <string name="transfer_waiting">Warte auf Ihre Entscheidung…</string>
-    <string name="transfer_busy">Übertragung läuft bereits; nach Abschluss erneut versuchen</string>
+    <string name="transfer_busy">Ein Dateivorgang läuft bereits; nach Abschluss erneut versuchen</string>
     <string name="transfer_done">Übertragung abgeschlossen</string>
     <string name="transfer_failed">Übertragung fehlgeschlagen</string>
     <string name="cmd_channel">Remote-Befehle</string>

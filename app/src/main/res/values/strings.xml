@@ -647,9 +647,9 @@
     <!-- Background transfers (copy / move / compress) -->
     <string name="transfer_channel">File transfers</string>
     <string name="transfer_background">Run in background</string>
-    <string name="transfer_background_hint">Transferring in background — tap the notification to return</string>
+    <string name="transfer_background_hint">Running in background — tap the notification to return</string>
     <string name="transfer_waiting">Waiting for your decision…</string>
-    <string name="transfer_busy">A transfer is already running; try again when it finishes</string>
+    <string name="transfer_busy">A file operation is already running; try again when it finishes</string>
     <string name="transfer_done">Transfer complete</string>
     <string name="transfer_failed">Transfer failed</string>
 

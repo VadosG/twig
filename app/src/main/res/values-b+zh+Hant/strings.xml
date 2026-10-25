@@ -608,9 +608,9 @@
     <string name="stream_bad_token">stream token 解析失敗</string>
     <string name="transfer_channel">檔案傳輸</string>
     <string name="transfer_background">轉到後臺</string>
-    <string name="transfer_background_hint">後臺傳輸中,點通知欄可返回</string>
+    <string name="transfer_background_hint">背景操作中，點通知欄可返回</string>
     <string name="transfer_waiting">等待確認…</string>
-    <string name="transfer_busy">已有傳輸在進行,完成後再試</string>
+    <string name="transfer_busy">已有檔案操作在進行，完成後再試</string>
     <string name="transfer_done">傳輸完成</string>
     <string name="transfer_failed">傳輸失敗</string>
     <string name="cmd_channel">遠端命令</string>

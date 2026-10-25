@@ -343,7 +343,7 @@ private fun runSync(
         }
     }
     if (deletes.isEmpty()) continueSync()
-    else DeleteUi.confirm(ctx, scope, deletes.map { it.file }) { continueSync() }
+    else DeleteUi.confirm(ctx, scope, deletes.map { it.file }) { success -> if (success) continueSync() }
 }
 
 private fun toastOn(ctx: Context, msg: String) =

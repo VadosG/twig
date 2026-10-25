@@ -608,9 +608,9 @@
     <string name="stream_bad_token">Jeton de flux mal formé</string>
     <string name="transfer_channel">Transferts de fichiers</string>
     <string name="transfer_background">Exécuter en arrière-plan</string>
-    <string name="transfer_background_hint">Transfert en arrière-plan — touchez la notification pour revenir</string>
+    <string name="transfer_background_hint">Opération en arrière-plan — touchez la notification pour revenir</string>
     <string name="transfer_waiting">En attente de votre décision…</string>
-    <string name="transfer_busy">Un transfert est en cours ; réessayez après sa fin</string>
+    <string name="transfer_busy">Une opération sur les fichiers est en cours ; réessayez après sa fin</string>
     <string name="transfer_done">Transfert terminé</string>
     <string name="transfer_failed">Échec du transfert</string>
     <string name="cmd_channel">Commandes distantes</string>

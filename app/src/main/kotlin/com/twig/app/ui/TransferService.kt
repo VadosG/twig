@@ -14,15 +14,18 @@ import android.os.Looper
 import com.twig.app.Format
 import com.twig.app.MainActivity
 import com.twig.app.R
+import com.twig.app.TrashStore
+import com.twig.app.TrashFileSystem
 import com.twig.core.CopyEngine
 import com.twig.core.FsRegistry
 import com.twig.core.XFile
 import com.twig.fs.archive.ArchiveWriter
+import kotlinx.coroutines.CompletableDeferred
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Session state for background transfers (copy/move/compress), in-process singleton.
+ * Session state for background file operations (copy/move/compress/delete), in-process singleton.
  *
  * Why this layer exists: the progress dialog used to own the whole job itself — engine
  * callbacks wrote straight to its View, and the job's lifecycle was tied to
@@ -51,6 +54,16 @@ object Transfers {
 
         internal class Download(val task: WebsiteDownloadTask, val dest: XFile) : Work() {
             override val items: List<XFile> = emptyList()
+        }
+
+        /** Confirmed trash decisions are kept intact; execution never falls back to permanent deletion. */
+        class Delete(val targets: List<TrashStore.Target>, val recycle: Boolean) : Work() {
+            override val items: List<XFile> = targets.map { it.file }
+        }
+
+        /** Only the entries confirmed by the user, including nested payload paths. */
+        class Purge(val targets: List<Pair<XFile, TrashFileSystem.Item>>) : Work() {
+            override val items: List<XFile> = targets.map { it.first }
         }
 
         class Copy(
@@ -131,6 +144,8 @@ object Transfers {
         /** Notification-bar refresh hook (installed by [TransferService]); even moments without a progress event (e.g. waiting on a conflict) need to refresh. */
         @Volatile internal var tick: (() -> Unit)? = null
 
+        internal val completion = CompletableDeferred<Unit>()
+
         val cancelled = AtomicBoolean(false)
 
         /** Entries skipped because their name cannot be written into a directory (zip slip attempts); reported when the transfer ends. */
@@ -145,6 +160,7 @@ object Transfers {
             pendingConflict?.answer(null) // If we're stuck on the conflict dialog, release it so the transfer thread sees the cancel flag
         }
 
+        val isDelete: Boolean get() = work is Work.Delete || work is Work.Purge
         val isCompress: Boolean get() = work is Work.Compress
     }
 
@@ -244,6 +260,9 @@ object Transfers {
 
         val result = runCatching {
             val plan = s.plan
+                ?: s.work.takeIf { s.isDelete }?.let { w ->
+                    CopyEngine.Plan(0, w.items.count { !it.isDir }, w.items.count { it.isDir })
+                }
                 ?: runCatching { CopyEngine.plan(s.work.items) }.getOrNull()
                 ?: CopyEngine.Plan(0, 0, 0)
             s.plan = plan
@@ -252,6 +271,21 @@ object Transfers {
             post(s)
 
             when (val w = s.work) {
+                is Work.Delete -> {
+                    val store = TrashStore(ctx.applicationContext)
+                    deleteItems(ctx, s, w.items, listener) { index ->
+                        val target = w.targets[index]
+                        if (w.recycle && target.volume != null) store.move(target)
+                        else FsRegistry.of(target.file).delete(target.file)
+                    }
+                }
+                is Work.Purge -> {
+                    val store = (FsRegistry.of("trash") as TrashFileSystem).store
+                    deleteItems(ctx, s, w.items, listener) { index ->
+                        val item = w.targets[index].second
+                        store.purgeItem(item.entry, item.relative)
+                    }
+                }
                 is Work.Download -> w.task.execute(ctx, w.dest, listener, isCancelled = { s.cancelled.get() })
                 is Work.Copy -> CopyEngine.transfer(
                     w.items, w.dest, w.move, listener,
@@ -296,6 +330,30 @@ object Transfers {
         finish(ctx, s, onComplete)
     }
 
+    /** Count confirmed entries, leaving recursive and symlink handling to the owning backend. */
+    private fun deleteItems(
+        ctx: Context, s: Session, items: List<XFile>, listener: CopyEngine.ProgressListener,
+        delete: (Int) -> Unit,
+    ) {
+        var firstError: Throwable? = null
+        var failed = 0
+        for ((index, file) in items.withIndex()) {
+            if (s.cancelled.get()) break
+            listener.onFile(file)
+            runCatching { delete(index) }.exceptionOrNull()?.let {
+                if (firstError == null) firstError = it
+                failed++
+            }
+            listener.onItemDone(file.isDir)
+            s.totalProgress = ((index + 1L) * 1000 / items.size).toInt()
+            post(s)
+        }
+        if (failed > 0) throw java.io.IOException(
+            ctx.getString(R.string.compare_sync_delete_failed, failed) + "\n" +
+                firstError?.message.orEmpty(), firstError,
+        )
+    }
+
     /** Conflict decision: transfer thread blocks; the UI (if attached) answers via dialog. */
     private fun resolverFor(s: Session) = CopyEngine.ConflictResolver { src, existing ->
         s.applyAll ?: run {
@@ -331,12 +389,17 @@ object Transfers {
                 else -> ctx.getString(R.string.msg_done)
             }
             OperationFeedback.finished(
-                ctx, ctx.getString(if (error == null) R.string.transfer_done else R.string.transfer_failed),
-                message, if (error == null) s.destLabel else message,
+                ctx, ctx.getString(when {
+                    s.isDelete -> s.titleRes
+                    error == null -> R.string.transfer_done
+                    else -> R.string.transfer_failed
+                }),
+                message, if (s.isDelete || error != null) message else s.destLabel,
                 cancelled = cancelled, openIntent = MainActivity.transferIntent(ctx),
             )
             onComplete()
             u?.onFinished(s)
+            s.completion.complete(Unit)
             if (u == null) ctx.sendBroadcast(Intent(ACTION_FINISHED).setPackage(ctx.packageName))
         }
     }
@@ -416,7 +479,7 @@ class TransferService : Service() {
             .setContentTitle(getString(s.titleRes))
             .setContentText(text)
             .setSubText(speed.ifEmpty { null })
-            .setSmallIcon(if (s.isCompress) R.drawable.ic_compress else R.drawable.ic_copy)
+            .setSmallIcon(when { s.isDelete -> R.drawable.ic_delete; s.isCompress -> R.drawable.ic_compress; else -> R.drawable.ic_copy })
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setProgress(1000, s.totalProgress, s.plan == null || (s.work is Transfers.Work.Download && s.plan?.bytes == 0L))

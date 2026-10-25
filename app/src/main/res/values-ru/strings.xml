@@ -631,9 +631,9 @@
     <!-- Background transfers (copy / move / compress) -->
     <string name="transfer_channel">Передача файлов</string>
     <string name="transfer_background">В фоновом режиме</string>
-    <string name="transfer_background_hint">Передача в фоновом режиме — нажмите на уведомление, чтобы вернуться</string>
+    <string name="transfer_background_hint">Операция выполняется в фоне — нажмите на уведомление, чтобы вернуться</string>
     <string name="transfer_waiting">Жду вашего решения…</string>
-    <string name="transfer_busy">Передача уже выполняется; попробуйте снова после её завершения</string>
+    <string name="transfer_busy">Операция с файлами уже выполняется; попробуйте после её завершения</string>
     <string name="transfer_done">Передача завершена</string>
     <string name="transfer_failed">Передача не удалась</string>
 

@@ -627,9 +627,9 @@
     <string name="stream_bad_token">stream token 解析失败</string>
     <string name="transfer_channel">文件传输</string>
     <string name="transfer_background">转到后台</string>
-    <string name="transfer_background_hint">后台传输中,点通知栏可返回</string>
+    <string name="transfer_background_hint">后台操作中，点通知栏可返回</string>
     <string name="transfer_waiting">等待确认…</string>
-    <string name="transfer_busy">已有传输在进行,完成后再试</string>
+    <string name="transfer_busy">已有文件操作在进行，完成后再试</string>
     <string name="transfer_done">传输完成</string>
     <string name="transfer_failed">传输失败</string>
 

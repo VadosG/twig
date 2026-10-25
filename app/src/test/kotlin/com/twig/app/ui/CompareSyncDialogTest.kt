@@ -37,6 +37,8 @@ import org.robolectric.shadows.ShadowDialog
 @Config(sdk = [34])
 class CompareSyncDialogTest {
 
+    private val hosts = mutableListOf<org.robolectric.android.controller.ActivityController<SettingsActivity>>()
+
     /** The destination side must be a **writable** source, otherwise [confirmSync] blocks it right there (see the last test case). */
     private val dstFs = FakeFileSystem("cmpdst", dirs = mapOf("/dst" to emptyList()), writable = true)
     private val roFs = FakeFileSystem("cmpro", dirs = mapOf("/dst" to emptyList()))
@@ -50,6 +52,8 @@ class CompareSyncDialogTest {
 
     @After
     fun tearDown() {
+        hosts.asReversed().forEach { it.pause().stop().destroy() }
+        hosts.clear()
         FsRegistry.unregister(dstFs.scheme)
         FsRegistry.unregister(roFs.scheme)
     }
@@ -58,7 +62,9 @@ class CompareSyncDialogTest {
         SyncItem(key, XFile("l", "/src/$key", isDir = false), newer)
 
     private fun show(plan: SyncPlan, options: CompareOptions = CompareOptions()): AlertDialog {
-        val a = Robolectric.buildActivity(SettingsActivity::class.java).setup().get()
+        val controller = Robolectric.buildActivity(SettingsActivity::class.java).setup()
+        hosts += controller
+        val a = controller.get()
         confirmSync(a, a.lifecycleScope, dst, to = 1, plan = plan, options = options)
         return ShadowDialog.getLatestDialog() as AlertDialog
     }
@@ -122,7 +128,9 @@ class CompareSyncDialogTest {
 
     @Test
     fun `when the destination is a read-only source it is blocked outright, with no confirmation dialog`() {
-        val a = Robolectric.buildActivity(SettingsActivity::class.java).setup().get()
+        val controller = Robolectric.buildActivity(SettingsActivity::class.java).setup()
+        hosts += controller
+        val a = controller.get()
         ShadowDialog.reset()
         confirmSync(
             a, a.lifecycleScope, XFile(roFs.scheme, "/dst", isDir = true), to = 1,

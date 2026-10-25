@@ -50,7 +50,9 @@ class TrashDialogs(private val ctx: Context, private val owner: LifecycleOwner, 
                     actions += extraActions
                     actions.item(ctx.getString(R.string.trash_delete_permanently), R.drawable.ic_delete, DANGER) {
                         DeleteUi.confirmation(ctx, listOf(file.name))
-                            .setPositiveButton(R.string.strip_delete) { _, _ -> work { store.purgeItem(item.entry, item.relative) } }
+                            .setPositiveButton(R.string.strip_delete) { _, _ ->
+                                DeleteUi.runConfirmed(ctx, owner.lifecycleScope, Transfers.Work.Purge(listOf(file to item))) { changed() }
+                            }
                             .show().track()
                     }
                     AlertDialog.Builder(ctx).setTitle(file.name)
@@ -83,12 +85,14 @@ class TrashDialogs(private val ctx: Context, private val owner: LifecycleOwner, 
     }
     private fun confirmEmpty() {
         owner.lifecycleScope.launch {
-            val result = withContext(Dispatchers.IO) { runCatching { store.snapshot().entries } }
+            val result = withContext(Dispatchers.IO) { runCatching { fs.list(fs.root()).map { it to fs.item(it) } } }
             if (!active()) return@launch
             result.fold(onSuccess = { entries ->
                 if (entries.isEmpty()) return@fold
-                DeleteUi.confirmation(ctx, entries.map { it.name })
-                    .setPositiveButton(R.string.trash_empty) { _, _ -> work { store.empty(entries) } }.show().track()
+                DeleteUi.confirmation(ctx, entries.map { it.first.name })
+                    .setPositiveButton(R.string.trash_empty) { _, _ ->
+                        DeleteUi.runConfirmed(ctx, owner.lifecycleScope, Transfers.Work.Purge(entries)) { changed() }
+                    }.show().track()
             }, onFailure = ::error)
         }
     }

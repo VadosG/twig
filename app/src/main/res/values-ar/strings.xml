@@ -608,9 +608,9 @@
     <string name="stream_bad_token">رمز التدفق غير صالح</string>
     <string name="transfer_channel">نقل الملفات</string>
     <string name="transfer_background">تشغيل في الخلفية</string>
-    <string name="transfer_background_hint">النقل في الخلفية؛ اضغط الإشعار للعودة</string>
+    <string name="transfer_background_hint">العملية جارية في الخلفية؛ اضغط الإشعار للعودة</string>
     <string name="transfer_waiting">بانتظار قرارك…</string>
-    <string name="transfer_busy">يوجد نقل جارٍ؛ حاول بعد انتهائه</string>
+    <string name="transfer_busy">توجد عملية ملفات جارية؛ حاول بعد انتهائها</string>
     <string name="transfer_done">اكتمل النقل</string>
     <string name="transfer_failed">فشل النقل</string>
     <string name="cmd_channel">أوامر بعيدة</string>

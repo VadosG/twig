@@ -608,9 +608,9 @@
     <string name="stream_bad_token">Geçersiz akış belirteci</string>
     <string name="transfer_channel">Dosya aktarımları</string>
     <string name="transfer_background">Arka planda çalıştır</string>
-    <string name="transfer_background_hint">Arka planda aktarılıyor; dönmek için bildirime dokunun</string>
+    <string name="transfer_background_hint">İşlem arka planda sürüyor; dönmek için bildirime dokunun</string>
     <string name="transfer_waiting">Kararınız bekleniyor…</string>
-    <string name="transfer_busy">Aktarım zaten sürüyor; bitince yeniden deneyin</string>
+    <string name="transfer_busy">Bir dosya işlemi zaten sürüyor; bitince yeniden deneyin</string>
     <string name="transfer_done">Aktarım tamamlandı</string>
     <string name="transfer_failed">Aktarım başarısız</string>
     <string name="cmd_channel">Uzak komutlar</string>

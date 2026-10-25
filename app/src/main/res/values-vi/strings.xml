@@ -608,9 +608,9 @@
     <string name="stream_bad_token">Mã luồng không hợp lệ</string>
     <string name="transfer_channel">Truyền tệp</string>
     <string name="transfer_background">Chạy nền</string>
-    <string name="transfer_background_hint">Đang truyền nền; chạm thông báo để quay lại</string>
+    <string name="transfer_background_hint">Đang chạy nền; chạm thông báo để quay lại</string>
     <string name="transfer_waiting">Đang chờ quyết định…</string>
-    <string name="transfer_busy">Đang có lượt truyền; thử lại khi xong</string>
+    <string name="transfer_busy">Đang có thao tác tệp; thử lại khi hoàn tất</string>
     <string name="transfer_done">Truyền hoàn tất</string>
     <string name="transfer_failed">Truyền thất bại</string>
     <string name="cmd_channel">Lệnh từ xa</string>

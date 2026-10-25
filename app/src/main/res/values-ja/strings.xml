@@ -608,9 +608,9 @@
     <string name="stream_bad_token">不正なストリームトークン</string>
     <string name="transfer_channel">ファイル転送</string>
     <string name="transfer_background">バックグラウンドで実行</string>
-    <string name="transfer_background_hint">バックグラウンドで転送中。通知をタップして戻れます</string>
+    <string name="transfer_background_hint">バックグラウンドで処理中。通知をタップして戻れます</string>
     <string name="transfer_waiting">選択を待っています…</string>
-    <string name="transfer_busy">転送中です。完了後に再試行してください</string>
+    <string name="transfer_busy">ファイル操作中です。完了後に再試行してください</string>
     <string name="transfer_done">転送完了</string>
     <string name="transfer_failed">転送に失敗</string>
     <string name="cmd_channel">リモートコマンド</string>

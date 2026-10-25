@@ -608,9 +608,9 @@
     <string name="stream_bad_token">अमान्य स्ट्रीम टोकन</string>
     <string name="transfer_channel">फ़ाइल स्थानांतरण</string>
     <string name="transfer_background">पृष्ठभूमि में चलाएँ</string>
-    <string name="transfer_background_hint">पृष्ठभूमि में स्थानांतरण; लौटने के लिए सूचना पर टैप करें</string>
+    <string name="transfer_background_hint">पृष्ठभूमि में कार्य जारी है; लौटने के लिए सूचना पर टैप करें</string>
     <string name="transfer_waiting">आपके निर्णय की प्रतीक्षा…</string>
-    <string name="transfer_busy">एक स्थानांतरण चल रहा है; समाप्त होने पर फिर कोशिश करें</string>
+    <string name="transfer_busy">फ़ाइल कार्य पहले से चल रहा है; समाप्त होने पर फिर कोशिश करें</string>
     <string name="transfer_done">स्थानांतरण पूरा</string>
     <string name="transfer_failed">स्थानांतरण विफल</string>
     <string name="cmd_channel">दूरस्थ कमांड</string>

@@ -80,3 +80,21 @@ pane action rows, not XFile placeholders that corrupt counts and copy plans. Car
 notices through Listing and include changes in quiet-refresh equality checks.
 Date sorting in the trash uses cached deletion dates for files and directories via
 SortSpec's date accessor, while XFile.lastModified remains the actual payload mtime.
+
+Background deletion (2026-10-25, issue #32): confirmed manual deletions, nested
+trash purges and empty-trash batches run as Transfers.Work.Delete / Work.Purge in
+TransferService. The host scope owns only its TransferBox observer and completion
+callback; destroying a screen detaches it without cancelling the service. A deferred
+session completion refreshes a surviving host even after Hide, while notification
+entry reuses MainActivity.transferIntent and the ordinary pane progress box.
+Progress counts confirmed top-level items, not bytes or recursively scanned children;
+the current backend call is indeterminate. Do not prewalk directories or replace
+backend recursion: local/privileged/SAF/symlink semantics must stay with their owner.
+Cancellation takes effect between backend calls. A failed item does not stop the
+remaining batch, but errors are retained and mirror sync must not continue after
+failed or cancelled deletion. Empty-trash work contains only the confirmed snapshot;
+newly recycled entries survive. A planned trash move still cannot fall back to
+permanent deletion. Restore remains a separate foreground dialog operation.
+DeleteProgressTest and TrashUiTest cover service/notification progress, detachment,
+reattachment, cancellation, partial failure, real recursive deletion, preserved
+trash decisions and post-confirmation trash additions.

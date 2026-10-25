@@ -608,9 +608,9 @@
     <string name="stream_bad_token">Token aliran tidak valid</string>
     <string name="transfer_channel">Transfer file</string>
     <string name="transfer_background">Jalankan di latar belakang</string>
-    <string name="transfer_background_hint">Transfer di latar belakang — ketuk notifikasi untuk kembali</string>
+    <string name="transfer_background_hint">Operasi berjalan di latar belakang — ketuk notifikasi untuk kembali</string>
     <string name="transfer_waiting">Menunggu keputusan Anda…</string>
-    <string name="transfer_busy">Transfer sedang berjalan; coba setelah selesai</string>
+    <string name="transfer_busy">Operasi berkas sedang berjalan; coba setelah selesai</string>
     <string name="transfer_done">Transfer selesai</string>
     <string name="transfer_failed">Transfer gagal</string>
     <string name="cmd_channel">Perintah jarak jauh</string>

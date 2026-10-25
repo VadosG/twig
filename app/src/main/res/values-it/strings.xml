@@ -608,9 +608,9 @@
     <string name="stream_bad_token">Token flusso non valido</string>
     <string name="transfer_channel">Trasferimenti file</string>
     <string name="transfer_background">Esegui in background</string>
-    <string name="transfer_background_hint">Trasferimento in background — tocca la notifica per tornare</string>
+    <string name="transfer_background_hint">Operazione in background — tocca la notifica per tornare</string>
     <string name="transfer_waiting">In attesa della tua scelta…</string>
-    <string name="transfer_busy">Trasferimento già in corso; riprova al termine</string>
+    <string name="transfer_busy">È già in corso un’operazione sui file; riprova al termine</string>
     <string name="transfer_done">Trasferimento completato</string>
     <string name="transfer_failed">Trasferimento non riuscito</string>
     <string name="cmd_channel">Comandi remoti</string>
