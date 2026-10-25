@@ -42,6 +42,7 @@ class MusicService : Service() {
     private val listener = object : MusicEngine.Listener {
         override fun onTrackChanged(index: Int, track: PlaylistTrack?) { updateCoverThenNotify() }
         override fun onPlayStateChanged(playing: Boolean) { pushNotification() }
+        override fun onPositionChanged() { pushNotification() }
         override fun onModeChanged() { pushNotification() }
         override fun onFavChanged() { pushNotification() } // player page / list page changed favorite, the heart switches to filled too
         override fun onEnded() {
@@ -68,7 +69,7 @@ class MusicService : Service() {
                 override fun onPause() { MusicEngine.pause(); pushNotification() }
                 override fun onSkipToNext() { MusicEngine.next() }
                 override fun onSkipToPrevious() { MusicEngine.prev() }
-                override fun onSeekTo(pos: Long) { MusicEngine.seekTo(pos); pushNotification() }
+                override fun onSeekTo(pos: Long) { MusicEngine.seekTo(pos) }
                 override fun onStop() { MusicEngine.stopPlayback(); stopForeground(STOP_FOREGROUND_REMOVE); stopSelf() }
                 override fun onCustomAction(action: String, extras: android.os.Bundle?) {
                     if (action == ACTION_FAV) toggleFav()
@@ -201,6 +202,10 @@ class MusicService : Service() {
             .setVisibility(Notification.VISIBILITY_PUBLIC)
             .setOngoing(playing)
             .setOnlyAlertOnce(true)
+            // Native header timer; SystemUI owns ticking and decides whether to display it.
+            .setWhen(if (playing) System.currentTimeMillis() - MusicEngine.positionMs().coerceAtLeast(0L) else 0L)
+            .setShowWhen(playing)
+            .setUsesChronometer(playing)
         cover?.let { builder.setLargeIcon(it) }
         builder.addAction(action(R.drawable.ic_skip_prev, "prev", ACTION_PREV, 1))
         builder.addAction(

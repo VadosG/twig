@@ -4,6 +4,18 @@
 > shared conventions are in [AGENTS.md](../../AGENTS.md); the other sections live
 > beside this file in [docs/lessons/](.).
 
+- **Playback time missing from some system notification headers (2026-10-26, issue #23)**:
+  the media seek bar's time labels come from MediaSession; a header stopwatch is a
+  separate native Notification chronometer. Set when to wall-clock time minus player
+  position and enable showWhen/usesChronometer only while playing. Pause/buffering
+  hides it, and resume rebases it; SystemUI owns ticking and decides whether to show
+  it. Do not rewrite titles, poll each second, or add custom RemoteViews. MusicEngine
+  forwards position discontinuities so seeks from the player UI, previous-track
+  restart and system controls immediately refresh both session position and timer.
+  MusicNotificationTimeTest covers native extras, pause/resume, seek/track reset,
+  absence of periodic notification updates and the real ExoPlayer seek event on
+  API 24, 30 and 34.
+
 - **Music volume swipes opened a laggy system panel (2026-10-25, issue #23)**:
   cover swipes used FLAG_SHOW_UI and queried AudioManager on each movement. Match the
   video player's in-player percentage overlay and use volume flags=0. Snapshot the
