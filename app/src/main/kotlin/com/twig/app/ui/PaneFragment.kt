@@ -1776,7 +1776,7 @@ class PaneFragment : Fragment() {
     private fun trashFileActions(node: PaneViewModel.FileNode): List<MenuAct> {
         val file = node.file
         if (file.path == "/") return if (!adapter.hasChildren(node)) emptyList() else listOf(MenuAct(
-            getString(if (adapter.allChildrenSelected(node)) R.string.action_deselect_all else R.string.action_select_all),
+            getString(R.string.action_select_all),
             R.drawable.ic_sel_check,
         ) { adapter.toggleChildrenSelection(node) })
         val actions = ArrayList<MenuAct>()

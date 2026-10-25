@@ -1103,5 +1103,4 @@
     <string name="share_text_filename">공유 텍스트.txt</string>
     <string name="settings_toolbar_bottom">도구 모음을 하단에 배치</string>
     <string name="settings_toolbar_bottom_desc">한 손으로 쉽게 사용할 수 있도록 파일 탐색기의 도구 모음을 하단으로 이동</string>
-    <string name="action_deselect_all">전체 선택 해제</string>
 </resources>

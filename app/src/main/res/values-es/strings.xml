@@ -1103,5 +1103,4 @@
     <string name="share_text_filename">Texto compartido.txt</string>
     <string name="settings_toolbar_bottom">Barra de herramientas abajo</string>
     <string name="settings_toolbar_bottom_desc">Mover la barra de herramientas del explorador de archivos abajo para facilitar el uso con una mano</string>
-    <string name="action_deselect_all">Deseleccionar todo</string>
 </resources>

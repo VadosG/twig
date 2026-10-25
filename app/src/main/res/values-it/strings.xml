@@ -1103,5 +1103,4 @@
     <string name="share_text_filename">Testo condiviso.txt</string>
     <string name="settings_toolbar_bottom">Barra degli strumenti in basso</string>
     <string name="settings_toolbar_bottom_desc">Sposta in basso la barra degli strumenti del browser di file per facilitare l’uso con una mano</string>
-    <string name="action_deselect_all">Deseleziona tutto</string>
 </resources>

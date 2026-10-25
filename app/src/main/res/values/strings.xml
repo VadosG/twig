@@ -1179,5 +1179,4 @@
     <string name="share_text_filename">Shared text.txt</string>
     <string name="settings_toolbar_bottom">Toolbar at bottom</string>
     <string name="settings_toolbar_bottom_desc">Move the file browser toolbar to the bottom for easier one-handed use</string>
-    <string name="action_deselect_all">Deselect all</string>
 </resources>

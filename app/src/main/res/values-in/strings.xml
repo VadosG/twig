@@ -1103,5 +1103,4 @@
     <string name="share_text_filename">Teks dibagikan.txt</string>
     <string name="settings_toolbar_bottom">Bilah alat di bawah</string>
     <string name="settings_toolbar_bottom_desc">Pindahkan bilah alat penjelajah berkas ke bawah agar lebih mudah digunakan dengan satu tangan</string>
-    <string name="action_deselect_all">Batalkan semua pilihan</string>
 </resources>

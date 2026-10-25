@@ -1107,5 +1107,4 @@
     <string name="share_text_filename">نص مشارك.txt</string>
     <string name="settings_toolbar_bottom">شريط الأدوات في الأسفل</string>
     <string name="settings_toolbar_bottom_desc">نقل شريط أدوات متصفح الملفات إلى الأسفل لتسهيل الاستخدام بيد واحدة</string>
-    <string name="action_deselect_all">إلغاء تحديد الكل</string>
 </resources>
