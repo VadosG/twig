@@ -1109,4 +1109,5 @@
     <string name="directory_view_custom_sort">Sắp xếp tùy chỉnh</string>
     <string name="directory_view_custom_view">Chế độ xem tùy chỉnh</string>
     <string name="directory_view_reset">Dùng mặc định</string>
+    <string name="directory_view_recursive">Áp dụng cho thư mục con</string>
 </resources>

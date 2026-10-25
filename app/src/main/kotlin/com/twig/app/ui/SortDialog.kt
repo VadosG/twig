@@ -16,17 +16,22 @@ import com.twig.core.XFile
 
 /** Default and directory-specific sorting/view settings, shared with the destination picker. */
 object SortDialog {
-    fun show(activity: AppCompatActivity, directory: XFile?, onChanged: () -> Unit) =
-        showOptions(activity, directory, viewOnly = false, onChanged)
+    fun show(activity: AppCompatActivity, directory: XFile?,
+        parentOf: (XFile) -> XFile? = DirectoryViewStore::pathParent, onChanged: () -> Unit) =
+        showOptions(activity, directory, viewOnly = false, parentOf, onChanged)
 
-    fun showView(activity: AppCompatActivity, directory: XFile?, onChanged: () -> Unit) =
-        showOptions(activity, directory, viewOnly = true, onChanged)
+    fun showView(activity: AppCompatActivity, directory: XFile?,
+        parentOf: (XFile) -> XFile? = DirectoryViewStore::pathParent, onChanged: () -> Unit) =
+        showOptions(activity, directory, viewOnly = true, parentOf, onChanged)
 
-    private fun showOptions(activity: AppCompatActivity, directory: XFile?, viewOnly: Boolean, onChanged: () -> Unit) {
+    private fun showOptions(activity: AppCompatActivity, directory: XFile?, viewOnly: Boolean,
+        parentOf: (XFile) -> XFile?, onChanged: () -> Unit) {
+        val views = DirectoryViewStore.load(activity)
+        val inherited = DirectoryViewStore.resolve(views, directory?.let(parentOf), parentOf)
         val d = DialogSortBinding.inflate(activity.layoutInflater)
         val drafts = arrayOf(
             DirectoryView(SortSpec.load(activity), Prefs.thumbsGrid(activity)),
-            DirectoryViewStore.get(DirectoryViewStore.load(activity), directory) ?: DirectoryView(),
+            DirectoryViewStore.get(views, directory) ?: DirectoryView(),
         )
         d.sortOptions.visibility = if (viewOnly) View.GONE else View.VISIBLE
         d.viewOptions.visibility = if (viewOnly) View.VISIBLE else View.GONE
@@ -44,6 +49,7 @@ object SortDialog {
             enable(d.rgFolder, sort)
             d.cbReversed.isEnabled = sort
             enable(d.rgView, scope == 0 || d.cbCustomView.isChecked)
+            d.cbRecursive.isEnabled = if (viewOnly) d.cbCustomView.isChecked else d.cbCustomSort.isChecked
         }
         fun read(): DirectoryView = drafts[scope].copy(
             sort = if (viewOnly) drafts[scope].sort else if (scope == 0 || d.cbCustomSort.isChecked) SortSpec(
@@ -65,11 +71,15 @@ object SortDialog {
                 R.id.view_all -> 2
                 else -> 0
             } else null,
+            sortRecursive = if (viewOnly) drafts[scope].sortRecursive
+                else scope == 1 && d.cbCustomSort.isChecked && d.cbRecursive.isChecked,
+            viewRecursive = if (!viewOnly) drafts[scope].viewRecursive
+                else scope == 1 && d.cbCustomView.isChecked && d.cbRecursive.isChecked,
         )
         fun fill() {
             filling = true
             val cur = drafts[scope]
-            val sort = cur.sort ?: requireNotNull(drafts[0].sort)
+            val sort = cur.sort ?: inherited.sort ?: requireNotNull(drafts[0].sort)
             d.rgBy.check(when (sort.by) {
                 FileSortKey.NAME -> R.id.rb_name
                 FileSortKey.SIZE -> R.id.rb_size
@@ -82,7 +92,7 @@ object SortDialog {
                 FolderSortKey.DATE_OLD -> R.id.rf_date_old
                 FolderSortKey.DATE_NEW -> R.id.rf_date_new
             })
-            d.rgView.check(when (cur.gridMode ?: drafts[0].gridMode) {
+            d.rgView.check(when (cur.gridMode ?: inherited.gridMode ?: drafts[0].gridMode) {
                 1 -> R.id.view_media
                 2 -> R.id.view_all
                 else -> R.id.view_list
@@ -90,6 +100,8 @@ object SortDialog {
             d.cbCustomSort.isChecked = cur.sort != null
             d.cbCustomView.isChecked = cur.gridMode != null
             val visibility = if (scope == 1) View.VISIBLE else View.GONE
+            d.cbRecursive.visibility = visibility
+            d.cbRecursive.isChecked = if (viewOnly) cur.viewRecursive else cur.sortRecursive
             d.directoryPath.visibility = visibility
             d.cbCustomSort.visibility = visibility
             d.cbCustomView.visibility = visibility
@@ -127,7 +139,8 @@ object SortDialog {
         }
         dialog.show()
         dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
-            drafts[1] = if (viewOnly) drafts[1].copy(gridMode = null) else drafts[1].copy(sort = null)
+            drafts[1] = if (viewOnly) drafts[1].copy(gridMode = null, viewRecursive = false)
+                else drafts[1].copy(sort = null, sortRecursive = false)
             fill()
         }
         fill()

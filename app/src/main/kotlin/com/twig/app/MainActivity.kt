@@ -1203,7 +1203,8 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
     }
 
     private fun showSortDialog() {
-        com.twig.app.ui.SortDialog.show(this, activePane()?.viewModel?.currentDir) {
+        com.twig.app.ui.SortDialog.show(this, activePane()?.viewModel?.currentDir,
+            parentOf = { activePane()?.viewModel?.directoryViewParent(it) }) {
             paneAt(0)?.refreshSortAndView()
             paneAt(1)?.refreshSortAndView()
             uiSig = Prefs.uiSignature(this)
@@ -1211,7 +1212,8 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
     }
 
     private fun showViewModeDialog() {
-        com.twig.app.ui.SortDialog.showView(this, activePane()?.viewModel?.currentDir) {
+        com.twig.app.ui.SortDialog.showView(this, activePane()?.viewModel?.currentDir,
+            parentOf = { activePane()?.viewModel?.directoryViewParent(it) }) {
             paneAt(0)?.refreshSortAndView()
             paneAt(1)?.refreshSortAndView()
             uiSig = Prefs.uiSignature(this)

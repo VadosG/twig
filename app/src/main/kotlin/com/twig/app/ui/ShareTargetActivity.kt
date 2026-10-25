@@ -108,7 +108,8 @@ class ShareTargetActivity : AppCompatActivity(), PaneFragment.Host {
             strip.asRefresh.setOnClickListener { pane()?.actionRefresh() }
             strip.asNewFolder.setOnClickListener { pane()?.actionNewFolder() }
             strip.asSort.setOnClickListener {
-                SortDialog.show(this, pane()?.viewModel?.currentDir) {
+                SortDialog.show(this, pane()?.viewModel?.currentDir,
+                    parentOf = { pane()?.viewModel?.directoryViewParent(it) }) {
                     for (i in 0..1) paneAt(i)?.refreshSortAndView()
                 }
             }

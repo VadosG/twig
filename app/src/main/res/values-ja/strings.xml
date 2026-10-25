@@ -1110,4 +1110,5 @@
     <string name="directory_view_custom_sort">並べ替えを個別設定</string>
     <string name="directory_view_custom_view">表示を個別設定</string>
     <string name="directory_view_reset">既定に戻す</string>
+    <string name="directory_view_recursive">サブフォルダにも適用</string>
 </resources>

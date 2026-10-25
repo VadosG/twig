@@ -1114,4 +1114,5 @@
     <string name="directory_view_custom_sort">ترتيب مخصص</string>
     <string name="directory_view_custom_view">عرض مخصص</string>
     <string name="directory_view_reset">استخدام الإعدادات الافتراضية</string>
+    <string name="directory_view_recursive">تطبيق على المجلدات الفرعية</string>
 </resources>

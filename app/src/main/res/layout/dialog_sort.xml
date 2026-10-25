@@ -29,6 +29,9 @@
             android:layout_height="wrap_content" android:textIsSelectable="true"
             android:textColor="@color/text_secondary" />
 
+        <CheckBox android:id="@+id/cb_recursive" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="@string/directory_view_recursive" />
+
         <LinearLayout android:id="@+id/sort_options" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:orientation="vertical">
         <CheckBox android:id="@+id/cb_custom_sort" android:layout_width="match_parent"

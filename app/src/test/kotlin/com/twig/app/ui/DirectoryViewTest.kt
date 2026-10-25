@@ -6,6 +6,7 @@ import android.view.ContextThemeWrapper
 import android.widget.FrameLayout
 import androidx.test.core.app.ApplicationProvider
 import com.twig.app.*
+import com.twig.core.FileSystem
 import com.twig.core.FsRegistry
 import com.twig.core.XFile
 import kotlinx.coroutines.Dispatchers
@@ -113,6 +114,78 @@ class DirectoryViewTest {
         advanceUntilIdle()
         assertEquals(listOf("z.txt", "a.txt"), files("/").map { it.file.name })
         assertTrue(files("/").all { it.gridMode == 2 })
+    }
+
+    @Test
+    fun `recursive settings apply to descendants without creating descendant records`() = runTest(dispatcher) {
+        DirectoryViewStore.save(app, dir, DirectoryView(reverse, 2, sortRecursive = true, viewRecursive = true))
+        vm.refreshSortAndView()
+        vm.revealPath(dir.copy(path = "/photos/child"))
+        advanceUntilIdle()
+        assertEquals(listOf("z.txt", "a.txt"), files("/photos/child").map { it.file.name })
+        assertTrue(files("/photos/child").all { it.gridMode == 2 })
+        assertEquals(listOf("a.txt", "z.txt"), files("/").map { it.file.name })
+        assertTrue(files("/").all { it.gridMode == 0 })
+        assertEquals(1, DirectoryViewStore.load(app).size)
+
+        // A view-only child override retains the inherited sorting.
+        val child = dir.copy(path = "/photos/child")
+        DirectoryViewStore.save(app, child, DirectoryView(gridMode = 0))
+        vm.refreshSortAndView()
+        assertEquals(listOf("z.txt", "a.txt"), files(child.path).map { it.file.name })
+        assertTrue(files(child.path).all { it.gridMode == 0 })
+        DirectoryViewStore.save(app, child, DirectoryView())
+        vm.refreshSortAndView()
+        assertTrue(files(child.path).all { it.gridMode == 2 })
+
+        // Disabling recursion also updates already expanded descendants immediately.
+        DirectoryViewStore.save(app, dir, DirectoryView(reverse, 2))
+        vm.refreshSortAndView()
+        assertEquals(listOf("a.txt", "z.txt"), files(child.path).map { it.file.name })
+        assertTrue(files(child.path).all { it.gridMode == 0 })
+        assertTrue(files(dir.path).all { it.gridMode == 2 })
+    }
+
+    @Test
+    fun `a deep favorite inherits an ancestor rule without opening that ancestor`() = runTest(dispatcher) {
+        DirectoryViewStore.save(app, dir, DirectoryView(reverse, 2, sortRecursive = true, viewRecursive = true))
+        val conn = ConnectionStore.all(app).first { Connections.schemeOf(it) == dir.scheme }
+        val fav = Favorite(label = "child", kind = "conn", path = "/photos/child", connLabel = conn.label())
+        FavoritesStore.add(app, fav)
+        vm = PaneViewModel(app).apply { io = dispatcher }
+        vm.bootstrap(listOf("group\tfav"))
+        advanceUntilIdle()
+        val node = vm.state.value.rows.filterIsInstance<PaneViewModel.FavoriteNode>().first { it.fav.id == fav.id }
+        vm.toggleFavorite(node, password = null) { _, _ -> }
+        advanceUntilIdle()
+        assertEquals(listOf("z.txt", "a.txt"), files("/photos/child").map { it.file.name })
+        assertTrue(files("/photos/child").all { it.gridMode == 2 })
+    }
+
+    @Test
+    fun `opaque directory listings inherit using observed parents rather than path prefixes`() = runTest(dispatcher) {
+        val scheme = dir.scheme
+        fun node(path: String, name: String, directory: Boolean) =
+            XFile(scheme, path, isDir = directory, displayName = name)
+        val opaque = mapOf(
+            "/" to listOf(node("id-90", "Shows", true)),
+            "id-90" to listOf(node("id-12", "Season", true)),
+            "id-12" to listOf(node("track-9", "z.txt", false), node("track-2", "a.txt", false)),
+        )
+        FsRegistry.register(object : FileSystem by FakeFileSystem(scheme, emptyMap()) {
+            override fun list(dir: XFile) = opaque.getValue(dir.path)
+        })
+        DirectoryViewStore.save(app, dir.copy(path = "/"),
+            DirectoryView(reverse, 2, sortRecursive = true, viewRecursive = true))
+        vm.refreshSortAndView()
+        val conn = ConnectionStore.all(app).first { Connections.schemeOf(it) == scheme }
+        vm.revealUnder("s:${conn.label()}", null, "Shows/Season")
+        advanceUntilIdle()
+        val tracks = vm.state.value.rows.filterIsInstance<PaneViewModel.FileNode>().filter { !it.file.isDir }
+        assertEquals(listOf("z.txt", "a.txt"), tracks.map { it.file.name })
+        assertTrue(tracks.all { it.gridMode == 2 })
+        assertEquals("id-90", vm.directoryViewParent(node("id-12", "Season", true))?.path)
+        assertEquals("/", vm.directoryViewParent(node("id-90", "Shows", true))?.path)
     }
 
     @Test

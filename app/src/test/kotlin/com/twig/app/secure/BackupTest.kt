@@ -83,7 +83,7 @@ class BackupTest {
     @Test
     fun `directory sorting and view overrides survive backup on another device`() {
         val dir = XFile("file", "/storage/emulated/0/Pictures", isDir = true)
-        val view = DirectoryView(SortSpec(reversed = true), 2)
+        val view = DirectoryView(SortSpec(reversed = true), 2, sortRecursive = true, viewRecursive = true)
         DirectoryViewStore.save(ctx, dir, view)
         val raw = export(null)
         freshDevice()

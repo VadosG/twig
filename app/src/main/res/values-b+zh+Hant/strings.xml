@@ -1109,4 +1109,5 @@
     <string name="directory_view_custom_sort">自訂排序</string>
     <string name="directory_view_custom_view">自訂檢視</string>
     <string name="directory_view_reset">恢復預設</string>
+    <string name="directory_view_recursive">套用至子目錄</string>
 </resources>

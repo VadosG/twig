@@ -1110,4 +1110,5 @@
     <string name="directory_view_custom_sort">Urutan khusus</string>
     <string name="directory_view_custom_view">Tampilan khusus</string>
     <string name="directory_view_reset">Gunakan default</string>
+    <string name="directory_view_recursive">Terapkan ke subfolder</string>
 </resources>

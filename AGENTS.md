@@ -155,7 +155,11 @@ each write `= null`.
   for the selected directory. Resetting one leaves the other unchanged.
   Defaults remain in `twig_sort` / `twig_prefs`; `DirectoryViewStore` stores only explicit
   directory overrides in `twig_directory_views` (included in `.twigbak`). Sorting and
-  view mode inherit independently; overrides apply to direct children, never descendants.
+  view mode inherit independently. Each has a default-off recursive flag: a directory's own
+  override wins, otherwise the nearest recursive ancestor wins, then the global default.
+  Nonrecursive overrides do not propagate or block more distant recursive ancestors.
+  Resolve once per directory listing/render, without scanning descendants or persisting copies;
+  ordinary paths derive ancestry, while opaque paths use parent links learned from listings.
   Listing identities (`mountRoots` / `keyFile`) identify the containing directory, including
   favorites, servers and opaque SAF paths. `FileNode.gridMode` carries its effective view
   to the adapter; directory overrides are parsed per settings refresh, not per rendered row.

@@ -476,6 +476,12 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     private var sort = SortSpec.load(getApplication())
     private var directoryViews = DirectoryViewStore.load(getApplication())
     private var defaultGridMode = Prefs.thumbsGrid(getApplication())
+    // Only opaque directories need stored parent links; ordinary paths compute their own ancestors.
+    private val directoryViewParents = HashMap<String, XFile>()
+
+    fun directoryViewParent(dir: XFile): XFile? =
+        if (dir.path.startsWith("/")) DirectoryViewStore.pathParent(dir)
+        else directoryViewParents[fileKey(dir)]
 
     /** Whether to show hidden files; refreshed at the top of every [rebuild]. */
     private var showHidden = Prefs.showHidden(getApplication())
@@ -562,14 +568,20 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
      * we keep the original sort, matching the long-standing behavior.
      */
     private fun sortList(key: String, list: List<XFile>): List<XFile> {
+        val dir = mountRoots[key] ?: keyFile[key]
+        if (dir != null && (!dir.path.startsWith("/") || dir.path == "/")) list.forEach {
+            if (it.isDir && it.scheme == dir.scheme && !it.path.startsWith("/")) {
+                directoryViewParents[fileKey(it)] = dir
+            }
+        }
         if (keepsServerOrder(key)) return list
         val app = getApplication<Application>()
-        val view = DirectoryViewStore.get(directoryViews, mountRoots[key] ?: keyFile[key])
-        val cmp = (view?.sort ?: sort).comparator { file ->
+        val view = DirectoryViewStore.resolve(directoryViews, dir, ::directoryViewParent)
+        val cmp = (view.sort ?: sort).comparator { file ->
             if (file.scheme == "trash") (FsRegistry.of(file) as? com.twig.app.TrashFileSystem)?.deletedAt(file) ?: 0L
             else file.lastModified
         }
-        val grid = view?.gridMode ?: defaultGridMode
+        val grid = view.gridMode ?: defaultGridMode
         // Both off (tree list + no thumbnails): no grouping, matching the long-standing behavior.
         if (!Prefs.thumbs(app) && grid == 0) return SortRules.sorted(list, cmp, null)
         // Grid "All files" mode: archives, like directories, render as full expandable rows;
@@ -3041,7 +3053,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun addListedFiles(rows: MutableList<Node>, key: String, depth: Int, keyPrefix: String = "") {
-        val grid = DirectoryViewStore.get(directoryViews, mountRoots[key] ?: keyFile[key])?.gridMode
+        val grid = DirectoryViewStore.resolve(directoryViews, mountRoots[key] ?: keyFile[key], ::directoryViewParent).gridMode
             ?: defaultGridMode
         visible(children[key]).forEach { addFile(rows, it, depth, keyPrefix = keyPrefix, gridMode = grid) }
     }

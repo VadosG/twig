@@ -1110,4 +1110,5 @@
     <string name="directory_view_custom_sort">사용자 지정 정렬</string>
     <string name="directory_view_custom_view">사용자 지정 보기</string>
     <string name="directory_view_reset">기본값 사용</string>
+    <string name="directory_view_recursive">하위 폴더에 적용</string>
 </resources>

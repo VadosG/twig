@@ -1110,4 +1110,5 @@
     <string name="directory_view_custom_sort">Eigene Sortierung</string>
     <string name="directory_view_custom_view">Eigene Ansicht</string>
     <string name="directory_view_reset">Standard verwenden</string>
+    <string name="directory_view_recursive">Auf Unterordner anwenden</string>
 </resources>

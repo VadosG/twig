@@ -1186,4 +1186,5 @@
     <string name="directory_view_custom_sort">Custom sort</string>
     <string name="directory_view_custom_view">Custom view</string>
     <string name="directory_view_reset">Use defaults</string>
+    <string name="directory_view_recursive">Apply to subdirectories</string>
 </resources>

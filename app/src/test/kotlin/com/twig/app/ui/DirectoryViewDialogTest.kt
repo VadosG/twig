@@ -115,6 +115,69 @@ class DirectoryViewDialogTest {
     }
 
     @Test
+    fun `recursive controls stay independent and reset clears only the selected recursion`() {
+        withDialog { dialog ->
+            assertEquals(View.GONE, dialog.findViewById<CheckBox>(R.id.cb_recursive)!!.visibility)
+            dialog.findViewById<RadioGroup>(R.id.rg_scope)!!.check(R.id.scope_directory)
+            val recursive = dialog.findViewById<CheckBox>(R.id.cb_recursive)!!
+            assertFalse(recursive.isChecked)
+            assertFalse(recursive.isEnabled)
+            dialog.findViewById<CheckBox>(R.id.cb_custom_sort)!!.isChecked = true
+            assertTrue(recursive.isEnabled)
+            recursive.isChecked = true
+            dialog.findViewById<RadioGroup>(R.id.rg_by)!!.check(R.id.rb_size)
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+        }
+        val sorting = DirectoryViewStore.get(DirectoryViewStore.load(app), dir)!!
+        assertTrue(sorting.sortRecursive)
+        assertFalse(sorting.viewRecursive)
+        withDialog(viewOnly = true) { dialog ->
+            dialog.findViewById<RadioGroup>(R.id.rg_scope)!!.check(R.id.scope_directory)
+            assertFalse(dialog.findViewById<CheckBox>(R.id.cb_recursive)!!.isChecked)
+            dialog.findViewById<CheckBox>(R.id.cb_custom_view)!!.isChecked = true
+            dialog.findViewById<RadioGroup>(R.id.rg_view)!!.check(R.id.view_all)
+            dialog.findViewById<CheckBox>(R.id.cb_recursive)!!.isChecked = true
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+        }
+        val both = DirectoryViewStore.get(DirectoryViewStore.load(app), dir)!!
+        assertTrue(both.sortRecursive)
+        assertTrue(both.viewRecursive)
+        withDialog { dialog ->
+            dialog.findViewById<RadioGroup>(R.id.rg_scope)!!.check(R.id.scope_directory)
+            assertTrue(dialog.findViewById<CheckBox>(R.id.cb_recursive)!!.isChecked)
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).performClick()
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+        }
+        val reset = DirectoryViewStore.get(DirectoryViewStore.load(app), dir)!!
+        assertNull(reset.sort)
+        assertFalse(reset.sortRecursive)
+        assertEquals(2, reset.gridMode)
+        assertTrue(reset.viewRecursive)
+    }
+
+    @Test
+    fun `inherited settings are shown without becoming explicit overrides`() {
+        val parent = dir.copy(path = dir.parentPath)
+        DirectoryViewStore.save(app, parent, DirectoryView(SortSpec(by = FileSortKey.SIZE), 2,
+            sortRecursive = true, viewRecursive = true))
+        withDialog { dialog ->
+            dialog.findViewById<RadioGroup>(R.id.rg_scope)!!.check(R.id.scope_directory)
+            assertFalse(dialog.findViewById<CheckBox>(R.id.cb_custom_sort)!!.isChecked)
+            assertEquals(R.id.rb_size, dialog.findViewById<RadioGroup>(R.id.rg_by)!!.checkedRadioButtonId)
+            assertFalse(dialog.findViewById<RadioButton>(R.id.rb_size)!!.isEnabled)
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+        }
+        withDialog(viewOnly = true) { dialog ->
+            dialog.findViewById<RadioGroup>(R.id.rg_scope)!!.check(R.id.scope_directory)
+            assertFalse(dialog.findViewById<CheckBox>(R.id.cb_custom_view)!!.isChecked)
+            assertEquals(R.id.view_all, dialog.findViewById<RadioGroup>(R.id.rg_view)!!.checkedRadioButtonId)
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+        }
+        assertNull(DirectoryViewStore.get(DirectoryViewStore.load(app), dir))
+        assertEquals(1, DirectoryViewStore.load(app).size)
+    }
+
+    @Test
     fun `directory scope is unavailable without a selected directory`() {
         withDialog(null) { dialog ->
             assertFalse(dialog.findViewById<RadioButton>(R.id.scope_directory)!!.isEnabled)

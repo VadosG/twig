@@ -1146,4 +1146,5 @@
     <string name="directory_view_custom_sort">Своя сортировка</string>
     <string name="directory_view_custom_view">Свой вид</string>
     <string name="directory_view_reset">Использовать по умолчанию</string>
+    <string name="directory_view_recursive">Применить к подпапкам</string>
 </resources>

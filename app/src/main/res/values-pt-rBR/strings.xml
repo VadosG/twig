@@ -1110,4 +1110,5 @@
     <string name="directory_view_custom_sort">Ordenação personalizada</string>
     <string name="directory_view_custom_view">Visualização personalizada</string>
     <string name="directory_view_reset">Usar padrões</string>
+    <string name="directory_view_recursive">Aplicar às subpastas</string>
 </resources>
