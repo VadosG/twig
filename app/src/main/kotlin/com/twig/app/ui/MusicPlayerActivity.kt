@@ -1,5 +1,10 @@
 package com.twig.app.ui
 
+import android.content.Context
+import android.media.AudioManager
+import android.view.MotionEvent
+import android.view.ViewConfiguration
+import kotlin.math.roundToInt
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -84,6 +89,7 @@ class MusicPlayerActivity : AppCompatActivity() {
         b = ActivityMusicPlayerBinding.inflate(layoutInflater)
         setContentView(b.root)
         setupImmersive()
+        volumeControlStream = AudioManager.STREAM_MUSIC
         b.bgBlur.setBackgroundColor(fallbackBg()) // paint a solid color first to avoid a black flash before the blur appears
         requestNotifPermission()
         wireViews()
@@ -222,24 +228,49 @@ class MusicPlayerActivity : AppCompatActivity() {
         if (hasFocus) applyFullscreen() // the system may restore the status bar after a switch; re-apply
     }
 
-    /** Swipe left/right on the cover to skip tracks; single-tap toggles cover ↔ lyrics. */
+    /** Cover: horizontal swipes skip tracks, vertical drags adjust media volume. Lyrics keep scrolling. */
     private fun setupCenterGestures() {
-        val detector = android.view.GestureDetector(this, object : android.view.GestureDetector.SimpleOnGestureListener() {
-            override fun onDown(e: android.view.MotionEvent): Boolean = true // must consume DOWN for subsequent MOVE/UP/fling to arrive
-            override fun onSingleTapUp(e: android.view.MotionEvent): Boolean { toggleView(); return true }
-            override fun onFling(
-                e1: android.view.MotionEvent?, e2: android.view.MotionEvent, vx: Float, vy: Float,
-            ): Boolean {
-                val dx = e2.x - (e1?.x ?: return false)
-                if (kotlin.math.abs(dx) > kotlin.math.abs(e2.y - e1.y) && kotlin.math.abs(dx) > dp(48)) {
-                    if (dx < 0) MusicEngine.next() else MusicEngine.prev()
-                    return true
-                }
-                return false
+        val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val slop = ViewConfiguration.get(this).scaledTouchSlop.toFloat()
+        var startX = 0f
+        var startY = 0f
+        var startVolume = 0
+        var axis = SwipeGesture.UNDECIDED
+        var downAt = 0L
+        fun adjustVolume(y: Float) {
+            val max = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+            val delta = (startY - y) / b.centerArea.height.coerceAtLeast(1) * max
+            val volume = (startVolume + delta.roundToInt()).coerceIn(0, max)
+            if (volume != audio.getStreamVolume(AudioManager.STREAM_MUSIC)) {
+                audio.setStreamVolume(AudioManager.STREAM_MUSIC, volume, AudioManager.FLAG_SHOW_UI)
             }
-        })
-        // When lyrics are showing, hand them to LyricsView (scroll/tap); when cover is showing, gestures apply
-        b.centerArea.setOnTouchListener { _, ev -> if (showingLyrics) false else detector.onTouchEvent(ev) }
+        }
+        b.centerArea.setOnTouchListener { _, ev ->
+            if (showingLyrics && !isLandscape()) return@setOnTouchListener false
+            when (ev.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    startX = ev.x
+                    startY = ev.y
+                    downAt = ev.eventTime
+                    startVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
+                    axis = SwipeGesture.UNDECIDED
+                }
+                MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
+                    if (axis == SwipeGesture.UNDECIDED) axis = SwipeGesture.axis(ev.x - startX, ev.y - startY, slop)
+                    if (axis == SwipeGesture.VERTICAL) adjustVolume(ev.y)
+                    if (ev.actionMasked == MotionEvent.ACTION_UP) {
+                        when (axis) {
+                            SwipeGesture.HORIZONTAL -> if (kotlin.math.abs(ev.x - startX) > dp(48)) {
+                                if (ev.x < startX) MusicEngine.next() else MusicEngine.prev()
+                            }
+                            SwipeGesture.UNDECIDED -> if (ev.eventTime - downAt < ViewConfiguration.getLongPressTimeout()) toggleView()
+                        }
+                    }
+                }
+                MotionEvent.ACTION_CANCEL -> axis = SwipeGesture.UNDECIDED
+            }
+            true
+        }
     }
 
     override fun onResume() {
