@@ -12,7 +12,7 @@ Native Kotlin and XML views, no Material library, minimal dependencies. When
 something can reasonably be written by hand, it is: WebDAV, S3 signing, git and
 restic are all implemented from scratch.
 
-**Version 1.16.0-beta.1** (versionCode 309) · minSdk 24 / targetSdk 34 / compileSdk 36 ·
+**Version 1.16.0-beta.2** (versionCode 310) · minSdk 24 / targetSdk 34 / compileSdk 36 ·
 [GPL-3.0](LICENSE)
 
 <p align="center">
