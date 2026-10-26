@@ -28,7 +28,7 @@ object SortDialog {
     private fun showOptions(activity: AppCompatActivity, directory: XFile?, viewOnly: Boolean,
         parentOf: (XFile) -> XFile?, onChanged: () -> Unit) {
         val views = DirectoryViewStore.load(activity)
-        val inherited = DirectoryViewStore.resolve(views, directory?.let(parentOf), parentOf)
+        val inherited = DirectoryViewStore.resolve(views, directory, includeOwn = false, parentOf = parentOf)
         val d = DialogSortBinding.inflate(activity.layoutInflater)
         val drafts = arrayOf(
             DirectoryView(SortSpec.load(activity), Prefs.thumbsGrid(activity)),

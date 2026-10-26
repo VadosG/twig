@@ -44,14 +44,18 @@ object DirectoryViewStore {
         return dir.copy(path = dir.parentPath)
     }
 
-    /** Resolve sorting and view independently; a nonrecursive override only applies to its own directory. */
+    /**
+     * Resolve sorting and view independently; a nonrecursive override only applies to its own directory.
+     * Set [includeOwn] to false to preview inherited settings when clearing a directory override.
+     */
     fun resolve(
         views: Map<String, DirectoryView>,
         dir: XFile?,
+        includeOwn: Boolean = true,
         parentOf: (XFile) -> XFile? = ::pathParent,
     ): DirectoryView {
         if (dir == null || views.isEmpty()) return EMPTY
-        val own = get(views, dir)
+        val own = if (includeOwn) get(views, dir) else null
         var sort = own?.sort
         var grid = own?.gridMode
         if (own != null && sort != null && grid != null) return own

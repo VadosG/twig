@@ -598,7 +598,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
         }
         if (keepsServerOrder(key)) return list
         val app = getApplication<Application>()
-        val view = DirectoryViewStore.resolve(directoryViews, dir, ::directoryViewParent)
+        val view = DirectoryViewStore.resolve(directoryViews, dir, parentOf = ::directoryViewParent)
         val cmp = (view.sort ?: sort).comparator { file ->
             if (file.scheme == "trash") (FsRegistry.of(file) as? com.twig.app.TrashFileSystem)?.deletedAt(file) ?: 0L
             else file.lastModified
@@ -3076,7 +3076,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun addListedFiles(rows: MutableList<Node>, key: String, depth: Int, keyPrefix: String = "") {
-        val grid = DirectoryViewStore.resolve(directoryViews, mountRoots[key] ?: keyFile[key], ::directoryViewParent).gridMode
+        val grid = DirectoryViewStore.resolve(directoryViews, mountRoots[key] ?: keyFile[key], parentOf = ::directoryViewParent).gridMode
             ?: defaultGridMode
         visible(children[key]).forEach { addFile(rows, it, depth, keyPrefix = keyPrefix, gridMode = grid) }
     }

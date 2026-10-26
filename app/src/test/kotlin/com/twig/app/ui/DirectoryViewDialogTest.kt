@@ -163,6 +163,48 @@ class DirectoryViewDialogTest {
     }
 
     @Test
+    fun `nonrecursive parent settings fall back to defaults in child dialogs`() {
+        val parent = dir.copy(path = dir.parentPath)
+        DirectoryViewStore.save(app, parent, DirectoryView(SortSpec(by = FileSortKey.SIZE), 2))
+        withDialog { dialog ->
+            dialog.findViewById<RadioGroup>(R.id.rg_scope)!!.check(R.id.scope_directory)
+            assertEquals(R.id.rb_name, dialog.findViewById<RadioGroup>(R.id.rg_by)!!.checkedRadioButtonId)
+            dialog.findViewById<CheckBox>(R.id.cb_custom_sort)!!.isChecked = true
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+        }
+        assertEquals(SortSpec(), DirectoryViewStore.get(DirectoryViewStore.load(app), dir)?.sort)
+        withDialog(viewOnly = true) { dialog ->
+            dialog.findViewById<RadioGroup>(R.id.rg_scope)!!.check(R.id.scope_directory)
+            assertEquals(R.id.view_list, dialog.findViewById<RadioGroup>(R.id.rg_view)!!.checkedRadioButtonId)
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+        }
+        assertNull(DirectoryViewStore.get(DirectoryViewStore.load(app), dir)?.gridMode)
+    }
+
+    @Test
+    fun `reset skips nonrecursive parent settings and shows recursive ancestor settings`() {
+        val parent = dir.copy(path = dir.parentPath)
+        val ancestor = parent.copy(path = parent.parentPath)
+        DirectoryViewStore.save(app, ancestor, DirectoryView(SortSpec(by = FileSortKey.DATE), 1,
+            sortRecursive = true, viewRecursive = true))
+        DirectoryViewStore.save(app, parent, DirectoryView(SortSpec(by = FileSortKey.SIZE), 2))
+        DirectoryViewStore.save(app, dir, DirectoryView(SortSpec(), 0))
+        withDialog { dialog ->
+            dialog.findViewById<RadioGroup>(R.id.rg_scope)!!.check(R.id.scope_directory)
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).performClick()
+            assertEquals(R.id.rb_date, dialog.findViewById<RadioGroup>(R.id.rg_by)!!.checkedRadioButtonId)
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+        }
+        withDialog(viewOnly = true) { dialog ->
+            dialog.findViewById<RadioGroup>(R.id.rg_scope)!!.check(R.id.scope_directory)
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).performClick()
+            assertEquals(R.id.view_media, dialog.findViewById<RadioGroup>(R.id.rg_view)!!.checkedRadioButtonId)
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+        }
+        assertNull(DirectoryViewStore.get(DirectoryViewStore.load(app), dir))
+    }
+
+    @Test
     fun `inherited settings are shown without becoming explicit overrides`() {
         val parent = dir.copy(path = dir.parentPath)
         DirectoryViewStore.save(app, parent, DirectoryView(SortSpec(by = FileSortKey.SIZE), 2,
