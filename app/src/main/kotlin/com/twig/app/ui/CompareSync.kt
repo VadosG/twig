@@ -211,7 +211,8 @@ fun ensureDir(dir: XFile): XFile? = runCatching {
  * **We do not persist here**: the compare page wants the global last-used options stored,
  * while the "compare favorite" path wants to store **that favorite's own** options, and
  * only the caller knows where to store. [onStarted] gives back the keys involved once
- * the transfer has actually started; the compare page uses them for partial reclassification.
+ * the transfer has actually started or deletion stops early; the compare page uses them
+ * for partial reclassification, including files already removed by a partial batch.
  */
 fun confirmSync(
     ctx: Context,
@@ -343,7 +344,10 @@ private fun runSync(
         }
     }
     if (deletes.isEmpty()) continueSync()
-    else DeleteUi.confirm(ctx, scope, deletes.map { it.file }) { success -> if (success) continueSync() }
+    else DeleteUi.confirm(ctx, scope, deletes.map { it.file }) { success ->
+        if (success) continueSync()
+        else onStarted(deletes.map { it.key })
+    }
 }
 
 private fun toastOn(ctx: Context, msg: String) =

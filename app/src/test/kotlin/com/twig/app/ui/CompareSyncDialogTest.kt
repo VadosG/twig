@@ -88,6 +88,71 @@ class CompareSyncDialogTest {
             .first { it !is CheckBox && it.text.toString().contains("item") }
 
     @Test
+    fun `failed mirror deletion revalidates deleted items without starting copies`() {
+        partialMirrorDeletion(cancel = false)
+    }
+
+    @Test
+    fun `cancelled mirror deletion revalidates deleted items without starting copies`() {
+        partialMirrorDeletion(cancel = true)
+    }
+
+    private fun partialMirrorDeletion(cancel: Boolean) {
+        val controller = Robolectric.buildActivity(SettingsActivity::class.java).setup()
+        hosts += controller
+        val activity = controller.get()
+        val app = activity.application
+        com.twig.app.Prefs.setTrashEnabled(app, false)
+        val files = mutableMapOf("/dst/removed" to "first", "/dst/retained" to "second")
+        val source = FakeFileSystem("cmpsrc", mapOf("/src" to listOf("copy")), mapOf("/src/copy" to "copy"))
+        FsRegistry.register(source)
+        FsRegistry.register(object : com.twig.core.FileSystem by dstFs {
+            override fun delete(file: XFile) {
+                if (file.name == "retained") throw java.io.IOException("delete failed")
+                files.remove(file.path)
+                if (cancel) Transfers.active!!.cancel()
+            }
+        })
+        var revalidated: List<String>? = null
+        fun waitFor(condition: () -> Boolean) {
+            val deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(5)
+            while (!condition() && System.nanoTime() < deadline) {
+                org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
+                Thread.sleep(5)
+            }
+            assertTrue("operation timed out", condition())
+        }
+        try {
+            Transfers.attach(null)
+            Transfers.consumeFinished()
+            confirmSync(activity, activity.lifecycleScope, dst, to = 1,
+                plan = SyncPlan(listOf(SyncItem("copy", source.resolve("/src/copy"))),
+                    files.keys.map { SyncItem(it.substringAfterLast('/'), XFile(dst.scheme, it, false)) }),
+                options = CompareOptions(incrementalSync = false),
+                onStarted = { revalidated = it })
+            val syncDialog = ShadowDialog.getLatestDialog() as AlertDialog
+            syncDialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+            waitFor { ShadowDialog.getLatestDialog() !== syncDialog }
+            (ShadowDialog.getLatestDialog() as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+            waitFor { Transfers.active != null }
+            val session = Transfers.active!!
+            Thread { Transfers.execute(app, session) {} }.start()
+            waitFor { revalidated != null }
+            assertEquals(listOf("removed", "retained"), revalidated)
+            assertFalse(files.containsKey("/dst/removed"))
+            assertTrue(files.containsKey("/dst/retained"))
+            assertEquals(cancel, session.cancelled.get())
+            assertEquals(!cancel, session.finished!!.isFailure)
+            assertNull(Transfers.active)
+            assertTrue(source.opened.isEmpty())
+        } finally {
+            Transfers.attach(null)
+            Transfers.consumeFinished()
+            FsRegistry.unregister(source.scheme)
+        }
+    }
+
+    @Test
     fun `with both extra items and newer items present, both toggles render`() {
         val d = show(SyncPlan(listOf(item("a"), item("b", newer = true)), listOf(item("x"))))
         val texts = checkBoxes(d).map { it.text.toString() }
