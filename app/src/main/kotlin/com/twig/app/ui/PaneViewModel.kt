@@ -248,12 +248,12 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
         val currentDir: XFile? = null,
         /** Most recently selected (clicked expand/collapse) node key, used for the highlight box around the tree and restoring position. */
         val currentKey: String? = null,
+        /** Retained across asynchronous refreshes until the UI acknowledges it. */
         val error: String? = null,
         /**
          * Expanding this encrypted archive needs a password (UI uses this to show a
          * password dialog); [error] being non-null at the same time means the
-         * previous password was wrong. Like [error], this is "one-shot" — the next
-         * [rebuild] clears it.
+         * previous password was wrong. This is "one-shot" — the next [rebuild] clears it.
          */
         val passwordFor: XFile? = null,
         /**
@@ -1029,6 +1029,8 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
     fun refreshTree() = rebuild()
 
     fun dismissDataAccessRequest() { _state.value = _state.value.copy(dataAccessFor = null) }
+
+    fun dismissError() { _state.value = _state.value.copy(error = null) }
 
     fun revealGrantedDataFolder(file: XFile) {
         // Cached parent listings may predate this grant (and must not keep hiding the new entry).
@@ -3016,7 +3018,7 @@ class PaneViewModel(app: Application) : AndroidViewModel(app) {
                 if (currentKey == "search:$k") currentKey = null // The highlight used to point at it; if the row is gone, don't leave it dangling.
             }
         }
-        _state.value = State(rows, currentDir, currentKey, null, null, null,
+        _state.value = State(rows, currentDir, currentKey, _state.value.error, null, null,
             restoring || revealLoadingKey != null, revealLoadingKey ?: scrollKey)
     }
 

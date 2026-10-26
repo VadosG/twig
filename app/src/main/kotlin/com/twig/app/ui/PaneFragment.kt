@@ -427,7 +427,10 @@ class PaneFragment : Fragment() {
         }
         b.tvEmpty.visibility = if (s.rows.isEmpty()) View.VISIBLE else View.GONE
         host?.onClipTargetChanged() // Paste target = currentDir, refresh that line on the bar to follow.
-        s.error?.let { toast(it) }
+        s.error?.let {
+            viewModel.dismissError()
+            toast(it)
+        }
         s.passwordFor?.let { askArchivePassword(it) }
         s.dataAccessFor?.let { file ->
             viewModel.dismissDataAccessRequest()
