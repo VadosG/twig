@@ -137,7 +137,7 @@ class StorageVolumesTest {
         assertTrue("the volume row did not appear at the root: $labels", i > 0)
         assertEquals(app.getString(R.string.group_internal_storage), labels[i - 2])
         assertEquals(app.getString(R.string.group_root), labels[i - 1])
-        assertEquals(app.getString(R.string.trash_title), labels[i + 1])
+        assertEquals(app.getString(R.string.private_space), labels[i + 1])
     }
 
     @Test
