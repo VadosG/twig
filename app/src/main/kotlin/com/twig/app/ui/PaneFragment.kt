@@ -1150,6 +1150,9 @@ class PaneFragment : Fragment() {
         input.requestFocus()
         dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         dialog.show()
+        val stemEnd = if (target.isDir) target.name.length
+            else target.name.lastIndexOf('.').takeIf { it > 0 && it < target.name.lastIndex } ?: target.name.length
+        input.setSelection(0, stemEnd)
     }
 
     fun actionDelete() {
