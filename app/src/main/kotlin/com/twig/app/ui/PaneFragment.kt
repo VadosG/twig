@@ -1455,10 +1455,14 @@ class PaneFragment : Fragment() {
         cb.tvSrc.text = if (sel.size == 1) sel[0].name else getString(R.string.copy_items, sel.size)
         cb.tvDest.text = pathLabel(dest)
         cb.ivDest.setImageResource(pathIcon(dest))
-        cb.etName.setText("${defaultArchiveName(sel)}.${ArchiveWriter.Format.ZIP.ext}")
+        val format = Prefs.compressFormat(requireContext())
+        cb.rgFormat.check(if (format == ArchiveWriter.Format.SEVEN_Z) R.id.rb_7z else R.id.rb_zip)
+        cb.etName.setText("${defaultArchiveName(sel)}.${format.ext}")
         cb.rgFormat.setOnCheckedChangeListener { _, id ->
+            val selected = formatOf(id)
+            Prefs.setCompressFormat(requireContext(), selected)
             val stem = stripArchiveExt(cb.etName.text.toString())
-            cb.etName.setText("$stem.${formatOf(id).ext}")
+            cb.etName.setText("$stem.${selected.ext}")
             cb.etName.setSelection(stem.length) // setText sends the cursor back to the start; move it back to the end of the name to keep typing.
         }
         // "Encrypted archives are read-only" — only mention it when actually encrypting; don't take up space otherwise.
@@ -1490,12 +1494,7 @@ class PaneFragment : Fragment() {
                 )
             }
             .create()
-        // Rename as soon as the dialog opens: keyboard pops up directly (ALWAYS_ ignores the "user manually hid the keyboard last time" state, must be set before show),
-        // focus lands on the name field and **selects only the stem, not the extension** — typing replaces the name straight away while .zip/.7z is preserved.
-        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        dialog.show()
-        cb.etName.requestFocus()
-        cb.etName.setSelection(0, stripArchiveExt(cb.etName.text.toString()).length)
+        dialog.showNameInput(cb.etName, selectStem = true)
     }
 
     private fun formatOf(checkedId: Int): ArchiveWriter.Format =

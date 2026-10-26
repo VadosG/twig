@@ -2,6 +2,7 @@ package com.twig.app
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
+import com.twig.fs.archive.ArchiveWriter
 
 /** Lightweight preferences (SharedPreferences). */
 object Prefs {
@@ -11,6 +12,15 @@ object Prefs {
     private const val KEY_TEXT_SIZE = "row_text_size"
 
     private fun sp(ctx: Context) = ctx.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+
+    fun compressFormat(ctx: Context): ArchiveWriter.Format {
+        val saved = sp(ctx).getString("compress_format", null)
+        return ArchiveWriter.Format.entries.firstOrNull { it.name == saved } ?: ArchiveWriter.Format.ZIP
+    }
+
+    fun setCompressFormat(ctx: Context, format: ArchiveWriter.Format) {
+        sp(ctx).edit().putString("compress_format", format.name).apply()
+    }
 
     fun toolbarAtBottom(ctx: Context): Boolean = sp(ctx).getBoolean("toolbar_at_bottom", false)
 

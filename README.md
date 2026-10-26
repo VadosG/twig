@@ -224,6 +224,7 @@ Network sources connect on expand, support multiple servers (each gets a unique
 scheme), and persist their configuration. Extraction is just a cross-source copy;
 so is compression, which is why "compress a folder on SMB into a local archive"
 needs no special case.
+The compression dialog remembers the last ZIP/7Z format across launches, even if cancelled.
 
 ### Browsing
 
