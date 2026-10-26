@@ -47,7 +47,7 @@ class TrashDialogs(private val ctx: Context, private val owner: LifecycleOwner, 
                 result.fold(onSuccess = { item ->
                     val actions = ArrayList<MenuAct>()
                     if (item.entry.original != null) actions.item(ctx.getString(R.string.trash_restore), R.drawable.ic_up) {
-                        restoreName(item, file.name)
+                        restoreName(item, file)
                     }
                     actions += extraActions
                     actions.item(ctx.getString(R.string.trash_delete_permanently), R.drawable.ic_delete, DANGER) {
@@ -115,8 +115,8 @@ class TrashDialogs(private val ctx: Context, private val owner: LifecycleOwner, 
         }
     }
 
-    private fun restoreName(item: TrashFileSystem.Item, defaultName: String) {
-        val input = EditText(ctx).apply { setSingleLine(); setText(defaultName) }
+    private fun restoreName(item: TrashFileSystem.Item, file: XFile) {
+        val input = EditText(ctx).apply { setSingleLine(); setText(file.name) }
         AlertDialog.Builder(ctx).setTitle(R.string.trash_restore_name).setView(input)
             .setNegativeButton(R.string.dialog_cancel, null)
             .setPositiveButton(R.string.trash_restore) { _, _ ->
@@ -135,7 +135,7 @@ class TrashDialogs(private val ctx: Context, private val owner: LifecycleOwner, 
                             .show().track()
                     }, onFailure = ::error)
                 }
-            }.show().track()
+            }.create().showNameInput(input, selectStem = !file.isDir).track()
     }
     private fun confirmEmpty() {
         owner.lifecycleScope.launch {

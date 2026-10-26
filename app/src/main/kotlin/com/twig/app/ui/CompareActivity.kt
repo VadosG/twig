@@ -975,7 +975,7 @@ class CompareActivity : AppCompatActivity() {
                 CompareStore.add(this, CompareSession(name, l, r, options))
                 toast(getString(R.string.compare_saved_ok))
             }
-            .show()
+            .create().showNameInput(input)
     }
 
     private fun loadSession(s: CompareSession) {

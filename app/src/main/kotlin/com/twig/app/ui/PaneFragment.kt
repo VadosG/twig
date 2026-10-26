@@ -1016,7 +1016,7 @@ class PaneFragment : Fragment() {
                     viewModel.invalidate(dir); viewModel.refresh()
                 }
             }
-            .show()
+            .create().showNameInput(input)
     }
 
     /**
@@ -1029,7 +1029,6 @@ class PaneFragment : Fragment() {
         val input = EditText(requireContext()).apply {
             hint = getString(R.string.hint_name)
             setText(preset)
-            setSelection(0, preset.lastIndexOf('.').let { if (it <= 0) preset.length else it })
         }
         AlertDialog.Builder(requireContext())
             .setTitle(R.string.action_new_text)
@@ -1052,7 +1051,7 @@ class PaneFragment : Fragment() {
                     created?.let { TextViewerActivity.start(requireContext(), it, edit = true) }
                 }
             }
-            .show()
+            .create().showNameInput(input, selectStem = true)
     }
 
     /** Currently-checked files (for picker hosts to grab multi-selection results); empty when nothing is checked. */
@@ -1135,7 +1134,7 @@ class PaneFragment : Fragment() {
             toast(getString(R.string.apps_read_only)); return
         }
         val input = EditText(requireContext()).apply { setText(target.name) }
-        val dialog = AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext())
             .setTitle(R.string.action_rename)
             .setView(input)
             .setNegativeButton(R.string.dialog_cancel, null)
@@ -1146,13 +1145,7 @@ class PaneFragment : Fragment() {
                     adapter.clearSelection(); clearMapSelection(); viewModel.refresh()
                 }
             }
-            .create()
-        input.requestFocus()
-        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        dialog.show()
-        val stemEnd = if (target.isDir) target.name.length
-            else target.name.lastIndexOf('.').takeIf { it > 0 && it < target.name.lastIndex } ?: target.name.length
-        input.setSelection(0, stemEnd)
+            .create().showNameInput(input, selectStem = !target.isDir)
     }
 
     fun actionDelete() {
@@ -2321,7 +2314,7 @@ class PaneFragment : Fragment() {
                 val name = input.text.toString().trim()
                 if (name.isNotEmpty()) onRenamed(name)
             }
-            .show()
+            .create().showNameInput(input)
     }
 
     private fun promptRenameFavorite(fav: com.twig.app.Favorite, current: String) {
