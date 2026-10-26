@@ -1135,7 +1135,7 @@ class PaneFragment : Fragment() {
             toast(getString(R.string.apps_read_only)); return
         }
         val input = EditText(requireContext()).apply { setText(target.name) }
-        AlertDialog.Builder(requireContext())
+        val dialog = AlertDialog.Builder(requireContext())
             .setTitle(R.string.action_rename)
             .setView(input)
             .setNegativeButton(R.string.dialog_cancel, null)
@@ -1146,7 +1146,10 @@ class PaneFragment : Fragment() {
                     adapter.clearSelection(); clearMapSelection(); viewModel.refresh()
                 }
             }
-            .show()
+            .create()
+        input.requestFocus()
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        dialog.show()
     }
 
     fun actionDelete() {
