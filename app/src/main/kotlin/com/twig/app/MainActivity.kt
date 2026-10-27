@@ -43,8 +43,6 @@ import com.twig.app.ui.sizeIconsLikeRows
 import com.twig.core.FsRegistry
 import com.twig.core.XFile
 import com.twig.core.isWritableDir
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -474,14 +472,7 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
         s.asUp.setOnClickListener { activePane()?.actionUp() }
         s.asUp.setOnLongClickListener { activePane()?.actionScrollToTop(); true }
         s.asSort.setOnLongClickListener { showSortDialog(selectedDirectory = true); true }
-        s.asRefresh.setOnLongClickListener {
-            lifecycleScope.launch {
-                withContext(Dispatchers.IO) { com.twig.app.ui.Thumbs.clearCache(this@MainActivity) }
-                paneAt(0)?.actionRefresh(rebindThumbnails = true)
-                paneAt(1)?.actionRefresh(rebindThumbnails = true)
-            }
-            true
-        }
+        s.asRefresh.setOnLongClickListener { activePane()?.actionRefreshThumbnails(); true }
         s.asNewFolder.setOnLongClickListener { activePane()?.actionNewTextFile(); true }
         s.asCopy.setOnLongClickListener { activePane()?.actionCopy(move = false, immediate = true); true }
         s.asMove.setOnLongClickListener { activePane()?.actionCopy(move = true, immediate = true); true }

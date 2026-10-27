@@ -700,8 +700,14 @@ class PaneFragment : Fragment() {
         }.apply { targetPosition = index })
     }
 
-    fun actionRefresh(rebindThumbnails: Boolean = false) {
-        if (rebindThumbnails && ::adapter.isInitialized) adapter.notifyDataSetChanged()
+    fun actionRefreshThumbnails() {
+        val targets = selectionOrCurrent(readOnly = true)
+        if (targets.isEmpty()) return toast(getString(R.string.msg_no_selection))
+        if (targets.all { it.canRead } && targets.any { it.isDir || Thumbs.canThumb(it) })
+            refreshThumb(targets)
+    }
+
+    fun actionRefresh() {
         viewModel.currentDir?.let(viewModel::noteChangedIn)
         viewModel.refresh()
     }
