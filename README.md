@@ -104,7 +104,7 @@ S3, restic repositories and Jellyfin/Emby libraries expand in place. Keep two
 sources side by side: compress an SMB folder into a local zip, or copy a file
 from a remote archive straight to an FTP server.
 
-**Small and resource-conscious.** The 1.16.0 full build's arm64-v8a download measures 8.37 MiB,
+**Small and resource-conscious.** The 1.16.1 full build's arm64-v8a download measures 8.40 MiB,
 including the terminal, network backends and media player. Dependencies are added
 only after their APK cost is measured.
 
@@ -144,25 +144,25 @@ only after their APK cost is measured.
 
 ## Size
 
-Measured on the signed 1.16.0 release APKs (R8 + resource shrinking; MiB = 1,048,576 bytes):
+Measured on the signed 1.16.1 release APKs (R8 + resource shrinking; MiB = 1,048,576 bytes):
 
 | | Size |
 |---|---|
-| Full APK (`arm64-v8a` + `x86_64`) | 10.51 MiB |
-| Libre APK (`arm64-v8a` + `x86_64`) | 10.45 MiB |
-| **Full APK, `arm64-v8a` only** | **8.37 MiB** |
-| Full APK, `x86_64` only | 8.49 MiB |
-| Full APK, `armeabi-v7a` only (experimental) | 8.13 MiB |
+| Full APK (`arm64-v8a` + `x86_64`) | 10.54 MiB |
+| Libre APK (`arm64-v8a` + `x86_64`) | 10.48 MiB |
+| **Full APK, `arm64-v8a` only** | **8.40 MiB** |
+| Full APK, `x86_64` only | 8.52 MiB |
+| Full APK, `armeabi-v7a` only (experimental) | 8.16 MiB |
 
 Where it goes (compressed entries inside the full `arm64-v8a` APK):
 
 | Component | Size |
 |---|---|
-| `classes*.dex` (all our code plus every JVM dependency) | 3.09 MiB |
+| `classes*.dex` (all our code plus every JVM dependency) | 3.11 MiB |
 | `libffmpegJNI.so` | 1.39 MiB |
 | Bouncy Castle data files | 1.18 MiB |
-| Resources (`resources.arsc` + `res`) | 1.83 MiB |
-| `libsamba_jni.so` (libsmb2) | 484 KiB |
+| Resources (`resources.arsc` + `res`) | 1.84 MiB |
+| `libsamba_jni.so` (libsmb2) | 485 KiB |
 | `libtwigzstd` / `libtermux` / `libtwigpty` | 109 KiB |
 
 Of the Bouncy Castle data, 1.16 MiB is three lookup tables for the `picnic`
@@ -239,18 +239,31 @@ The compression dialog remembers the last ZIP/7Z format across launches, even if
   pin the current directory on the other side and switch to it.
 - Multi-select, cross-pane copy and move with progress and cancellation, mkdir,
   rename, recursive delete, clipboard-style paste, and sharing multiple selected
-  files through the system chooser.
+  files through the system chooser. The path bar shows the checked-item count.
+- **Retry failed transfers** from the failure dialog, or skip the failing item and
+  continue. Completed files are retained; local, FTP, SFTP and SMB destinations can
+  resume partial writes when source size and modification time are known.
+- **Share remote files** with background preparation, progress and cancellation.
+  Completed files are cached for reuse. Directly readable local files and remote files
+  with a known size up to 512 KiB can be shared directly.
 - **Trash** for ordinary writable local shared storage, on the original volume.
   Restore or permanently purge individual entries or batches; an empty trash root hides
   automatically. Network, SAF-only and privileged deletions use permanent deletion instead.
   Delete and purge jobs have background progress and stop between backend calls when cancelled.
+  Long-press Delete to recycle without confirmation only when every selected item can
+  use the trash; permanent deletions still require confirmation.
 - **Share into Twig** to copy incoming files or save shared text as a UTF-8 file with an
   editable name. The destination picker has two panes, sorting, search and history, and
   follows the browser's fullscreen and toolbar-placement settings.
 - **Browser controls:** optionally put the toolbar at the bottom or exit the main screen
-  with Back after pane navigation is exhausted. Completion vibration and foreground
-  completion notifications are separate, default-off settings; background results retain
-  a notification.
+  with Back after pane navigation is exhausted, always with exit confirmation.
+  Completion vibration and foreground completion notifications are separate, default-off
+  settings; background results and transfer failures retain a notification.
+- **Long-press shortcuts** on browser controls: copy/move/compress immediately, create
+  a text file, select the extension when renaming, open directory sorting or refresh
+  selected thumbnails. Terminal and music controls also offer direct actions.
+- **Folder icons** distinguish common local directories such as Downloads, Pictures
+  and Music; favourites retain their directory or installed-app icons.
 - **Batch rename** selected files and folders with live original/new-name previews.
   Replace text or use regular expressions, choose case sensitivity, and target names,
   extensions or both. Add numbering before or after names with a configurable start
@@ -817,5 +830,9 @@ changing subsystems like the terminal, thumbnails or the TS demuxer.
   Background deletion, batch trash recovery, optional bottom toolbar and completion
   alerts. Series opening/ending skips, music volume swipes and notification exit/timer,
   per-site capture/location permissions, and idle terminal dimming.
+- **1.16.1** — Transfer retries, resumable writes and skip-failed-item actions; remote
+  sharing with background preparation and reusable files. Selection counts, folder
+  icons and long-press actions for browsing, music and terminals. Fix image zoom
+  opening menus, Back exit confirmation and thumbnail refresh.
 
 </details>
