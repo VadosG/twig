@@ -742,6 +742,47 @@ class CopyEngineTest {
         assertFalse(source.exists(item))
     }
 
+    @Test fun retryRecopiesCompletedFileWithoutSourceModificationTime() {
+        val source = MemFs("unknown-time-source")
+        val target = MemFs("unknown-time-target")
+        FsRegistry.register(source)
+        FsRegistry.register(target)
+        source.put("/file", "old")
+        source.deleteFailPath = "/file"
+        val item = source.resolve("/file")
+        val checkpoint = TransferCheckpoint()
+        assertThrows(FsException::class.java) {
+            CopyEngine.transfer(listOf(item), target.root(), true, checkpoint = checkpoint)
+        }
+        source.put("/file", "new")
+        source.deleteFailPath = null
+        CopyEngine.transfer(listOf(item), target.root(), true, checkpoint = checkpoint)
+        assertEquals("new", target.text("/file"))
+        assertFalse(source.exists(item))
+    }
+
+    @Test fun retryRefreshesSourceSizeEvenWithoutModificationTime() {
+        val source = MemFs("unknown-size-source")
+        val target = MemFs("unknown-size-target")
+        FsRegistry.register(source)
+        FsRegistry.register(target)
+        source.put("/file", "old")
+        source.deleteFailPath = "/file"
+        val item = source.resolve("/file")
+        val checkpoint = TransferCheckpoint()
+        assertThrows(FsException::class.java) {
+            CopyEngine.transfer(listOf(item), target.root(), true, checkpoint = checkpoint)
+        }
+        source.put("/file", "longer content")
+        source.readLimit = 3
+        source.deleteFailPath = null
+        assertThrows(FsException::class.java) {
+            CopyEngine.transfer(listOf(item), target.root(), true, checkpoint = checkpoint)
+        }
+        assertEquals("longer content", source.text("/file"))
+        assertEquals("old", target.text("/file"))
+    }
+
     @Test fun sourcesWithoutStatOrModificationTimeStillCopyNormally() {
         val storage = MemFs("unstatable-source")
         val source = object : FileSystem by storage {

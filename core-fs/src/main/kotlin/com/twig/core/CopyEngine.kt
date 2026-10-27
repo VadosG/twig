@@ -134,7 +134,7 @@ object CopyEngine {
                 val priorKey = checkpoint?.key(item, destDir)
                 val needsRefresh = checkpoint != null &&
                     (priorKey in checkpoint.partials || priorKey in checkpoint.outputs)
-                val source = if (needsRefresh && !item.isDir && item.lastModified > 0) {
+                val source = if (needsRefresh && !item.isDir) {
                     FsRegistry.of(item).stat(item.path) ?: throw FsException("Source unavailable: ${item.name}")
                 } else item
                 val complete = copyRecursive(source, destDir, task)
@@ -206,7 +206,8 @@ object CopyEngine {
         val key = checkpoint?.key(src, destDir)
         val savedOutput = checkpoint?.outputs?.get(key)
         val savedEntry = savedOutput?.let { saved -> siblings[saved.name]?.takeIf { it.path == saved.path } }
-        if (key != null && key in checkpoint.completed && savedOutput != null && savedEntry != null &&
+        if (key != null && src.size > 0 && src.lastModified > 0 &&
+            key in checkpoint.completed && savedOutput != null && savedEntry != null &&
             !savedEntry.isDir && (src.size <= 0 || savedEntry.size == src.size) &&
             (savedOutput.lastModified <= 0 || savedEntry.lastModified == savedOutput.lastModified)
         ) {

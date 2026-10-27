@@ -43,7 +43,8 @@ class CompressionFormatMemoryTest {
             ReflectionHelpers.callInstanceMethod<Unit>(pane, "performCompress",
                 ReflectionHelpers.ClassParameter.from(List::class.java,
                     listOf(XFile("file", source.path, false, size = source.length()))),
-                ReflectionHelpers.ClassParameter.from(java.lang.Boolean.TYPE, true))
+                ReflectionHelpers.ClassParameter.from(java.lang.Boolean.TYPE, true),
+                ReflectionHelpers.ClassParameter.from(java.lang.Boolean.TYPE, false))
             return ShadowDialog.getLatestDialog() as AlertDialog
         }
         try {
