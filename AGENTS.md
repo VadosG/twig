@@ -77,8 +77,6 @@ APKs. Add `--publish` to push the current branch/tag and publish a Pre-release w
 changing Latest. `--notes-file PATH` supplies detailed release notes; `--offline`
 uses cached Gradle dependencies. The script respects the configured signing key and
 uses `tools/verify-apk.py` before publishing. Stable releases use `tools/release.sh`.
-Gitee mirroring is manual: do not push or publish a Gitee release unless the user
-explicitly requests Gitee for that release; a general release request covers GitHub only.
 
 ## Build environment
 
