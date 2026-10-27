@@ -266,6 +266,13 @@ class TerminalActivity : AppCompatActivity() {
         CmdShims.ensureAsync(this) // Command-completion shims for local shells — build/repair symlinks in the background.
         SshHome.ensureAsync(this) // .mkshrc's ssh alias needs -F on this config, so it has to exist first.
 
+        ToolbarLongPress.bind(b.toolbar,
+            actions = mapOf(MENU_END_CURRENT to { TermManager.closeAll(); finish() }),
+            overflow = { locateCurrentDir() },
+            navigation = {
+                startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+                finish()
+            })
         b.toolbar.setNavigationOnClickListener { finish() } // Back to file manager; the session keeps running.
         b.toolbar.menu.add(0, MENU_END_CURRENT, 0, getString(R.string.terminal_end_current)).apply {
             icon = ContextCompat.getDrawable(this@TerminalActivity, R.drawable.ic_close)
