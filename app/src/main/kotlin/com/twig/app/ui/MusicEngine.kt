@@ -62,6 +62,7 @@ object MusicEngine {
     private var errorSkips = 0 // consecutive playback failure counter; stop if all tracks in the queue have been tried and failed
     @Volatile var loadingQueue = false
         private set
+    private var resumeWhenLoaded = false
     @Volatile private var loadGeneration = 0L
 
     /** Whoever changes "favorite" calls this so other places (player page heart, notification heart) update too. */
@@ -140,6 +141,7 @@ object MusicEngine {
     /** Loads the playlist and starts playback from [startIndex]; conn tracks build connections in the background, missing ones are skipped. */
     @Synchronized
     fun play(ctx: Context, playlist: Playlist, startIndex: Int, startPosMs: Long = 0L, autoPlay: Boolean = true) {
+        resumeWhenLoaded = false
         val generation = ++loadGeneration
         loadingQueue = true
         val appCtx = ctx.applicationContext
@@ -179,9 +181,11 @@ object MusicEngine {
                 errorSkips = 0
                 p.setMediaSources(files.map { MediaSources.lazy(it) }, startPos, startPosMs)
                 p.prepare()
-                p.playWhenReady = autoPlay
+                val shouldPlay = autoPlay || resumeWhenLoaded
+                resumeWhenLoaded = false
+                p.playWhenReady = shouldPlay
                 listeners.forEach { it.onQueueChanged(); it.onTrackChanged(startPos, tracks.getOrNull(startPos)) }
-                if (autoPlay) MusicService.start(appCtx)
+                if (shouldPlay) MusicService.start(appCtx)
                 prefetchMeta(startPos)
                 schedulePrefetchNext()
             }
@@ -313,6 +317,14 @@ object MusicEngine {
     fun trackAt(i: Int): PlaylistTrack? = tracks.getOrNull(i)
 
     fun togglePlay() { player?.let { if (it.isPlaying) it.pause() else { it.play(); app?.let { c -> MusicService.start(c) } } } }
+    fun resumePlayback(ctx: Context) {
+        if (loadingQueue) { resumeWhenLoaded = true; return }
+        val current = player ?: return
+        if (current.playbackState == Player.STATE_ENDED) current.seekToDefaultPosition()
+        current.play()
+        MusicService.start(ctx.applicationContext)
+    }
+
     fun pause() { player?.pause() }
     fun next() { player?.seekToNextMediaItem() }
     fun prev() {
@@ -394,6 +406,7 @@ object MusicEngine {
     @Synchronized
     fun shutdown() {
         ++loadGeneration
+        resumeWhenLoaded = false
         loadingQueue = false
         saveResume()
         player?.release()
