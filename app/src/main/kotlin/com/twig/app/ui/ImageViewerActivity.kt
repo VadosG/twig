@@ -145,6 +145,10 @@ class ImageViewerActivity : AppCompatActivity() {
             scheduleHide()
             if (order.isNotEmpty()) togglePick(images[current])
         }
+        b.btnDelete.setOnLongClickListener {
+            if (order.isNotEmpty()) confirmDelete(images[current], skipTrashConfirmation = true)
+            true
+        }
         b.btnDelete.setOnClickListener {
             if (order.isNotEmpty()) confirmDelete(images[current])
         }
@@ -430,10 +434,10 @@ class ImageViewerActivity : AppCompatActivity() {
         publishResult()
     }
 
-    private fun confirmDelete(file: XFile) {
+    private fun confirmDelete(file: XFile, skipTrashConfirmation: Boolean = false) {
         if (playing) stop()
         handler.removeCallbacks(hideControls)
-        DeleteUi.confirm(this, this, listOf(file), onDismiss = { scheduleHide() }) { success ->
+        DeleteUi.confirm(this, this, listOf(file), onDismiss = { scheduleHide() }, skipTrashConfirmation = skipTrashConfirmation) { success ->
             if (success) {
                 val idx = images.indexOfFirst { it.path == file.path && it.scheme == file.scheme }
                 if (idx >= 0) {
