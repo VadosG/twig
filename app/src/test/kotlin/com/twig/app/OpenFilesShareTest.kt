@@ -58,4 +58,17 @@ class OpenFilesShareTest {
         val mixed = shadowOf(activity).nextStartedActivity.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)!!
         assertEquals("*/*", mixed.type)
     }
+
+    @Test fun `known remote files up to 512 KiB bypass preparation`() {
+        val activity = activity()
+        val files = listOf(XFile("sftp-test", "/small.txt", false, 123),
+            XFile("sftp-test", "/limit.bin", false, 512L * 1024))
+        OpenFiles.share(activity, files)
+        val chooser = shadowOf(activity).nextStartedActivity
+        val send = chooser.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)!!
+        assertEquals(Intent.ACTION_SEND_MULTIPLE, send.action)
+        assertEquals(files.map { StreamProvider.uriFor(activity, it) },
+            send.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM))
+        org.junit.Assert.assertNull(shadowOf(activity.application).nextStartedService)
+    }
 }

@@ -294,8 +294,9 @@ each write `= null`.
   and history to the active pane, while compress and WiFi sharing stay hidden.
   The share picker follows `Prefs.fullscreen` through `StatusBarFullscreen`, including
   resume and window-focus changes.
-  Outgoing system sharing prepares sources that are not directly readable local files
-  in a separate cache as `Transfers.Work.Share`, using `TransferService` and `TransferBox`
+  Outgoing system sharing sends directly readable local files and known-size remote
+  files up to 512 KiB directly. If a batch includes a larger or unknown-size nonlocal
+  file, prepare its nonlocal sources in a separate cache as `Transfers.Work.Share`, using `TransferService` and `TransferBox`
   for progress, cancellation, background execution and notification reopening. A headless
   `ShareTransfers` fragment only bridges resumed UI to the completed local URIs; there
   is no separate share dialog/ViewModel. Finished shares retain their cache leases until

@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [24, 34])
 class ShareTransfersTest {
+    private val payload = ByteArray(512 * 1024 + 1) { (it % 251).toByte() }
     private fun waitUntil(check: () -> Boolean) {
         val end = System.nanoTime() + TimeUnit.SECONDS.toNanos(10)
         while (System.nanoTime() < end) {
@@ -40,7 +41,7 @@ class ShareTransfersTest {
         fail("Timed out waiting for preparation")
     }
 
-    private fun withPendingShare(test: (org.robolectric.android.controller.ActivityController<SettingsActivity>,
+    private fun withPendingShare(size: Long = payload.size.toLong(), test: (org.robolectric.android.controller.ActivityController<SettingsActivity>,
                                        CountDownLatch, AtomicInteger, CountDownLatch) -> Unit) {
         Transfers.attach(null)
         while (Transfers.hasPendingShare()) Transfers.consumeShare()?.preparedShare?.release()
@@ -66,7 +67,7 @@ class ShareTransfersTest {
                 opens.incrementAndGet()
                 entered.countDown()
                 check(gate.await(10, TimeUnit.SECONDS))
-                return object : ByteArrayInputStream("ready".toByteArray()) {
+                return object : ByteArrayInputStream(payload) {
                     override fun close() { super.close(); closed.countDown() }
                 }
             }
@@ -77,7 +78,7 @@ class ShareTransfersTest {
         })
         val service = Robolectric.buildService(TransferService::class.java).create()
         try {
-            OpenFiles.share(activity, XFile("share-dialog-test", "/example.txt", false, 5, lastModified = 1234))
+            OpenFiles.share(activity, XFile("share-dialog-test", "/example.txt", false, size, lastModified = 1234))
             shadowOf(Looper.getMainLooper()).idle()
             assertTrue(Transfers.active!!.isShare)
             assertTrue(Transfers.ui is TransferBox)
@@ -118,9 +119,9 @@ class ShareTransfersTest {
         assertEquals(Intent.ACTION_SEND, send.action)
         val uri = send.getParcelableExtra<android.net.Uri>(Intent.EXTRA_STREAM)!!
         val token = String(android.util.Base64.decode(uri.pathSegments[0], android.util.Base64.URL_SAFE))
-        assertTrue(token.startsWith("file\n5\nexample.txt\n"))
+        assertTrue(token.startsWith("file\n${payload.size}\nexample.txt\n"))
         val cached = File(token.split("\n", limit = 4)[3])
-        assertEquals("ready", cached.readText())
+        assertArrayEquals(payload, cached.readBytes())
         assertEquals(1, opens.get())
         shadowOf(Looper.getMainLooper()).idle()
         assertNull(shadowOf(controller.get()).nextStartedActivity)
@@ -233,7 +234,7 @@ class ShareTransfersTest {
         org.robolectric.shadows.ShadowToast.reset()
         val service = Robolectric.buildService(TransferService::class.java).create()
         try {
-            OpenFiles.share(activity, XFile("share-dialog-test", "/example.txt", false, 5, lastModified = 1234))
+            OpenFiles.share(activity, XFile("share-dialog-test", "/example.txt", false, payload.size.toLong(), lastModified = 1234))
             shadowOf(Looper.getMainLooper()).idle()
             service.get().onStartCommand(null, 0, 2)
             waitUntil { Transfers.active == null }
@@ -245,5 +246,12 @@ class ShareTransfersTest {
             service.destroy()
             com.twig.app.Prefs.setVibrateOnCompletion(activity, previous)
         }
+    }
+
+    @Test fun `unknown size keeps the preparation flow`() = withPendingShare(size = 0) { controller, gate, _, _ ->
+        assertTrue(Transfers.active!!.isShare)
+        gate.countDown()
+        waitUntil { Transfers.active == null }
+        assertNotNull(shadowOf(controller.get()).nextStartedActivity)
     }
 }

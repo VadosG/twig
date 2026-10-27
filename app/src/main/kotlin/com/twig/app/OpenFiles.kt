@@ -164,7 +164,9 @@ object OpenFiles {
         return MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext) ?: "*/*"
     }
 
-    /** Share readable local files directly; prepare other sources with visible progress first. */
+    private const val DIRECT_SHARE_LIMIT = 512L * 1024
+
+    /** Share local files and small known-size sources directly; otherwise prepare the batch first. */
     fun share(context: Context, file: XFile) {
         share(context, listOf(file))
     }
@@ -172,14 +174,14 @@ object OpenFiles {
     /** Multiple streams keep their individual URI grants, including across backends. */
     fun share(context: Context, files: List<XFile>) {
         require(files.isNotEmpty() && files.none { it.isDir })
-        if (files.any { !directlyReadable(it) }) {
+        if (files.any { !directlyReadable(it) && (it.size <= 0 || it.size > DIRECT_SHARE_LIMIT) }) {
             com.twig.app.ui.ShareTransfers.start(context, files)
             return
         }
         sharePrepared(context, files)
     }
 
-    /** Called only once every source is ready; "open with" keeps its separate streaming path. */
+    /** Dispatch the granted URIs after applying the sharing preparation policy. */
     internal fun sharePrepared(context: Context, files: List<XFile>) {
         val uris = ArrayList(files.map { StreamProvider.uriFor(context, it) })
         val types = files.map { mimeOf(it.name) }.distinct()

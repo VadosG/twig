@@ -174,8 +174,9 @@
   (2026-10-27, issue #39). Sharing a large SFTP file to WeChat left the user staring
   at a spinner until the recipient appeared. `OpenFiles.share` handed out the remote
   URI directly, so reads happened on the recipient/system side without Twig progress.
-  Prepare every source that is not directly readable local storage before sending
-  ACTION_SEND, using a cancellable "Preparing to share" dialog; leave "Open with"
+  A batch of local files and known-size remote files up to 512 KiB shares directly.
+  A larger or unknown-size remote file sends the batch through preparation, with a
+  cancellable "Preparing to share" dialog; leave "Open with"
   streaming so external players can seek without a complete download. Execute it as
   `Transfers.Work.Share` in the existing foreground `TransferService`, with the existing
   `TransferBox` for progress, cancellation, backgrounding and notification reopening.
