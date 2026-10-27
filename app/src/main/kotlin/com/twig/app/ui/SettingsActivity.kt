@@ -1,7 +1,5 @@
 package com.twig.app.ui
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -747,31 +745,7 @@ class SettingsActivity : AppCompatActivity() {
      * — not every device has a browser installed (the combination of a pure file
      * manager + TV box is not uncommon), so only offering "open" is a dead end.
      */
-    private fun showAbout() {
-        AlertDialog.Builder(this)
-            .setTitle(R.string.settings_about)
-            .setMessage(getString(R.string.about_body, versionLine(), PROJECT_URL))
-            .setPositiveButton(R.string.about_open) { _, _ -> openProject() }
-            .setNeutralButton(R.string.about_copy) { _, _ -> copyProjectUrl() }
-            .setNegativeButton(R.string.dialog_close, null)
-            .show()
-    }
-
-    private fun openProject() {
-        runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(PROJECT_URL))) }
-            .onFailure {
-                // When no app can open the link, don't just say "can't open": first put
-                // the URL into the clipboard so the user still has a next step
-                copyProjectUrl()
-                Toast.makeText(this, R.string.about_no_browser, Toast.LENGTH_LONG).show()
-            }
-    }
-
-    private fun copyProjectUrl() {
-        val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        cm.setPrimaryClip(ClipData.newPlainText("twig", PROJECT_URL))
-        Toast.makeText(this, R.string.info_copied, Toast.LENGTH_SHORT).show()
-    }
+    private fun showAbout() = AboutDialog.show(this)
 
     private fun actionRow(title: String, subtitle: String, onClick: (TextView) -> Unit): View {
         lateinit var subRef: TextView

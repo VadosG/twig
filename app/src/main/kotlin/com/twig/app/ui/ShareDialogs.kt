@@ -211,7 +211,17 @@ object ShareDialogs {
     }
 
     /** Start the service: the connection may need re-establishment, the bind may fail — the whole thing goes on an IO thread, and the result is delivered back on the main thread. */
-    private fun startShare(act: AppCompatActivity, cfg: ShareConfig, dir: XFile?) {
+    fun startBackground(act: AppCompatActivity, dir: XFile?) {
+        if (WebShare.session != null) {
+            Toast.makeText(act, act.getString(R.string.share_notif_title, WebShare.session?.primaryUrl().orEmpty()), Toast.LENGTH_SHORT).show()
+            return
+        }
+        val saved = ShareStore.load(act)
+        val scope = dir?.let { scopeOf(act, it) } ?: saved.scope
+        startShare(act, saved.copy(scope = scope), dir, background = true)
+    }
+
+    private fun startShare(act: AppCompatActivity, cfg: ShareConfig, dir: XFile?, background: Boolean = false) {
         val ctx = act.applicationContext
         val label = when (val s = cfg.scope) {
             is ShareScope.Dir -> s.label
@@ -224,7 +234,8 @@ object ShareDialogs {
             }
             result.onSuccess {
                 // Re-open: this shows the "Sharing" face, with the address right at the top.
-                show(act, dir)
+                if (background) Toast.makeText(act, act.getString(R.string.share_notif_title, WebShare.session?.primaryUrl().orEmpty()), Toast.LENGTH_SHORT).show()
+                else show(act, dir)
             }.onFailure {
                 AlertDialog.Builder(act)
                     .setTitle(R.string.share_title)

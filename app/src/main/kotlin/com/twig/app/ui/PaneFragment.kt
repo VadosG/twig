@@ -700,7 +700,8 @@ class PaneFragment : Fragment() {
         }.apply { targetPosition = index })
     }
 
-    fun actionRefresh() {
+    fun actionRefresh(rebindThumbnails: Boolean = false) {
+        if (rebindThumbnails && ::adapter.isInitialized) adapter.notifyDataSetChanged()
         viewModel.currentDir?.let(viewModel::noteChangedIn)
         viewModel.refresh()
     }
@@ -740,8 +741,8 @@ class PaneFragment : Fragment() {
     fun unmountLocated(): Boolean = viewModel.unmountLocated()
 
     /** Open on recent locations, with unfinished videos available in a separate tab. */
-    fun actionHistory() {
-        HistoryDialog.show(requireContext(), ::jumpToHistory, ::openRecentVideo)
+    fun actionHistory(continueWatching: Boolean = false) {
+        HistoryDialog.show(requireContext(), ::jumpToHistory, ::openRecentVideo, continueWatching)
     }
 
     private fun openRecentVideo(mark: PlaybackMark, fromStart: Boolean = false) {
@@ -1018,6 +1019,21 @@ class PaneFragment : Fragment() {
             .show()
     }
 
+    fun actionNewTextFile() {
+        val dir = viewModel.currentDir ?: return toast(getString(R.string.msg_pick_dir_first))
+        if (dir.isWritableDir()) performNewTextFile(dir)
+    }
+
+    fun actionTerminal() {
+        val dir = viewModel.currentDir ?: return toast(getString(R.string.msg_pick_dir_first))
+        when {
+            dir.scheme == "file" -> TerminalActivity.startLocal(requireContext(), dir.path)
+            FsRegistry.of(dir) is com.twig.fs.network.SftpFileSystem ->
+                TerminalActivity.start(requireContext(), dir.scheme, dir.name, Connections.shellPath(dir.scheme, dir.path))
+            else -> toast(getString(R.string.terminal_locate_failed))
+        }
+    }
+
     fun actionNewFolder() {
         val dir = viewModel.currentDir ?: return toast(getString(R.string.msg_pick_dir_first))
         performNewFolder(dir)
@@ -1134,23 +1150,23 @@ class PaneFragment : Fragment() {
 
     fun canCreateHere(): Boolean = viewModel.currentDir?.isWritableDir() == true
 
-    fun actionRename() {
+    fun actionRename(selectExtension: Boolean = false) {
         val sel = selectionOrCurrent()
         if (sel.isEmpty()) {
             toast(getString(R.string.msg_no_selection)); return
         }
         if (!sel.all { it.isMutable() }) return
         noteSourceDirs(sel)
-        if (sel.size == 1) performRename(sel.first()) else performBatchRename(sel)
+        if (sel.size == 1) performRename(sel.first(), selectExtension) else performBatchRename(sel, selectExtension)
     }
 
-    private fun performBatchRename(targets: List<XFile>) {
-        BatchRenameDialog.show(requireContext(), this, targets.distinctBy { it.scheme to it.path }, viewModel::renameParent) {
+    private fun performBatchRename(targets: List<XFile>, selectExtension: Boolean = false) {
+        BatchRenameDialog.show(requireContext(), this, targets.distinctBy { it.scheme to it.path }, viewModel::renameParent, selectExtension) {
             adapter.clearSelection(); clearMapSelection(); viewModel.refresh()
         }
     }
 
-    private fun performRename(target: XFile) {
+    private fun performRename(target: XFile, selectExtension: Boolean = false) {
         if (target.scheme == AppsFileSystem.SCHEME) {
             toast(getString(R.string.apps_read_only)); return
         }
@@ -1166,27 +1182,31 @@ class PaneFragment : Fragment() {
                     adapter.clearSelection(); clearMapSelection(); viewModel.refresh()
                 }
             }
-            .create().showNameInput(input, selectStem = !target.isDir)
+            .create().showNameInput(input, selectStem = !target.isDir).also {
+                val dot = target.name.lastIndexOf('.')
+                if (selectExtension && !target.isDir && dot > 0 && dot < target.name.lastIndex)
+                    input.setSelection(dot + 1, target.name.length)
+            }
     }
 
-    fun actionDelete() {
+    fun actionDelete(skipTrashConfirmation: Boolean = false) {
         val sel = selectionOrCurrent()
         if (sel.isEmpty()) {
             toast(getString(R.string.msg_no_selection)); return
         }
         noteSourceDirs(sel)
-        performDelete(sel)
+        performDelete(sel, skipTrashConfirmation)
     }
 
     /**
      * Delete. For app entries, "delete" means **uninstall** and is delegated to the system uninstall UI (which has its own confirmation, so we don't layer ours on top); for a mixed selection across sources, apps go to uninstall and the rest are deleted as usual.
      */
-    private fun performDelete(sel: List<XFile>) {
+    private fun performDelete(sel: List<XFile>, skipTrashConfirmation: Boolean = false) {
         val apps = sel.filter { it.scheme == AppsFileSystem.SCHEME }
         if (apps.isNotEmpty()) uninstallApps(apps)
         val rest = sel.filterNot { it.scheme == AppsFileSystem.SCHEME }
         if (rest.isEmpty()) return
-        DeleteUi.confirm(requireContext(), viewLifecycleOwner, rest) {
+        DeleteUi.confirm(requireContext(), viewLifecycleOwner, rest, skipTrashConfirmation = skipTrashConfirmation && apps.isEmpty()) {
             adapter.clearSelection(); clearMapSelection(); viewModel.refresh()
         }
     }
@@ -1310,16 +1330,16 @@ class PaneFragment : Fragment() {
     }
 
     /** Copy/move the checked items (or the green-highlighted current node when nothing is checked) to the other pane's current directory. */
-    fun actionCopy(move: Boolean) {
+    fun actionCopy(move: Boolean, immediate: Boolean = false) {
         val sel = selectionOrCurrent(readOnly = !move)
         if (sel.isEmpty()) {
             toast(getString(R.string.msg_no_selection)); return
         }
         noteSourceDirs(sel)
-        performCopy(sel, move, allowMove = selectionOrCurrent().containsAll(sel))
+        performCopy(sel, move, allowMove = selectionOrCurrent().containsAll(sel), immediate = immediate)
     }
 
-    private fun performCopy(sel: List<XFile>, move: Boolean, allowMove: Boolean = true) {
+    private fun performCopy(sel: List<XFile>, move: Boolean, allowMove: Boolean = true, immediate: Boolean = false) {
         // Move = copy + delete source. Apps can't be deleted (uninstall is a different thing), and the document tree root
         // can't be deleted (it's a grant, see [isMovableSource]); the action bar's "Move" and batch-after-check bypass the menu,
         // so we catch the failure here rather than failing after the copy completes.
@@ -1340,6 +1360,11 @@ class PaneFragment : Fragment() {
         }
         if (!dest.isWritableDir()) {
             toast(getString(R.string.msg_dest_not_writable)); return
+        }
+
+        if (immediate) {
+            startTransfer(sel, dest, move, null)
+            return
         }
 
         // ---- Confirmation dialog: source + size (background tally) + destination + move mode ----
@@ -1447,13 +1472,13 @@ class PaneFragment : Fragment() {
     // ---- Compress (pack into the other pane's current directory) ----
 
     /** Action bar "Compress": pack the checked items (or the green-highlighted current node when nothing is checked) into the other pane's current directory. */
-    fun actionCompress() {
+    fun actionCompress(immediate: Boolean = false) {
         val sel = selectionOrCurrent(readOnly = true)
         if (sel.isEmpty()) {
             toast(getString(R.string.msg_no_selection)); return
         }
         noteSourceDirs(sel)
-        performCompress(sel, allowMove = selectionOrCurrent().containsAll(sel))
+        performCompress(sel, allowMove = selectionOrCurrent().containsAll(sel), immediate = immediate)
     }
 
     /**
@@ -1463,7 +1488,7 @@ class PaneFragment : Fragment() {
      * Default name: with a single item (the case when the file/directory menu enters) use that item's name — files strip the extension;
      * for multiple items use their containing directory's name. The extension follows the format and is rewritten whenever the format changes.
      */
-    private fun performCompress(sel: List<XFile>, allowMove: Boolean = true) {
+    private fun performCompress(sel: List<XFile>, allowMove: Boolean = true, immediate: Boolean = false) {
         val sibling = host?.siblingOf(this)
         val dest = sibling?.viewModel?.currentDir
         if (dest == null) {
@@ -1473,6 +1498,11 @@ class PaneFragment : Fragment() {
             toast(getString(R.string.msg_dest_not_writable)); return
         }
         val movable = allowMove && sel.all { it.isMovableSource() }
+        if (immediate) {
+            val format = Prefs.compressFormat(requireContext())
+            startCompress(sel, dest, "${defaultArchiveName(sel)}.${format.ext}", format, false, null, "")
+            return
+        }
         val cb = DialogCompressBinding.inflate(layoutInflater)
         cb.cbMove.visibility = if (movable) View.VISIBLE else View.GONE
         cb.tvSrc.text = if (sel.size == 1) sel[0].name else getString(R.string.copy_items, sel.size)

@@ -43,6 +43,8 @@ import com.twig.app.ui.sizeIconsLikeRows
 import com.twig.core.FsRegistry
 import com.twig.core.XFile
 import com.twig.core.isWritableDir
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -471,6 +473,38 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
         s.sizeIconsLikeRows(this)
         s.asUp.setOnClickListener { activePane()?.actionUp() }
         s.asUp.setOnLongClickListener { activePane()?.actionScrollToTop(); true }
+        s.asSort.setOnLongClickListener { showSortDialog(selectedDirectory = true); true }
+        s.asRefresh.setOnLongClickListener {
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) { com.twig.app.ui.Thumbs.clearCache(this@MainActivity) }
+                paneAt(0)?.actionRefresh(rebindThumbnails = true)
+                paneAt(1)?.actionRefresh(rebindThumbnails = true)
+            }
+            true
+        }
+        s.asNewFolder.setOnLongClickListener { activePane()?.actionNewTextFile(); true }
+        s.asCopy.setOnLongClickListener { activePane()?.actionCopy(move = false, immediate = true); true }
+        s.asMove.setOnLongClickListener { activePane()?.actionCopy(move = true, immediate = true); true }
+        s.asCompress.setOnLongClickListener { activePane()?.actionCompress(immediate = true); true }
+        s.asRename.setOnLongClickListener { activePane()?.actionRename(selectExtension = true); true }
+        s.asDelete.setOnLongClickListener { activePane()?.actionDelete(skipTrashConfirmation = true); true }
+        s.asCompare.setOnLongClickListener { startCompare(reversed = true); true }
+        s.asMap.setOnLongClickListener {
+            runCatching { startActivity(Intent(android.provider.Settings.ACTION_INTERNAL_STORAGE_SETTINGS)) }
+                .recoverCatching { startActivity(Intent(android.provider.Settings.ACTION_MEMORY_CARD_SETTINGS)) }
+                .onFailure { Toast.makeText(this, R.string.err_failed, Toast.LENGTH_SHORT).show() }
+            true
+        }
+        s.asSearch.setOnLongClickListener {
+            startActivity(com.twig.app.ui.WebsiteActivity.browserIntent(this, "https://duckduckgo.com/")); true
+        }
+        s.asHistory.setOnLongClickListener { activePane()?.actionHistory(continueWatching = true); true }
+        s.asShare.setOnLongClickListener {
+            ShareDialogs.startBackground(this, activePane()?.viewModel?.currentDir); true
+        }
+        s.asTerm.setOnLongClickListener { activePane()?.actionTerminal(); true }
+        s.asMusic.setOnLongClickListener { openMusicPlaying(); true }
+        s.asMenu.setOnLongClickListener { confirmExit(); true }
         s.asSort.setOnClickListener { showSortDialog() }
         s.asRefresh.setOnClickListener { activePane()?.actionRefresh() }
         s.asNewFolder.setOnClickListener { activePane()?.actionNewFolder() }
@@ -663,7 +697,7 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
      * need a selected directory first — right after launch, before any directory has been
      * tapped, `currentDir` is null, so we prompt instead of forcing the root.
      */
-    private fun startCompare() {
+    private fun startCompare(reversed: Boolean = false) {
         val l = paneAt(0)?.viewModel?.currentDir
         val r = paneAt(1)?.viewModel?.currentDir
         if (l == null || r == null) {
@@ -672,7 +706,7 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
         }
         paneAt(0)?.viewModel?.noteChangedIn(l)
         paneAt(1)?.viewModel?.noteChangedIn(r)
-        com.twig.app.ui.CompareActivity.start(this, l, r)
+        com.twig.app.ui.CompareActivity.start(this, if (reversed) r else l, if (reversed) l else r)
     }
 
     /**
@@ -1096,6 +1130,11 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
             onSwitch = { setActiveIndex(1 - activeIndex, animateSwitch = true) },
             onLongPress = { showCurrentDirInOtherPane() },
         )
+        com.twig.app.ui.ToolbarLongPress.bind(b.toolbar,
+            actions = mapOf(MENU_TERMINAL to { activePane()?.actionTerminal(); Unit },
+                MENU_MUSIC to { openMusicPlaying() }),
+            overflow = { confirmExit() },
+            title = { com.twig.app.ui.AboutDialog.show(this) })
         return true
     }
 
@@ -1203,13 +1242,17 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
         ShortcutManagerCompat.requestPinShortcut(this, shortcut, null)
     }
 
-    private fun showSortDialog() {
-        com.twig.app.ui.SortDialog.show(this, activePane()?.viewModel?.currentDir,
+    private fun showSortDialog(selectedDirectory: Boolean = false) {
+        com.twig.app.ui.SortDialog.show(this, activePane()?.viewModel?.currentDir, selectedDirectory,
             parentOf = { activePane()?.viewModel?.directoryViewParent(it) }) {
             paneAt(0)?.refreshSortAndView()
             paneAt(1)?.refreshSortAndView()
             uiSig = Prefs.uiSignature(this)
         }
+    }
+
+    private fun openMusicPlaying() {
+        startActivity(Intent(this, com.twig.app.ui.MusicPlayerActivity::class.java).putExtra(com.twig.app.ui.MusicPlayerActivity.EXTRA_AUTO_PLAY, true))
     }
 
     private fun showViewModeDialog() {

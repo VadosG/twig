@@ -248,4 +248,57 @@ class StripWriteActionsTest {
         assertStrip(R.id.as_compress, false)
     }
 
+    @Test
+    fun `long copy and move start cancellable progress immediately even for huge files`() {
+        val pane = pane0()
+        val adapter = adapterOf(pane)
+        val source = XFile("file", "/source/huge.bin", isDir = false, size = 10L * 1024 * 1024 * 1024)
+        adapter.submitList(listOf(PaneViewModel.FileNode(source, 1, false, false)))
+        awaitList(adapter, 1)
+        adapter.setSelection(listOf(source))
+        pane1().viewModel.currentDir = XFile("file", activity.cacheDir.path, isDir = true)
+        for ((button, move) in listOf(R.id.as_copy to false, R.id.as_move to true)) {
+            assertTrue(activity.findViewById<View>(R.id.strip_right).findViewById<View>(button).performLongClick())
+            val session = requireNotNull(Transfers.active)
+            val work = session.work as Transfers.Work.Copy
+            assertEquals(move, work.move)
+            assertEquals(listOf(source), work.items)
+            val progress = org.robolectric.shadows.ShadowDialog.getLatestDialog() as androidx.appcompat.app.AlertDialog
+            assertTrue(progress.isShowing)
+            assertTrue(progress.findViewById<View>(R.id.bar_file) != null)
+            progress.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE).performClick()
+            idle()
+            assertTrue(session.cancelled.get())
+            val worker = Thread { Transfers.execute(activity, session) {} }
+            worker.start(); worker.join(5000)
+            idle()
+            assertFalse(worker.isAlive)
+            assertTrue(Transfers.active == null)
+            Transfers.consumeFinished()
+            adapter.submitList(listOf(PaneViewModel.FileNode(source, 1, false, false)))
+            awaitList(adapter, 1)
+            adapter.setSelection(listOf(source))
+        }
+    }
+
+    @Test
+    fun `long rename selects just the extension`() {
+        val pane = pane0()
+        val adapter = adapterOf(pane)
+        val source = XFile("file", "/source/photo.backup.jpg", isDir = false)
+        adapter.submitList(listOf(PaneViewModel.FileNode(source, 1, false, false)))
+        awaitList(adapter, 1)
+        adapter.setSelection(listOf(source))
+        assertTrue(activity.findViewById<View>(R.id.strip_right).findViewById<View>(R.id.as_rename).performLongClick())
+        val dialog = org.robolectric.shadows.ShadowDialog.getLatestDialog() as androidx.appcompat.app.AlertDialog
+        fun inputs(view: View): List<android.widget.EditText> = when (view) {
+            is android.widget.EditText -> listOf(view)
+            is android.view.ViewGroup -> (0 until view.childCount).flatMap { inputs(view.getChildAt(it)) }
+            else -> emptyList()
+        }
+        val input = inputs(dialog.window!!.decorView).single()
+        assertEquals("jpg", input.text.substring(input.selectionStart, input.selectionEnd))
+        dialog.dismiss()
+    }
+
 }
