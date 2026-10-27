@@ -332,3 +332,16 @@
   when the status bar is hidden, preserving visible navigation and keyboard insets. The
   Chromium fullscreen overlay likewise fills the cutout area. `WebsiteFullscreenTest`
   covers either side, navigation visibility, keyboard space and restoring status-bar mode.
+
+- **Image quick-scale and the long-press menu must be mutually exclusive**
+  (2026-10-28, issue #42). `ZoomableImageView` feeds both a `ScaleGestureDetector`
+  and a `GestureDetector`. Double-tap-and-hold starts the former's quick-scale mode,
+  but the latter can still deliver a long press on the second touch. Guarding only
+  `isInProgress` is too late: the user may hold before moving far enough to start scaling.
+  Suppress the menu from `onDoubleTap` until the next DOWN; also suppress it when a
+  pinch begins. During scale or multiple-pointer movement, ignore ordinary scroll
+  callbacks so the same MOVE cannot both scale and pan. Remember whether the touch
+  scaled through UP, because the scale detector ends before the fling callback and
+  must not accidentally turn a page. Ordinary double-tap mode cycling, long presses,
+  one-finger panning and fresh page swipes remain supported. `ImageGestureTest` feeds
+  real single/multiple-pointer events and advances long-press timers on API 24/34.

@@ -60,6 +60,8 @@ class ZoomableImageView @JvmOverloads constructor(
     private var tx = 0f
     private var ty = 0f
     private var mode = 0 // 0 FIT, 1 CROP, 2 ACTUAL
+    private var suppressLongPress = false
+    private var scaledTouch = false
     /** Bitmap → original image pixels ratio (decoded down-sampling ratio); the actual-size mode scales up by this to render the image at its true size. */
     private var actualScale = 1f
 
@@ -98,6 +100,8 @@ class ZoomableImageView @JvmOverloads constructor(
         override fun onSingleTapConfirmed(e: MotionEvent): Boolean { onTap?.invoke(); return true }
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
+            // Quick-scale starts with the second DOWN, before ScaleGestureDetector is in progress.
+            suppressLongPress = true
             val cycle = modeCycle
             val i = cycle.indexOf(mode)
             mode = cycle[(if (i < 0) 0 else i + 1) % cycle.size]
@@ -108,15 +112,17 @@ class ZoomableImageView @JvmOverloads constructor(
 
         // ★ Same-named member: omitting this@ZoomableImageView would resolve to the listener's own onLongPress
         override fun onLongPress(e: MotionEvent) {
-            this@ZoomableImageView.onLongPress?.invoke()
+            if (!suppressLongPress) this@ZoomableImageView.onLongPress?.invoke()
         }
 
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent, dx: Float, dy: Float): Boolean {
+            if (scaleGesture.isInProgress || e2.pointerCount > 1) return true
             tx -= dx; ty -= dy; clampAndApply(); notifyViewport()
             return true
         }
 
         override fun onFling(e1: MotionEvent?, e2: MotionEvent, vx: Float, vy: Float): Boolean {
+            if (scaledTouch) return true // Scaling may already have ended while processing this UP.
             // Preserve panning when the image overflows along the swipe axis.
             val horizontal = kotlin.math.abs(vx) > kotlin.math.abs(vy)
             val velocity = if (horizontal) vx else vy
@@ -130,6 +136,12 @@ class ZoomableImageView @JvmOverloads constructor(
     })
 
     private val scaleGesture = ScaleGestureDetector(context, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+        override fun onScaleBegin(d: ScaleGestureDetector): Boolean {
+            suppressLongPress = true
+            scaledTouch = true
+            return true
+        }
+
         override fun onScale(d: ScaleGestureDetector): Boolean {
             val f = d.scaleFactor
             val ns = (scale * f).coerceIn(minScale, maxScale)
@@ -282,6 +294,10 @@ class ZoomableImageView @JvmOverloads constructor(
             (event.x < edgeGuardPx || event.x > width - edgeGuardPx)
         ) {
             return false
+        }
+        if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+            suppressLongPress = false
+            scaledTouch = false
         }
         scaleGesture.onTouchEvent(event)
         gesture.onTouchEvent(event)
