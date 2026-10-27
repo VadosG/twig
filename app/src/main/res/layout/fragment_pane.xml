@@ -34,6 +34,20 @@
             android:ellipsize="start"
             android:textColor="@color/white"
             android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_selection_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:drawableEnd="@drawable/ic_sel_check"
+            android:drawableTint="@color/accent"
+            android:drawablePadding="2dp"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:visibility="gone" />
     </LinearLayout>
 
     <FrameLayout

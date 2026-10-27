@@ -260,7 +260,10 @@ class PaneFragment : Fragment() {
                 if (host?.shortcutResult != null) host?.onPickNode(node)
                 else onLongClick(node)
             },
-            onSelectionChanged = { host?.onSelectionChanged() },
+            onSelectionChanged = {
+                updateSelectionCount()
+                host?.onSelectionChanged()
+            },
             onInfoTab = { node, idx -> viewModel.selectInfoTab(node, idx) },
             onInfoHash = { node -> viewModel.computeHash(node) },
             onInfo = { node -> viewModel.toggleInfo(node) },
@@ -287,6 +290,12 @@ class PaneFragment : Fragment() {
         b.list.addItemDecoration(CurrentDirFrame(requireContext()))
 
         installGestures()
+        // Match the list checkbox's 36dp width minus its 8dp padding on each side.
+        b.tvSelectionCount.compoundDrawablesRelative[2]?.let { check ->
+            val size = (20 * resources.displayMetrics.density).toInt()
+            check.setBounds(0, 0, size, size)
+            b.tvSelectionCount.setCompoundDrawablesRelative(null, null, check, null)
+        }
         b.pathBar.setOnLongClickListener { editCurrentPath() }
         val pathGestures = GestureDetector(requireContext(), object : GestureDetector.SimpleOnGestureListener() {
             override fun onDown(e: MotionEvent) = true
@@ -395,7 +404,16 @@ class PaneFragment : Fragment() {
         v.setBackgroundResource(if (active) R.color.path_bar_active else R.color.path_bar)
     }
 
+    private fun updateSelectionCount() {
+        val bb = _b ?: return
+        val count = if (mapMode) mapSelected.size else adapter.selectedItems().size
+        bb.tvSelectionCount.text = if (count > 0) count.toString() else ""
+        bb.tvSelectionCount.contentDescription = if (count > 0) getString(R.string.title_selected_count, count) else null
+        bb.tvSelectionCount.visibility = if (count > 0) View.VISIBLE else View.GONE
+    }
+
     private fun render(s: PaneViewModel.State) {
+        updateSelectionCount()
         b.tvPath.text = s.currentDir?.let { pathLabel(it) } ?: ""
         b.ivPathIcon.setImageResource(
             s.currentDir?.let { pathIcon(it) } ?: R.drawable.ic_folder,
@@ -761,6 +779,7 @@ class PaneFragment : Fragment() {
 
     private fun enterTreemap(target: XFile) {
         mapMode = true
+        updateSelectionCount()
         b.list.visibility = View.GONE
         b.tvEmpty.visibility = View.GONE
         host?.onClipTargetChanged()
@@ -847,6 +866,7 @@ class PaneFragment : Fragment() {
     private fun toggleMapSelection(e: TreemapEntry) {
         if (!mapSelected.remove(e)) mapSelected.add(e)
         b.map.selectedKeys = mapSelected.mapTo(HashSet()) { TreemapView.keyOf(it) }
+        updateSelectionCount()
         // Tile selection is the same input as the tree's checks (see selectionOrCurrent), so the host's write actions follow it too.
         host?.onSelectionChanged()
     }
@@ -855,6 +875,7 @@ class PaneFragment : Fragment() {
         if (mapSelected.isEmpty()) return
         mapSelected.clear()
         _b?.map?.selectedKeys = emptySet()
+        updateSelectionCount()
         host?.onSelectionChanged()
     }
 
