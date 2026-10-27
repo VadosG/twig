@@ -356,7 +356,7 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
             return
         }
         if (Prefs.exitOnBack(this)) {
-            confirmExit()
+            confirmExit(alwaysConfirm = true)
             return
         }
         @Suppress("DEPRECATION") super.onBackPressed()
@@ -700,22 +700,14 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
         com.twig.app.ui.CompareActivity.start(this, if (reversed) r else l, if (reversed) l else r)
     }
 
-    /**
-     * Exit confirmation.
-     *
-     * **If nothing is running, don't ask** (just exit) — at that point the confirmation
-     * dialog prevents no real loss, it's just one extra step. If music is playing, a
-     * terminal session is open, sharing is on, or files are transferring, list them
-     * so the user can see exactly what's about to be lost, and offer the "lock instead"
-     * exit, which doesn't interrupt any of that.
-     */
-    private fun confirmExit() {
+    /** Back-triggered exits always ask; explicit exit shortcuts ask only when tasks are running. */
+    private fun confirmExit(alwaysConfirm: Boolean = false) {
         val running = com.twig.app.ui.AppExit.running(this)
-        if (running.isEmpty()) {
+        if (running.isEmpty() && !alwaysConfirm) {
             com.twig.app.ui.AppExit.quit(this)
             return
         }
-        val canLock = com.twig.app.secure.Secrets.hasMasterPassword(this)
+        val canLock = running.isNotEmpty() && com.twig.app.secure.Secrets.hasMasterPassword(this)
         val msg = buildString {
             append(getString(R.string.exit_note))
             running.forEach { append("\n  • ").append(it) }
@@ -723,7 +715,7 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
         }
         AlertDialog.Builder(this)
             .setTitle(R.string.exit_title)
-            .setMessage(msg)
+            .setMessage(msg.takeIf { running.isNotEmpty() })
             .setPositiveButton(R.string.exit_confirm) { _, _ -> com.twig.app.ui.AppExit.quit(this) }
             .apply {
                 // "Lock instead" is the "don't interrupt anything" path; it's only available when

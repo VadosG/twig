@@ -1098,7 +1098,7 @@
     <string name="settings_foreground_completion_desc">Cũng thông báo khi đang dùng Twig. Luôn thông báo khi chạy nền hoặc màn hình bị khóa.</string>
 
     <string name="settings_exit_on_back">Thoát khi nhấn Quay lại</string>
-    <string name="settings_exit_on_back_desc">Thoát Twig khi nút Quay lại đóng màn hình chính. Yêu cầu xác nhận nếu có tác vụ đang chạy.</string>
+    <string name="settings_exit_on_back_desc">Yêu cầu xác nhận trước khi thoát Twig khi nút Quay lại đóng màn hình chính.</string>
     <string name="share_text_filename">Văn bản được chia sẻ.txt</string>
     <string name="settings_toolbar_bottom">Thanh công cụ ở dưới</string>
     <string name="settings_toolbar_bottom_desc">Chuyển thanh công cụ của trình duyệt tệp xuống dưới để dễ sử dụng bằng một tay</string>

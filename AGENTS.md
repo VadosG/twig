@@ -337,7 +337,7 @@ each write `= null`.
   the main layout while retaining pane ViewModels.
   The default-off `Prefs.exitOnBack` applies
   only to the main screen: after pane-local Back handling, it reuses `confirmExit`
-  (active tasks require confirmation). Music keeps its long-press Shuffle exit shortcut.
+  (Back-triggered exits always require confirmation; explicit exit shortcuts ask only with active tasks). Music keeps its long-press Shuffle exit shortcut.
   Layout-affecting preferences (row height,
   grid, thumbnails) go through `Prefs.uiSignature` — `MainActivity.onResume` compares the
   signature and calls `recreate()` on change; in `PaneFragment.onViewCreated`, **when the

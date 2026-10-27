@@ -1099,7 +1099,7 @@
     <string name="settings_foreground_completion_desc">Twig 사용 중에도 알립니다. 백그라운드 및 화면 잠금 상태에서는 항상 알립니다.</string>
 
     <string name="settings_exit_on_back">뒤로 가기로 종료</string>
-    <string name="settings_exit_on_back_desc">뒤로 가기로 메인 화면을 닫을 때 Twig를 종료합니다. 실행 중인 작업이 있으면 확인합니다.</string>
+    <string name="settings_exit_on_back_desc">뒤로 가기로 메인 화면을 닫을 때 확인 후 Twig를 종료합니다.</string>
     <string name="share_text_filename">공유 텍스트.txt</string>
     <string name="settings_toolbar_bottom">도구 모음을 하단에 배치</string>
     <string name="settings_toolbar_bottom_desc">한 손으로 쉽게 사용할 수 있도록 파일 탐색기의 도구 모음을 하단으로 이동</string>
