@@ -462,6 +462,7 @@ object Transfers {
                 cancelled = cancelled, openIntent = MainActivity.transferIntent(ctx),
                 showToast = !s.isShare || (error != null && !cancelled),
                 allowVibration = s.preparedShare?.cacheOnly != true,
+                failed = error != null,
             )
             onComplete()
             u?.onFinished(s)

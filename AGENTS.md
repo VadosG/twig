@@ -345,7 +345,8 @@ each write `= null`.
   recreate the VM survives, and a second bootstrap is either skipped by an internal guard
   or breaks position restoration).
 - Transfer retries: failed copy/move/sync operations offer “Retry unfinished items” directly in
-  the failure dialog, along with the exact failing destination and “Skip this item”. Skipping
+  the failure dialog, along with the exact failing destination and “Skip this item”. Outside
+  touches must not dismiss this dialog or discard its partial files. Skipping
   continues the remaining entries and keeps the skipped source (including its containing move
   directory); repeated failures identify the next entry independently. `TransferCheckpoint` belongs
   to that operation in memory only; there is no task history or persisted queue. Completed roots/files are skipped on retry; owned UUID
@@ -358,7 +359,9 @@ each write `= null`.
   screen/keyguard state; a detached progress dialog does not mean the app is in the
   background. Foreground completion notifications and completion vibration are
   independent, default-off preferences. Background/locked-screen results retain a
-  notification; completion also requests a toast regardless of app visibility.
+  notification; transfer failures also retain a notification in the foreground, independently of the
+  successful-completion notification preference. Cancellation still suppresses result alerts.
+  Completion also requests a toast regardless of app visibility.
   Running transfers always keep their progress notification.
   `Transfers.finish` handles feedback and service shutdown on the main thread before
   notifying UI observers, which only refresh their views. Never decide whether to
