@@ -1113,4 +1113,10 @@
     <string name="directory_view_recursive">Auf Unterordner anwenden</string>
     <string name="sort_name_az">Name: A → Z</string>
     <string name="sort_name_za">Name: Z → A</string>
+
+    <!-- Preparing files for system sharing -->
+    <string name="share_preparing">Freigabe wird vorbereitet…</string>
+    <string name="share_prepare_failed">Dateien konnten nicht zur Freigabe vorbereitet werden.</string>
+    <string name="share_prepare_space">Nicht genügend Speicherplatz zur Vorbereitung der Freigabe.</string>
+    <string name="share_prepare_incomplete">Die Datei wurde geändert oder konnte nicht vollständig gelesen werden.</string>
 </resources>

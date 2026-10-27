@@ -164,7 +164,7 @@ object OpenFiles {
         return MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext) ?: "*/*"
     }
 
-    /** Share to another app (also via [StreamProvider] for streamed authorization, no whole-file cache). */
+    /** Share readable local files directly; prepare other sources with visible progress first. */
     fun share(context: Context, file: XFile) {
         share(context, listOf(file))
     }
@@ -172,6 +172,15 @@ object OpenFiles {
     /** Multiple streams keep their individual URI grants, including across backends. */
     fun share(context: Context, files: List<XFile>) {
         require(files.isNotEmpty() && files.none { it.isDir })
+        if (files.any { !directlyReadable(it) }) {
+            com.twig.app.ui.ShareTransfers.start(context, files)
+            return
+        }
+        sharePrepared(context, files)
+    }
+
+    /** Called only once every source is ready; "open with" keeps its separate streaming path. */
+    internal fun sharePrepared(context: Context, files: List<XFile>) {
         val uris = ArrayList(files.map { StreamProvider.uriFor(context, it) })
         val types = files.map { mimeOf(it.name) }.distinct()
         val majorTypes = types.map { it.substringBefore('/') }.distinct()

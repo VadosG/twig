@@ -1113,4 +1113,10 @@
     <string name="directory_view_recursive">सबफ़ोल्डर पर लागू करें</string>
     <string name="sort_name_az">नाम: A → Z</string>
     <string name="sort_name_za">नाम: Z → A</string>
+
+    <!-- Preparing files for system sharing -->
+    <string name="share_preparing">साझा करने की तैयारी…</string>
+    <string name="share_prepare_failed">साझा करने के लिए फ़ाइलें तैयार नहीं हो सकीं।</string>
+    <string name="share_prepare_space">फ़ाइलें तैयार करने के लिए पर्याप्त जगह नहीं है।</string>
+    <string name="share_prepare_incomplete">फ़ाइल बदल गई है या पूरी तरह पढ़ी नहीं जा सकी।</string>
 </resources>

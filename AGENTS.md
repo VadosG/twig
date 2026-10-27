@@ -294,6 +294,19 @@ each write `= null`.
   and history to the active pane, while compress and WiFi sharing stay hidden.
   The share picker follows `Prefs.fullscreen` through `StatusBarFullscreen`, including
   resume and window-focus changes.
+  Outgoing system sharing prepares sources that are not directly readable local files
+  in a separate cache as `Transfers.Work.Share`, using `TransferService` and `TransferBox`
+  for progress, cancellation, background execution and notification reopening. A headless
+  `ShareTransfers` fragment only bridges resumed UI to the completed local URIs; there
+  is no separate share dialog/ViewModel. Finished shares retain their cache leases until
+  handoff, independently of ordinary transfer results. Preparation completion suppresses
+  the success toast; notification and vibration follow ordinary operation preferences,
+  except an entirely cached share does not vibrate.
+  Preparation errors still show a toast.
+  Completed files are reused by scheme/path/name/size/mtime when size and time are
+  known; partial files are removed on failure/cancellation. Cache hits refresh the
+  24-hour idle retention, and the next preparation prunes expired files except those
+  held by an active preparation. "Open with" continues to stream.
   Incoming `content://` URIs are all carried by `ShareSourceFileSystem` (scheme `share`),
   whose `openRandom` seeks through `openFileDescriptor` — so archives are parsed
   streaming without materializing and video can seek.

@@ -1189,4 +1189,10 @@
     <string name="directory_view_recursive">Apply to subdirectories</string>
     <string name="sort_name_az">Name: A → Z</string>
     <string name="sort_name_za">Name: Z → A</string>
+
+    <!-- Preparing files for system sharing -->
+    <string name="share_preparing">Preparing to share…</string>
+    <string name="share_prepare_failed">Could not prepare files for sharing.</string>
+    <string name="share_prepare_space">Not enough space to prepare files for sharing.</string>
+    <string name="share_prepare_incomplete">The file changed or could not be read completely.</string>
 </resources>

@@ -1113,4 +1113,10 @@
     <string name="directory_view_recursive">Applica alle sottocartelle</string>
     <string name="sort_name_az">Nome: A → Z</string>
     <string name="sort_name_za">Nome: Z → A</string>
+
+    <!-- Preparing files for system sharing -->
+    <string name="share_preparing">Preparazione della condivisione…</string>
+    <string name="share_prepare_failed">Impossibile preparare i file da condividere.</string>
+    <string name="share_prepare_space">Spazio insufficiente per preparare i file da condividere.</string>
+    <string name="share_prepare_incomplete">Il file è cambiato o non è stato letto completamente.</string>
 </resources>

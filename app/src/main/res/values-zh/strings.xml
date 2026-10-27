@@ -1143,4 +1143,10 @@
     <string name="directory_view_recursive">应用到子目录</string>
     <string name="sort_name_az">名称：A → Z</string>
     <string name="sort_name_za">名称：Z → A</string>
+
+    <!-- Preparing files for system sharing -->
+    <string name="share_preparing">正在准备分享…</string>
+    <string name="share_prepare_failed">无法准备要分享的文件。</string>
+    <string name="share_prepare_space">空间不足，无法准备要分享的文件。</string>
+    <string name="share_prepare_incomplete">文件已更改或未能完整读取。</string>
 </resources>

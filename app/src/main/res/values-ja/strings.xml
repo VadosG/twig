@@ -1113,4 +1113,10 @@
     <string name="directory_view_recursive">サブフォルダにも適用</string>
     <string name="sort_name_az">名前：A → Z</string>
     <string name="sort_name_za">名前：Z → A</string>
+
+    <!-- Preparing files for system sharing -->
+    <string name="share_preparing">共有の準備中…</string>
+    <string name="share_prepare_failed">共有するファイルを準備できませんでした。</string>
+    <string name="share_prepare_space">共有するファイルを準備する空き容量がありません。</string>
+    <string name="share_prepare_incomplete">ファイルが変更されたか、完全に読み取れませんでした。</string>
 </resources>

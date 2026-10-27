@@ -1113,4 +1113,10 @@
     <string name="directory_view_recursive">Alt klasörlere uygula</string>
     <string name="sort_name_az">Ad: A → Z</string>
     <string name="sort_name_za">Ad: Z → A</string>
+
+    <!-- Preparing files for system sharing -->
+    <string name="share_preparing">Paylaşım hazırlanıyor…</string>
+    <string name="share_prepare_failed">Paylaşılacak dosyalar hazırlanamadı.</string>
+    <string name="share_prepare_space">Dosyaları hazırlamak için yeterli alan yok.</string>
+    <string name="share_prepare_incomplete">Dosya değişti veya tamamen okunamadı.</string>
 </resources>

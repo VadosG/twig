@@ -1113,4 +1113,10 @@
     <string name="directory_view_recursive">Terapkan ke subfolder</string>
     <string name="sort_name_az">Nama: A → Z</string>
     <string name="sort_name_za">Nama: Z → A</string>
+
+    <!-- Preparing files for system sharing -->
+    <string name="share_preparing">Menyiapkan berbagi…</string>
+    <string name="share_prepare_failed">Tidak dapat menyiapkan file untuk dibagikan.</string>
+    <string name="share_prepare_space">Ruang tidak cukup untuk menyiapkan file.</string>
+    <string name="share_prepare_incomplete">File berubah atau tidak dapat dibaca sepenuhnya.</string>
 </resources>

@@ -1113,4 +1113,10 @@
     <string name="directory_view_recursive">Aplicar às subpastas</string>
     <string name="sort_name_az">Nome: A → Z</string>
     <string name="sort_name_za">Nome: Z → A</string>
+
+    <!-- Preparing files for system sharing -->
+    <string name="share_preparing">Preparando para compartilhar…</string>
+    <string name="share_prepare_failed">Não foi possível preparar os arquivos para compartilhar.</string>
+    <string name="share_prepare_space">Espaço insuficiente para preparar os arquivos.</string>
+    <string name="share_prepare_incomplete">O arquivo foi alterado ou não pôde ser lido completamente.</string>
 </resources>

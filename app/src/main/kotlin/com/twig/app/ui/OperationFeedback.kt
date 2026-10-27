@@ -41,13 +41,14 @@ object OperationFeedback : Application.ActivityLifecycleCallbacks {
     @MainThread
     fun finished(
         ctx: Context, title: String, message: String, details: String = message,
-        cancelled: Boolean = false, openIntent: Intent? = null,
+        cancelled: Boolean = false, openIntent: Intent? = null, showToast: Boolean = true,
+        allowVibration: Boolean = true,
     ) {
         val app = ctx.applicationContext
         val visible = foreground(app)
-        Toast.makeText(app, message, Toast.LENGTH_SHORT).show()
+        if (showToast) Toast.makeText(app, message, Toast.LENGTH_SHORT).show()
         if (cancelled) return
-        if (Prefs.vibrateOnCompletion(app)) vibrate(app)
+        if (allowVibration && Prefs.vibrateOnCompletion(app)) vibrate(app)
         if (visible && !Prefs.foregroundCompletionNotifications(app)) return
 
         val nm = app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

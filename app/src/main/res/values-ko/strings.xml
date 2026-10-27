@@ -1113,4 +1113,10 @@
     <string name="directory_view_recursive">하위 폴더에 적용</string>
     <string name="sort_name_az">이름: A → Z</string>
     <string name="sort_name_za">이름: Z → A</string>
+
+    <!-- Preparing files for system sharing -->
+    <string name="share_preparing">공유 준비 중…</string>
+    <string name="share_prepare_failed">공유할 파일을 준비하지 못했습니다.</string>
+    <string name="share_prepare_space">공유할 파일을 준비할 공간이 부족합니다.</string>
+    <string name="share_prepare_incomplete">파일이 변경되었거나 완전히 읽을 수 없습니다.</string>
 </resources>

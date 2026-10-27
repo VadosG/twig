@@ -636,8 +636,8 @@ class PaneFragment : Fragment() {
     }
 
     /**
-     * System share: via [com.twig.app.StreamProvider]'s streaming grant, files inside SMB / archives / S3 can be sent to other apps
-     * **without being materialized to a temp file**. This is a different thing from the per-directory "WiFi sharing" item
+     * System share: prepare nonlocal sources with progress, then grant the receiving app access.
+     * This is a different thing from the per-directory "WiFi sharing" item
      * (which is for letting other devices connect to this one).
      */
     private fun shareFile(file: XFile) {
@@ -1380,6 +1380,7 @@ class PaneFragment : Fragment() {
     fun showTransferBox() {
         // `active` is cleared by the transfer thread (right at completion); copy it locally before checking, don't crash on `!!`.
         val session = Transfers.active ?: return
+        if (session.isShare) { ShareTransfers.attach(requireContext(), reveal = true); return }
         if (_b == null || Transfers.ui != null) return
         progressBox = TransferBox(
             requireContext(), layoutInflater, session,

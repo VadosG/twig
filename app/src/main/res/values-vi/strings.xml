@@ -1112,4 +1112,10 @@
     <string name="directory_view_recursive">Áp dụng cho thư mục con</string>
     <string name="sort_name_az">Tên: A → Z</string>
     <string name="sort_name_za">Tên: Z → A</string>
+
+    <!-- Preparing files for system sharing -->
+    <string name="share_preparing">Đang chuẩn bị chia sẻ…</string>
+    <string name="share_prepare_failed">Không thể chuẩn bị tệp để chia sẻ.</string>
+    <string name="share_prepare_space">Không đủ dung lượng để chuẩn bị tệp.</string>
+    <string name="share_prepare_incomplete">Tệp đã thay đổi hoặc không thể đọc đầy đủ.</string>
 </resources>

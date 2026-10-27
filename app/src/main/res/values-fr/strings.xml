@@ -1113,4 +1113,10 @@
     <string name="directory_view_recursive">Appliquer aux sous-dossiers</string>
     <string name="sort_name_az">Nom : A → Z</string>
     <string name="sort_name_za">Nom : Z → A</string>
+
+    <!-- Preparing files for system sharing -->
+    <string name="share_preparing">Préparation du partage…</string>
+    <string name="share_prepare_failed">Impossible de préparer les fichiers à partager.</string>
+    <string name="share_prepare_space">Espace insuffisant pour préparer les fichiers à partager.</string>
+    <string name="share_prepare_incomplete">Le fichier a changé ou sa lecture est incomplète.</string>
 </resources>

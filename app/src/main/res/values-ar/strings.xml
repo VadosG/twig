@@ -1117,4 +1117,10 @@
     <string name="directory_view_recursive">تطبيق على المجلدات الفرعية</string>
     <string name="sort_name_az">الاسم: A → Z</string>
     <string name="sort_name_za">الاسم: Z → A</string>
+
+    <!-- Preparing files for system sharing -->
+    <string name="share_preparing">جارٍ التحضير للمشاركة…</string>
+    <string name="share_prepare_failed">تعذر تحضير الملفات للمشاركة.</string>
+    <string name="share_prepare_space">لا توجد مساحة كافية لتحضير الملفات.</string>
+    <string name="share_prepare_incomplete">تغير الملف أو تعذرت قراءته بالكامل.</string>
 </resources>

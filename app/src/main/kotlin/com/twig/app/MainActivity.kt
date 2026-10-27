@@ -407,6 +407,7 @@ class MainActivity : AppCompatActivity(), PaneFragment.Host {
     }
 
     private fun consumeFinishedTransfer() {
+        com.twig.app.ui.ShareTransfers.attach(this)
         activePane()?.takeIf { it.isReady() }?.let { pane ->
             com.twig.app.ui.Transfers.consumeFinished()?.let { pane.finishTransfer(it) }
         }

@@ -17,6 +17,22 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [24, 34])
 class OpenFilesShareTest {
+    private val hosts = mutableListOf<org.robolectric.android.controller.ActivityController<Activity>>()
+    private fun activity(): Activity = Robolectric.buildActivity(Activity::class.java).setup().also(hosts::add).get()
+    @org.junit.After fun cleanup() { hosts.forEach { it.pause().stop().destroy() } }
+
+    @Test
+    fun `readable local file opens sharing directly`() {
+        val activity = activity()
+        val local = java.io.File(activity.cacheDir, "direct.txt").apply { writeText("ready") }
+        val file = XFile("file", local.path, false, local.length())
+        OpenFiles.share(activity, file)
+        val chooser = shadowOf(activity).nextStartedActivity
+        val send = chooser.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)!!
+        assertEquals(Intent.ACTION_SEND, send.action)
+        assertEquals(StreamProvider.uriFor(activity, file), send.getParcelableExtra<Uri>(Intent.EXTRA_STREAM))
+    }
+
     @Test
     fun `multiple streams carry URI grants and a common MIME type`() {
         // Robolectric's MIME map starts empty, unlike Android's system map.
@@ -25,9 +41,9 @@ class OpenFilesShareTest {
             addExtensionMimeTypeMapping("png", "image/png")
             addExtensionMimeTypeMapping("txt", "text/plain")
         }
-        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val activity = activity()
         val files = listOf(XFile("file", "/a.jpg", false), XFile("smb-test", "/b.png", false))
-        OpenFiles.share(activity, files)
+        OpenFiles.sharePrepared(activity, files)
         val chooser = shadowOf(activity).nextStartedActivity
         val send = chooser.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)!!
         assertEquals(Intent.ACTION_SEND_MULTIPLE, send.action)
@@ -38,7 +54,7 @@ class OpenFilesShareTest {
         streams.forEachIndexed { index, uri -> assertEquals(uri, send.clipData!!.getItemAt(index).uri) }
         assertTrue(send.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION != 0)
 
-        OpenFiles.share(activity, files + XFile("file", "/c.txt", false))
+        OpenFiles.sharePrepared(activity, files + XFile("file", "/c.txt", false))
         val mixed = shadowOf(activity).nextStartedActivity.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)!!
         assertEquals("*/*", mixed.type)
     }
